@@ -16,6 +16,13 @@ type Product = {
   description: string
 }
 
+interface Variant {
+  type: string;
+  value: string;
+  label: string;
+  price?: number;
+}
+
 export default function ProductDetailPage() {
   const { slug } = useParams()
   const [product, setProduct] = useState<Product | null>(null)
@@ -26,8 +33,8 @@ export default function ProductDetailPage() {
   const [selectedMemory, setSelectedMemory] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [tab, setTab] = useState<'desc'|'profile'|'review'|'related'>('desc')
-  const [colors, setColors] = useState([]);
-  const [memories, setMemories] = useState([]);
+  const [colors, setColors] = useState<Variant[]>([]);
+  const [memories, setMemories] = useState<Variant[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -59,9 +66,10 @@ export default function ProductDetailPage() {
     const fetchVariants = async () => {
       if (!product) return;
       const res = await api.get(`/product-variant?productId=${product.id}`);
-      // Giả sử res.data là mảng variant, mỗi variant có type: 'color' hoặc 'memory'
-      setColors(res.data.filter(v => v.type === 'color'));
-      setMemories(res.data.filter(v => v.type === 'memory'));
+      // Ép kiểu res.data về Variant[]
+      const variants = res.data as Variant[];
+      setColors(variants.filter(v => v.type === 'color'));
+      setMemories(variants.filter(v => v.type === 'memory'));
     };
     fetchVariants();
   }, [product]);
@@ -151,9 +159,9 @@ export default function ProductDetailPage() {
                 <span className="text-danger ms-3 fw-bold">FREE GIFT</span>
               </div>
               <div className="mb-3">
-                <span className="fw-bold">COLOR: {selectedColor ? COLORS.find(c => c.value === selectedColor)?.label : ''}</span>
+                <span className="fw-bold">COLOR: {selectedColor ? colors.find((c: Variant) => c.value === selectedColor)?.label : ''}</span>
                 <div className="d-flex flex-wrap gap-2 mt-1">
-                  {colors.map(c => (
+                  {colors.map((c: Variant) => (
                     <label key={c.value} className={`btn option-btn${selectedColor === c.value ? ' active' : ''} rounded-3 px-3 py-2`} style={{minWidth:120}}>
                       <input type="radio" name="color" value={c.value} checked={selectedColor === c.value} onChange={() => setSelectedColor(c.value)} className="d-none" />
                       <div>{c.label}</div>
@@ -163,9 +171,9 @@ export default function ProductDetailPage() {
                 </div>
               </div>
               <div className="mb-3">
-                <span className="fw-bold">MEMORY SIZE: {selectedMemory ? MEMORY.find(m => m.value === selectedMemory)?.label : ''}</span>
+                <span className="fw-bold">MEMORY SIZE: {selectedMemory ? memories.find((m: Variant) => m.value === selectedMemory)?.label : ''}</span>
                 <div className="d-flex flex-wrap gap-2 mt-1">
-                  {memories.map(m => (
+                  {memories.map((m: Variant) => (
                     <label key={m.value} className={`btn option-btn${selectedMemory === m.value ? ' active' : ''} rounded-3 px-3 py-2 fw-bold`} style={{minWidth:90}}>
                       <input type="radio" name="memory" value={m.value} checked={selectedMemory === m.value} onChange={() => setSelectedMemory(m.value)} className="d-none" />
                       {m.label}

@@ -18,6 +18,12 @@ interface Product {
   category?: string
 }
 
+interface FilterOptions {
+  search: string
+  category: string
+  maxPrice: string
+}
+
 export default function HomePage() {
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -60,10 +66,10 @@ export default function HomePage() {
     fetchData()
   }, [])
 
-  const handleFilter = (filters: { search: string; category: string; maxPrice: string }) => {
+  const handleFilter = (filters: FilterOptions) => {
     const { search, category, maxPrice } = filters
 
-    const filtered = allProducts.filter((product) => {
+    const filtered = allProducts.filter((product: Product) => {
       const matchSearch = product.name.toLowerCase().includes(search.toLowerCase())
       const matchCategory = category ? product.category?.toLowerCase() === category : true
       const matchPrice = maxPrice ? product.price <= parseInt(maxPrice, 10) : true
@@ -94,7 +100,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="row">
-                {currentProducts.map((product) => (
+                {currentProducts.map((product: Product) => (
                   <div className="col-md-3 mb-4" key={product.id}>
                     <div className="card h-100">
                       <Image
