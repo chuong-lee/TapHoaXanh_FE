@@ -11,14 +11,30 @@ export type CartItem = {
   images: string
   discount: number
   description: string
+  variant_id?: number
+  variant_name?: string
+  stock?: number
 }
 
 export function useCart() {
-  const [cart, setCart] = useState<CartItem[]>([])
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const local = localStorage.getItem("cart_local")
-    if (local) setCart(JSON.parse(local))
+    if (local) {
+      let parsed: CartItem[] = []
+      try {
+        parsed = JSON.parse(local)
+        // Lọc bỏ các sản phẩm mẫu nếu có
+        parsed = parsed.filter(item => item.slug !== 'SPM9' && item.slug !== 'SPM1')
+        setCart(parsed)
+        // Ghi đè lại localStorage nếu có sản phẩm mẫu
+        localStorage.setItem("cart_local", JSON.stringify(parsed))
+      } catch {
+        setCart([])
+        localStorage.removeItem("cart_local")
+      }
+    }
   }, [])
 
   const saveToLocal = (items: CartItem[]) => {
@@ -26,16 +42,16 @@ export function useCart() {
     setCart(items)
   }
 
-  const addToCart = (product: Omit<CartItem, "quantity">) => {
+  const addToCart = (product: Omit<CartItem, "quantity">, quantity: number = 1) => {
     const existing = cart.find((item) => item.slug === product.slug)
     let updatedCart
 
     if (existing) {
       updatedCart = cart.map((item) =>
-        item.slug === product.slug ? { ...item, quantity: item.quantity + 1 } : item
+        item.slug === product.slug ? { ...item, quantity: item.quantity + quantity } : item
       )
     } else {
-      updatedCart = [...cart, { ...product, quantity: 1 }]
+      updatedCart = [...cart, { ...product, quantity }]
     }
 
     saveToLocal(updatedCart)
@@ -46,6 +62,14 @@ export function useCart() {
     saveToLocal(updatedCart)
   }
 
+  const updateQuantity = (slug: string, quantity: number) => {
+    if (quantity < 1) return;
+    const updatedCart = cart.map(item => 
+      item.slug === slug ? { ...item, quantity } : item
+    );
+    saveToLocal(updatedCart);
+  };
+
   const syncWithDatabase = async () => {
     try {
       await api.post("/api/cart/sync", cart)
@@ -55,5 +79,5 @@ export function useCart() {
     }
   }
 
-  return { cart, addToCart, removeFromCart, syncWithDatabase }
+  return { cart, addToCart, removeFromCart, updateQuantity, syncWithDatabase }
 }
