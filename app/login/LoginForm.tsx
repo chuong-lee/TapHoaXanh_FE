@@ -13,7 +13,7 @@ function LoginForm() {
   const passwordRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/main/cart'
+  const redirectTo = searchParams.get('redirect') || '/home'
 
   const handleLogin = async (e:FormEvent) => {
     e.preventDefault()
