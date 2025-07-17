@@ -1,5 +1,5 @@
-import '../assets/css/dashboard.css';
 import Nav from '../nav/Nav';
+
 
 const loadDashboard = [
   {
@@ -37,7 +37,7 @@ function Dashboard() {
       <div className="row">
         {
           loadDashboard.map((item)=>(
-<>
+
 
 <div className="col-xl-3 col-sm-3 mb-xl-0 mb-4" key={item.id}>
           <div className="card">
@@ -60,7 +60,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-</>
+
           ))
         }
         
@@ -81,7 +81,6 @@ function Dashboard() {
                     <td className="w-30">
                       <div className="d-flex px-2 py-1 align-items-center">
                         <div>
-                          <img src="../assets/img/icons/flags/US.png" alt="Country flag"/>
                         </div>
                         <div className="ms-4">
                           <p className="text-xs font-weight-bold mb-0">Tên sản phẩm:</p>
