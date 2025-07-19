@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
-import Pagination from '@/components/Pagination'
 
 function fixImgSrc(img: string) {
   if (!img) return '/images/placeholder.png';
@@ -35,10 +34,9 @@ interface Product {
 
 export default function HomePage() {
   const router = useRouter()
-  const [allProducts, setAllProducts] = useState<Product[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
+  const currentPage = 1
   const itemsPerPage = 20
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -60,10 +58,8 @@ export default function HomePage() {
           console.error('❌ Dữ liệu sản phẩm không hợp lệ:', data)
         }
         console.log('Products loaded:', productList)
-        setAllProducts(productList)
         setProducts(productList)
-      } catch (err: unknown) {
-        setAllProducts([])
+      } catch {
         setProducts([])
       } finally {
         setLoading(false)
@@ -76,7 +72,7 @@ export default function HomePage() {
       try {
         const res = await api.get('/categories');
         setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
-      } catch (err) {
+      } catch {
         setCategories([]);
       }
     };
@@ -156,7 +152,7 @@ export default function HomePage() {
       <section className="container mb-5">
         <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Featured Categories</h2>
         <div className="categories-scroll d-flex flex-nowrap gap-3">
-          {categories.map((cat, idx) => (
+          {categories.map((cat) => (
             <div
               className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
               key={cat.name}
@@ -254,7 +250,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="product-list-grid">
-            {currentProducts.map((product, idx) => (
+            {currentProducts.map((product) => (
               <div className="custom-product-card" key={product.id}>
                 <span className="badge-hot">Hot</span>
                 <div className="product-image">
@@ -346,19 +342,25 @@ export default function HomePage() {
           <div className="featured-product-list">
             {/* Banner ngoài cùng bên trái */}
             <div className="featured-product-card banner-in-grid">
-              <img
+              <Image
                 src="/client/images/banne-milk.png"
                 alt="Banner"
+                width={200}
+                height={200}
                 className="banner-img-in-grid"
+                style={{objectFit: 'cover'}}
               />
             </div>
             {/* Các sản phẩm còn lại */}
-            {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product, idx) => (
+            {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product) => (
               <div className="featured-product-card" key={product.id}>
                 <div className="featured-product-image">
-                  <img
+                  <Image
                     src={fixImgSrc(product.images)}
                     alt={product.name}
+                    width={140}
+                    height={140}
+                    style={{objectFit: 'contain'}}
                   />
                 </div>
                 <div className="brand-row">
@@ -405,7 +407,7 @@ export default function HomePage() {
               Stay home & get your daily<br />needs from our shop
             </h2>
             <div className="mb-3 text-secondary" style={{fontSize: '1.1rem'}}>
-              Sffart You'r Shopping with <span style={{color: '#e11d48', fontWeight: 700}}>brsmaket</span>
+              Start You&apos;r Shopping with <span style={{color: '#e11d48', fontWeight: 700}}>brsmaket</span>
             </div>
             <form className="d-flex" style={{maxWidth: 400}}>
               <div className="position-relative flex-grow-1">
@@ -443,9 +445,11 @@ export default function HomePage() {
             </form>
           </div>
           <div className="col-md-5 text-center">
-            <img
+            <Image
               src="/images/girl-red-hoodie.png"
               alt="Girl in red hoodie"
+              width={300}
+              height={280}
               style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
             />
           </div>

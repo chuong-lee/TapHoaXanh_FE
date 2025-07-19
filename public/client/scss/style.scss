@@ -281,13 +281,10 @@ a {
 }
 
 body {
-<<<<<<< Updated upstream
-=======
-  
->>>>>>> Stashed changes
   font-size: 12px;
   overflow-x: hidden;
-  background-color: white;
+  background-color: white !important;
+
 }
 
 //global class
@@ -2475,10 +2472,7 @@ section {
   }
 }
 
-<<<<<<< Updated upstream
-=======
-// Footer styles
->>>>>>> Stashed changes
+
 .footer {
   background: #fff;
   font-family: 'Roboto', Arial, sans-serif;

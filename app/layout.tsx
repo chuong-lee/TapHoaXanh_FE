@@ -1,6 +1,6 @@
 // 📁 layout.tsx
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono } from "next/font/google"
 import "bootstrap/dist/css/bootstrap.min.css"
 // import "@/public/client/css/all.min.css"
 // import "@/public/client/css/hover-min.css"
@@ -9,13 +9,13 @@ import "bootstrap/dist/css/bootstrap.min.css"
 // import "@/public/client/fonts/fontstyle.css"
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 })
 
@@ -41,7 +41,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         {children}
       </body>
     </html>

@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch (e) {
+      } catch {
         setVariants([]);
       }
     };
@@ -235,12 +235,12 @@ export default function ProductDetailPage() {
                   <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
                 </div>
                 <div className="mt-2 d-flex gap-2">
-                  <a href="#"><img src="/images/social-fb.png" alt="fb" width={28} /></a>
-                  <a href="#"><img src="/images/social-ig.png" alt="ig" width={28} /></a>
-                  <a href="#"><img src="/images/social-x.png" alt="x" width={28} /></a>
-                  <a href="#"><img src="/images/social-yt.png" alt="yt" width={28} /></a>
-                  <a href="#"><img src="/images/social-tg.png" alt="tg" width={28} /></a>
-                  <a href="#"><img src="/images/social-in.png" alt="in" width={28} /></a>
+                  <a href="#"><Image src="/images/social-fb.png" alt="fb" width={28} height={28} /></a>
+                  <a href="#"><Image src="/images/social-ig.png" alt="ig" width={28} height={28} /></a>
+                  <a href="#"><Image src="/images/social-x.png" alt="x" width={28} height={28} /></a>
+                  <a href="#"><Image src="/images/social-yt.png" alt="yt" width={28} height={28} /></a>
+                  <a href="#"><Image src="/images/social-tg.png" alt="tg" width={28} height={28} /></a>
+                  <a href="#"><Image src="/images/social-in.png" alt="in" width={28} height={28} /></a>
                 </div>
               </div>
             </div>
@@ -275,7 +275,6 @@ export default function ProductDetailPage() {
                       price: product.price + (variant?.price_modifier || 0),
                       stock: variant?.stock || 0,
                       images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-                      quantity, // nhớ truyền số lượng!
                     });
                     router.push('/cart');
                   }}
@@ -291,7 +290,7 @@ export default function ProductDetailPage() {
                   <a href="#" className="text-decoration-none text-muted">So sánh</a>
                 </div>
                 <hr />
-                <div className="mb-2"><img src="/images/safe-checkout.png" alt="Thanh toán an toàn" style={{ height: 24 }} /></div>
+                <div className="mb-2"><Image src="/images/safe-checkout.png" alt="Thanh toán an toàn" width={100} height={24} /></div>
                 <div className="mb-2 fw-bold">Đặt hàng nhanh 24/7<br /><span className="fw-normal">(025) 3886 25 16</span></div>
                 <div className="mb-2"><i className="bi bi-truck"></i> Giao từ <a href="#" className="text-decoration-none">Việt Nam</a></div>
               </div>

@@ -19,6 +19,7 @@ export default function VoucherPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedShipping, setSelectedShipping] = useState('')
+  const [form, setForm] = useState({ agree: false })
   const router = useRouter()
 
   useEffect(() => {
@@ -67,10 +68,23 @@ export default function VoucherPage() {
           {v.code} - {v.max_discount}đ ({v.description})
         </div>
       ))}
+      
+      <div className="mt-3 mb-3">
+        <label>
+          <input
+            type="checkbox"
+            checked={form.agree}
+            onChange={(e) => setForm({ ...form, agree: e.target.checked })}
+          />
+          <span className="ms-2">Tôi đồng ý với các điều khoản và điều kiện</span>
+        </label>
+      </div>
+      
       <button
         className="btn btn-primary w-100 fw-bold"
         style={{background:'#7c3aed', border:0, borderRadius:8, fontSize:18}}
         disabled={!form.agree}
+        onClick={handleConfirm}
       >
         Đặt hàng
       </button>
