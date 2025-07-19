@@ -1,6 +1,10 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-green: #22c55e;
+  --primary-green-dark: #16a34a;
+  --accent-orange: #ff9800;
+  --accent-orange-light: #fb923c;
+  --neutral-bg: #f9fafb;
+  --neutral-text: #222;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,8 +21,8 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -51,18 +55,18 @@ main {
   left: 0;
   width: 100%;
   z-index: 100;
-  background: #fff;
-  color: #22c55e;
+  background: var(--primary-green);
+  color: #fff;
   transition: background 0.3s, color 0.3s, box-shadow 0.3s;
   box-shadow: 0 2px 8px rgba(34,197,94,0.08);
 }
 .custom-header .navbar-brand,
 .custom-header .nav-link {
-  color: #22c55e !important;
+  color: #fff !important;
   transition: color 0.3s;
 }
 .custom-header.scrolled {
-  background: #22c55e;
+  background: var(--primary-green);
   color: #fff;
   box-shadow: 0 2px 8px rgba(34,197,94,0.08);
 }
@@ -870,4 +874,69 @@ input[type="range"].custom-range::-ms-fill-lower,
 input[type="range"].custom-range::-ms-fill-upper {
   background: #e9ecef;
   border-radius: 4px;
+}
+
+header, .navbar, .main-header {
+  background: var(--primary-green) !important;
+  color: #fff;
+}
+
+.btn, .btn-primary, .btn-success {
+  background: var(--primary-green);
+  border: none;
+  color: #fff;
+}
+.btn:hover, .btn-primary:hover, .btn-success:hover {
+  background: var(--primary-green-dark);
+}
+
+.btn-warning, .btn-orange, .btn-accent {
+  background: var(--accent-orange);
+  color: #fff;
+  border: none;
+}
+.btn-warning:hover, .btn-orange:hover, .btn-accent:hover {
+  background: var(--accent-orange-light);
+}
+
+a, .link, .nav-link.active, .nav-link.selected {
+  color: var(--primary-green);
+}
+a:hover, .link:hover {
+  color: var(--primary-green-dark);
+}
+
+.badge, .badge-success, .badge-green {
+  background: var(--primary-green);
+  color: #fff;
+}
+.badge-warning, .badge-orange {
+  background: var(--accent-orange);
+  color: #fff;
+}
+
+/* Các phần nhấn nhá, icon, border phụ */
+.accent-bg, .bg-accent, .border-accent {
+  background: var(--accent-orange) !important;
+  border-color: var(--accent-orange) !important;
+}
+
+/* Giữ lại màu trắng/xám cho các vùng nền phụ */
+.card, .product-list-grid, .custom-product-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.04);
+}
+
+/* Đảm bảo các nút, badge, header, nav... dùng màu mới */
+
+/* Card sản phẩm */
+.custom-product-card,
+.featured-product-card {
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s;
+}
+.custom-product-card:hover,
+.featured-product-card:hover {
+  border-color: #e5e7eb !important; /* xám nhạt */
 }

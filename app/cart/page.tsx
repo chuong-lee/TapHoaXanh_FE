@@ -24,24 +24,24 @@ export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCart()
 
   // State lưu danh sách slug sản phẩm được chọn
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<{slug: string, variant_id?: number}[]>([]);
   const [showAll, setShowAll] = useState(false);
 
-  // Khi cart thay đổi, mặc định chọn tất cả sản phẩm
-  useEffect(() => {
-    setSelected(cart.map(item => item.slug));
-  }, [cart]);
-
   // Hàm xử lý chọn/bỏ chọn sản phẩm
-  const handleSelect = (slug: string) => {
-    setSelected(prev =>
-      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
-    );
+  const handleSelect = (slug: string, variant_id?: number) => {
+    setSelected(prev => {
+      const exists = prev.some(s => s.slug === slug && s.variant_id === variant_id);
+      if (exists) {
+        return prev.filter(s => !(s.slug === slug && s.variant_id === variant_id));
+      } else {
+        return [...prev, { slug, variant_id }];
+      }
+    });
   };
 
   // Tổng tiền chỉ tính sản phẩm được chọn
   const total = useMemo(() =>
-    cart.filter(item => selected.includes(item.slug))
+    cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id))
         .reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cart, selected]
   );
@@ -50,7 +50,7 @@ export default function CartPage() {
   const allSelected = cart.length > 0 && selected.length === cart.length;
   const handleSelectAll = () => {
     if (allSelected) setSelected([]);
-    else setSelected(cart.map(item => item.slug));
+    else setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
   };
 
   return (
@@ -86,8 +86,8 @@ export default function CartPage() {
                         <input
                           type="checkbox"
                           className="form-check-input"
-                          checked={selected.includes(item.slug)}
-                          onChange={() => handleSelect(item.slug)}
+                          checked={selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)}
+                          onChange={() => handleSelect(item.slug, item.variant_id)}
                         />
                       </div>
                       <div className="col-md-2 text-center">
@@ -101,22 +101,25 @@ export default function CartPage() {
                       </div>
                       <div className="col-md-5">
                         <div className="card-body py-0">
-                          <h6 className="card-title mb-1">{item.name}</h6>
+                          <h6 className="card-title mb-1">
+                            {item.name}
+                            {item.variant_name && <span className="text-muted"> ({item.variant_name})</span>}
+                          </h6>
                           <p className="card-text text-muted small">(Hộp 500g)</p>
                           <p className="card-text fw-bold">{(item.price * (1-item.discount/100)).toLocaleString()}₫</p>
                         </div>
                       </div>
                       <div className="col-md-3 d-flex justify-content-center">
                         <div className="input-group" style={{ width: '120px' }}>
-                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.quantity - 1)}>-</button>
+                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.variant_id, item.quantity - 1)}>-</button>
                           <input type="text" className="form-control text-center" value={item.quantity} readOnly />
-                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.quantity + 1)}>+</button>
+                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.variant_id, item.quantity + 1)}>+</button>
                         </div>
                       </div>
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.slug)}
+                          onClick={() => removeFromCart(item.slug, item.variant_id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa
@@ -178,7 +181,13 @@ export default function CartPage() {
                 {/* Disable nút thanh toán nếu không chọn sản phẩm nào */}
                 <Link
                   href={selected.length === 0 ? '#' : '/checkout'}
-                  className={`btn btn-dark w-100 mt-2 fw-bold${selected.length === 0 ? ' disabled' : ''}`}
+                  className={`btn w-100 mt-2 fw-bold${selected.length === 0 ? ' disabled' : ''}`}
+                  style={{
+                    background: '#fb923c',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: 600
+                  }}
                   tabIndex={selected.length === 0 ? -1 : 0}
                   aria-disabled={selected.length === 0}
                 >

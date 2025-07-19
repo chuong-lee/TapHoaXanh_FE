@@ -266,7 +266,11 @@ export default function ProductDetailPage() {
               <div className="card shadow-sm p-3" style={{ borderRadius: 12 }}>
                 <div className="d-flex align-items-baseline">
                   <div className="fs-2 fw-bold text-dark">
-                    {totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}
+                    {selectedVariant ? (
+                      <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
+                    ) : (
+                      <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
+                    )}
                   </div>
                 </div>
                 <div className="my-3">
@@ -274,16 +278,23 @@ export default function ProductDetailPage() {
                     <i className="bi bi-check-circle-fill"></i> Còn hàng
                   </span>
                 </div>
-                <div className="d-flex align-items-center mb-3">
-                  <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                  <span className="mx-3 fs-5 fw-bold">{quantity}</span>
-                  <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
-                </div>
+                {selectedVariant && (
+                  <div className="d-flex align-items-center mb-3">
+                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                    <span className="mx-3 fs-5 fw-bold">{quantity}</span>
+                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
+                  </div>
+                )}
                 {variants.length > 0 ? (
                   <>
                     <button
-                      className="btn btn-success btn-lg w-100 mb-2 fw-bold"
-                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      className="btn w-100 mb-2 fw-bold"
+                      style={{
+                        background: '#22c55e',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
                       onClick={() => {
                         if (!selectedVariant) return;
                         const variant = variants.find(v => v.id === selectedVariant);
@@ -302,8 +313,13 @@ export default function ProductDetailPage() {
                       Thêm vào giỏ hàng
                     </button>
                     <button
-                      className="btn btn-warning btn-lg w-100 mb-3 fw-bold"
-                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      className="btn w-100 mb-3 fw-bold"
+                      style={{
+                        background: '#fb923c',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
                       disabled={!selectedVariant}
                     >
                       Mua với PayPal

@@ -142,9 +142,16 @@ export default function HomePage() {
               <Image
                 src="/client/images/banner.png"
                 alt="Tạp Hóa Xanh"
-                width={650}
-                height={540}
-                style={{objectFit: 'contain', background: 'none', maxWidth: '100%', maxHeight: 540}}
+                width={1000}
+                height={800}
+                style={{
+                  objectFit: 'contain',
+                  background: 'none',
+                  width: '100%',      // luôn chiếm hết chiều ngang cột
+                  height: 'auto',     // tự động chiều cao
+                  maxWidth: 'none',   // không giới hạn
+                  maxHeight: 'none'   // không giới hạn
+                }}
               />
             </div>
           </div>
@@ -204,10 +211,10 @@ export default function HomePage() {
                   />
                 </div>
                 {/* Nhãn giảm giá */}
-                {idx === 0 && <span className="badge bg-success position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8}}>Tiết kiệm 35%</span>}
-                {idx === 1 && <span className="badge bg-primary position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8}}>Giảm giá</span>}
-                {idx === 2 && <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8}}>Bán chạy</span>}
-                {idx === 3 && <span className="badge bg-danger position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8}}>Tiết kiệm 15%</span>}
+                {idx === 0 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 35%</span>}
+                {idx === 1 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Giảm giá</span>}
+                {idx === 2 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Bán chạy</span>}
+                {idx === 3 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 15%</span>}
                 {/* Brand + icon sao */}
                 <div className="d-flex align-items-center mb-1">
                   <span className="text-secondary small me-2">Hodo Foods</span>
@@ -231,7 +238,7 @@ export default function HomePage() {
                 <button 
                   className="btn btn-danger w-100 fw-bold mt-auto" 
                   style={{borderRadius: 24, fontSize: 18, padding: '10px 0'}}
-                  onClick={() => router.push(`/main/cart`)}
+                  onClick={() => router.push(`/product/${product.slug}`)}
                 >
                   <i className="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
                 </button>
@@ -254,8 +261,24 @@ export default function HomePage() {
         ) : (
           <div className="product-list-grid">
             {currentProducts.map((product, idx) => (
-              <div className="custom-product-card" key={product.id}>
-                <span className="badge-hot">Nổi bật</span>
+              <div className="custom-product-card d-flex flex-column h-100 position-relative" key={product.id}>
+                <span
+                  className="badge-hot"
+                  style={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 12,
+                    zIndex: 2,
+                    borderRadius: 8,
+                    padding: '6px 16px',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    background: '#fb923c',
+                    color: '#fff'
+                  }}
+                >
+                  Nổi bật
+                </span>
                 <div className="product-image">
                   <Image
                     src={fixImgSrc(product.images)}
@@ -277,19 +300,27 @@ export default function HomePage() {
                     <span className="star">★</span> <span>4.0</span>
                   </div>
                 </div>
+                <div style={{ height: 18 }}></div>
                 <Link
                   href={product.slug ? `/product/${product.slug}` : "#"}
-                  className="btn-add-cart"
+                  className="btn btn-success"
                   style={{
-                    background: '#38bdf8',
+                    background: '#22c55e',
                     color: '#fff',
                     borderRadius: 999,
                     fontWeight: 600,
-                    display: 'inline-block',
-                    textAlign: 'center',
-                    padding: '12px 24px',
+                    fontSize: 16,
+                    padding: '10px 0',
+                    minHeight: 36,
+                    width: '92%',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    marginTop: 'auto',
+                    marginBottom: 20,
                     cursor: product.slug ? 'pointer' : 'not-allowed',
-                    pointerEvents: product.slug ? 'auto' : 'none'
+                    pointerEvents: product.slug ? 'auto' : 'none',
+                    display: 'inline-block',
+                    textAlign: 'center'
                   }}
                   scroll={true}
                 >
@@ -377,15 +408,22 @@ export default function HomePage() {
                   <a
                     className="btn-featured-addcart"
                     style={{
-                      background: '#38bdf8',
+                      background: '#22c55e',
                       color: '#fff',
                       borderRadius: 999,
                       fontWeight: 600,
-                      display: 'inline-block',
-                      textAlign: 'center',
-                      padding: '12px 24px',
+                      fontSize: 16,
+                      padding: '10px 0',
+                      minHeight: 36,
+                      width: '92%',
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                      marginTop: 'auto',
+                      marginBottom: 20,
                       cursor: product.slug ? 'pointer' : 'not-allowed',
-                      pointerEvents: product.slug ? 'auto' : 'none'
+                      pointerEvents: product.slug ? 'auto' : 'none',
+                      display: 'inline-block',
+                      textAlign: 'center'
                     }}
                   >
                     Xem chi tiết <i className="fa fa-eye"></i>
