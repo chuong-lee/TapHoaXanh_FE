@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
 
 type CartItem = {
@@ -18,9 +17,15 @@ type CartItem = {
   stock?: number
 }
 
+type SelectedVoucher = {
+  code: string;
+  label: string;
+  max_discount?: number;
+  min_order_value?: number;
+} | null;
+
 function CheckoutPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     fullName: '',
     address: '',
@@ -38,18 +43,11 @@ function CheckoutPage() {
     voucher: ''
   });
 
-  // Danh sách voucher mẫu
-  const voucherList = [
-    { code: '', label: 'Không sử dụng voucher' },
-    { code: 'SALE10', label: 'SALE10 - Giảm 10%' },
-    { code: 'FREESHIP', label: 'FREESHIP - Miễn phí vận chuyển' }
-  ];
-
   const [selectedProductVoucher, setSelectedProductVoucher] = useState<string | null>(null)
   const [selectedShippingVoucher, setSelectedShippingVoucher] = useState<string | null>(null)
   const router = useRouter();
   const [errorFields, setErrorFields] = useState<string[]>([]);
-  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<SelectedVoucher>(null);
 
   useEffect(() => {
     const local = localStorage.getItem("cart_local");
@@ -60,7 +58,6 @@ function CheckoutPage() {
         setCart([]);
       }
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -82,8 +79,8 @@ function CheckoutPage() {
   // Tính tổng tiền
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   let discount = 0;
-  if (selectedVoucher && subtotal >= selectedVoucher.min_order_value) {
-    discount = Math.min(selectedVoucher.max_discount, subtotal);
+  if (selectedVoucher && selectedVoucher.min_order_value && subtotal >= selectedVoucher.min_order_value) {
+    discount = Math.min(selectedVoucher.max_discount || 0, subtotal);
   }
   const shipping = subtotal > 300000 ? 0 : 15000;
   const total = subtotal - discount + shipping;
@@ -170,7 +167,7 @@ function CheckoutPage() {
           <div className="bg-white p-3 rounded-3 mb-4" style={{border: '1.5px solid #f3f3f3'}}>
             <h5 className="fw-bold mb-3">Đơn hàng của bạn</h5>
             {/* Thông báo điều kiện voucher */}
-            {selectedVoucher && subtotal < selectedVoucher.min_order_value && (
+            {selectedVoucher && selectedVoucher.min_order_value && subtotal < selectedVoucher.min_order_value && (
               <div className="alert alert-warning mt-2">
                 Bạn không đủ điều kiện để dùng voucher này (Đơn tối thiểu: {selectedVoucher.min_order_value.toLocaleString('vi-VN')}₫)
               </div>

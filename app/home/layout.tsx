@@ -1,5 +1,6 @@
 "use client"
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
@@ -18,7 +19,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         <nav className="navbar navbar-expand-lg py-2">
           <div className="container d-flex align-items-center justify-content-between">
             <Link className="navbar-brand d-flex align-items-center gap-2" href="/home">
-              <img className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh Logo" width={56} height={56} style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)'}} />
+              <Image className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh Logo" width={56} height={56} style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)'}} />
               <span className="fw-bold fs-4" style={{letterSpacing: 1}}>Tạp Hóa Xanh</span>
             </Link>
             
@@ -56,7 +57,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
         </nav>
       </div>
       <div className="header-slogan d-none d-lg-block fst-italic text-white">
-        "Tươi sạch mỗi ngày - Giao nhanh tận nhà"
+        &quot;Tươi sạch mỗi ngày - Giao nhanh tận nhà&quot;
       </div>
       <main className="main-content">{children}</main>
       <Footer />

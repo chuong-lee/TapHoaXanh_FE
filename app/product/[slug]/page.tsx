@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch (e) {
+      } catch {
         setVariants([]);
       }
     };
@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
         // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
         products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
         setRelatedProducts(products);
-      } catch (e) {
+      } catch {
         setRelatedProducts([]);
       }
     };
@@ -410,7 +410,7 @@ export default function ProductDetailPage() {
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
         <div className="row g-3">
-          {relatedProducts.map((item, i) => (
+          {relatedProducts.map((item) => (
             <div className="col-3" key={item.id}>
               <div className="custom-product-card h-100">
                 <span className="badge-hot">Hot</span>
