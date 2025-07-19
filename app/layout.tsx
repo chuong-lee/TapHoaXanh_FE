@@ -8,6 +8,8 @@ import "bootstrap/dist/css/bootstrap.min.css"
 // import "@/public/client/css/style.css"
 // import "@/public/client/fonts/fontstyle.css"
 import "./globals.css"
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +44,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   )

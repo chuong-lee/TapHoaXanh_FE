@@ -54,7 +54,7 @@ export default function CartPage() {
   };
 
   return (
-    <>
+    <main className="main-content">
       <div className="container py-5">
         <div className="row">
           {/* Left Column: Cart Items & Notes */}
@@ -101,7 +101,7 @@ export default function CartPage() {
                       </div>
                       <div className="col-md-5">
                         <div className="card-body py-0">
-                          <h6 className="card-title mb-1">
+                          <h6 className="card-title mb-1" style={{marginTop: 12}}>
                             {item.name}
                             {item.variant_name && <span className="text-muted"> ({item.variant_name})</span>}
                           </h6>
@@ -165,10 +165,26 @@ export default function CartPage() {
 
           {/* Right Column: Order Summary */}
           <div className="col-lg-4">
-            <div className="card border-0 shadow-sm p-3 mb-4">
+            <div className="card border-0 shadow-sm p-3 mb-4" style={{ marginTop: 32 }}>
               <div className="card-body">
                 <h5 className="card-title fw-bold">Thông tin đơn hàng</h5>
                 <hr />
+                <table className="table mb-3">
+                  <thead>
+                    <tr>
+                      <th>Sản phẩm</th>
+                      <th className="text-end">Giá</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)).map(item => (
+                      <tr key={item.id}>
+                        <td>{item.name}</td>
+                        <td className="text-end">{item.price.toLocaleString('vi-VN')}₫</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <div className="d-flex justify-content-between">
                   <span>Tạm tính</span>
                   <span>{total.toLocaleString()}₫</span>
@@ -179,8 +195,7 @@ export default function CartPage() {
                   <span className="fw-bold text-danger fs-5">{total.toLocaleString()}₫</span>
                 </div>
                 {/* Disable nút thanh toán nếu không chọn sản phẩm nào */}
-                <Link
-                  href={selected.length === 0 ? '#' : '/checkout'}
+                <button
                   className={`btn w-100 mt-2 fw-bold${selected.length === 0 ? ' disabled' : ''}`}
                   style={{
                     background: '#fb923c',
@@ -190,9 +205,17 @@ export default function CartPage() {
                   }}
                   tabIndex={selected.length === 0 ? -1 : 0}
                   aria-disabled={selected.length === 0}
+                  disabled={selected.length === 0}
+                  onClick={() => {
+                    if (selected.length === 0) return;
+                    // Lưu danh sách sản phẩm đã chọn vào localStorage
+                    const selectedItems = cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id));
+                    localStorage.setItem('cart_selected', JSON.stringify(selectedItems));
+                    window.location.href = '/checkout';
+                  }}
                 >
                   THANH TOÁN
-                </Link>
+                </button>
               </div>
             </div>
             <div className="card border-0" style={{backgroundColor: '#e6f6f2'}}>
@@ -204,6 +227,6 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    </>
+    </main>
   )
 }

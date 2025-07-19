@@ -205,14 +205,18 @@ export default function ProductDetailPage() {
             {/* Left part of right column: Info */}
             <div className="col-md-7">
               <h4 className="mb-1">{product.name}</h4>
-              <div className="mb-2 text-muted">
-                Mã SP: COCA330 | DANH MỤC: Nước giải khát | THƯƠNG HIỆU: Coca-Cola
-              </div>
-              <ul>
-                <li>Nước giải khát có gas, hương vị truyền thống</li>
-                <li>Thể tích: 330ml/lon</li>
-                <li>Thích hợp cho mọi bữa tiệc, dã ngoại, giải khát tức thì</li>
-              </ul>
+              <div
+                style={{
+                  fontSize: 16,
+                  color: '#555',
+                  fontStyle: 'italic',
+                  lineHeight: 1.7,
+                  marginBottom: 12
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: product.description.replace(/\\n/g, '<br />')
+                }}
+              />
               <div className="mb-2">
                 <span className="text-success fw-bold">MIỄN PHÍ GIAO HÀNG</span>
                 <span className="text-danger ms-3 fw-bold">QUÀ TẶNG MIỄN PHÍ</span>
