@@ -42,16 +42,16 @@ export function useCart() {
     setCart(items)
   }
 
-  const addToCart = (product: Omit<CartItem, "quantity">) => {
+  const addToCart = (product: Omit<CartItem, "quantity">, quantity: number = 1) => {
     const existing = cart.find((item) => item.slug === product.slug)
     let updatedCart
 
     if (existing) {
       updatedCart = cart.map((item) =>
-        item.slug === product.slug ? { ...item, quantity: item.quantity + 1 } : item
+        item.slug === product.slug ? { ...item, quantity: item.quantity + quantity } : item
       )
     } else {
-      updatedCart = [...cart, { ...product, quantity: 1 }]
+      updatedCart = [...cart, { ...product, quantity }]
     }
 
     saveToLocal(updatedCart)

@@ -36,7 +36,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product">
                 <i className="fa-solid fa-store"></i> Sản Phẩm
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/posts">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/news">
                 <i className="fa-solid fa-newspaper"></i> Bài Viết
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">

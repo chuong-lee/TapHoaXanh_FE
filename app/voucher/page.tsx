@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 type Voucher = {
   id: number;
@@ -12,90 +12,122 @@ type Voucher = {
   start_date: string;
   end_date: string;
   description?: string;
-  type: 'product' | 'shipping'; // Bạn nên thêm trường này ở backend hoặc phân loại ở FE
 };
 
 export default function VoucherPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState('')
-  const [selectedShipping, setSelectedShipping] = useState('')
-  const [form, setForm] = useState({ agree: false })
-  const router = useRouter()
+  const [selected, setSelected] = useState<number | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/voucher') // Đổi thành endpoint thực tế của bạn
+    fetch('http://localhost:5000/voucher')
       .then(res => res.json())
       .then(data => setVouchers(data))
   }, [])
 
-  console.log('Vouchers:', vouchers);
-
-  const productVouchers = vouchers.filter(v => v.code.toLowerCase().includes('ship') === false);
-  const shippingVouchers = vouchers.filter(v => v.code.toLowerCase().includes('ship'));
-
   const handleConfirm = () => {
-    localStorage.setItem('selectedProductVoucher', selectedProduct)
-    localStorage.setItem('selectedShippingVoucher', selectedShipping)
-    router.push('/checkout')
-  }
+    if (selected !== null) {
+      const voucher = vouchers.find(v => v.id === selected);
+      if (voucher) {
+        localStorage.setItem('selectedVoucher', JSON.stringify(voucher));
+        router.push('/checkout'); // Chuyển về trang thanh toán
+      }
+    }
+  };
 
   return (
-    <div className="container py-4">
-      <h2>Chọn voucher</h2>
-      <h4>Voucher giảm giá sản phẩm</h4>
-      {productVouchers.map(v => (
-        <div key={v.code}>
-          <input
-            type="radio"
-            name="productVoucher"
-            value={v.code}
-            checked={selectedProduct === v.code}
-            onChange={() => setSelectedProduct(v.code)}
-          />
-          {v.code} - {v.max_discount}đ ({v.description})
+    <div className="container py-4" style={{maxWidth: 800, margin: '0 auto'}}>
+      <div style={{textAlign: 'center', marginBottom: 32}}>
+        <h2 style={{
+          fontWeight: 700, // hoặc 600 cho vừa phải
+          color: '#7c3aed',
+          textTransform: 'none', // Đảm bảo không in hoa toàn bộ
+          letterSpacing: 0,
+          fontSize: 32,
+          margin: 0
+        }}>
+          Chọn mã giảm giá
+        </h2>
+        <div style={{color: '#666', fontSize: 16, marginTop: 8}}>
+          Chọn một mã voucher phù hợp để nhận ưu đãi cho đơn hàng của bạn
         </div>
-      ))}
-      <h4>Voucher giảm phí ship</h4>
-      {shippingVouchers.map(v => (
-        <div key={v.code}>
-          <input
-            type="radio"
-            name="shippingVoucher"
-            value={v.code}
-            checked={selectedShipping === v.code}
-            onChange={() => setSelectedShipping(v.code)}
-          />
-          {v.code} - {v.max_discount}đ ({v.description})
-        </div>
-      ))}
-      
-      <div className="mt-3 mb-3">
-        <label>
-          <input
-            type="checkbox"
-            checked={form.agree}
-            onChange={(e) => setForm({ ...form, agree: e.target.checked })}
-          />
-          <span className="ms-2">Tôi đồng ý với các điều khoản và điều kiện</span>
-        </label>
       </div>
-      
-      <button
-        className="btn btn-primary w-100 fw-bold"
-        style={{background:'#7c3aed', border:0, borderRadius:8, fontSize:18}}
-        disabled={!form.agree}
-        onClick={handleConfirm}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 24,
+          justifyContent: 'center',
+          margin: '24px 0',
+          gridAutoFlow: 'row dense',
+        }}
       >
-        Đặt hàng
-      </button>
-      <div>
-        <h4>Tất cả voucher (debug)</h4>
-        {vouchers.map(v => (
-          <div key={v.code}>
-            {v.code} - {v.max_discount}đ ({v.description})
+        {vouchers.map((v) => (
+          <div
+            key={v.id}
+            onClick={() => setSelected(v.id)}
+            style={{
+              cursor: 'pointer',
+              padding: 20,
+              borderRadius: 16,
+              border: '2.5px solid ' + (selected === v.id ? '#7c3aed' : '#e0e0e0'),
+              background: selected === v.id ? 'linear-gradient(90deg, #f3e8ff 0%, #fff 100%)' : '#fff',
+              color: selected === v.id ? '#7c3aed' : '#222',
+              minWidth: 260,
+              maxWidth: 320,
+              boxShadow: '0 2px 8px #f3f3f3',
+              transition: 'background 0.2s, border-color 0.2s, color 0.2s',
+              position: 'relative',
+              marginBottom: 12,
+              outline: 'none',
+              justifySelf: 'center',
+            }}
+          >
+            <div style={{fontWeight: 700, fontSize: 20, marginBottom: 8, letterSpacing: 1}}>{v.code}</div>
+            <div style={{fontSize: 15, marginBottom: 4}}>Giảm tối đa: <b>{v.max_discount.toLocaleString()}₫</b></div>
+            <div style={{fontSize: 15, marginBottom: 4}}>Đơn tối thiểu: <b>{v.min_order_value.toLocaleString()}₫</b></div>
+            {v.description && <div style={{fontSize: 13, marginTop: 6, color: '#666'}}>{v.description}</div>}
+            {selected === v.id && (
+              <div style={{position: 'absolute', top: 12, right: 16, color: '#7c3aed', fontWeight: 700, fontSize: 16}}>
+                ✓ Đã chọn
+              </div>
+            )}
           </div>
         ))}
       </div>
+      <div style={{textAlign: 'center', marginTop: 32}}>
+        <button
+          className="btn btn-primary"
+          style={{
+            background: selected !== null ? '#7c3aed' : '#bdbdbd',
+            border: 0,
+            borderRadius: 8,
+            fontSize: 18,
+            opacity: selected !== null ? 1 : 0.7,
+            cursor: selected !== null ? 'pointer' : 'not-allowed',
+            minWidth: 180,
+            padding: '10px 0',
+            fontWeight: 700,
+            letterSpacing: 1
+          }}
+          disabled={selected === null}
+          onClick={handleConfirm}
+        >
+          Xác nhận
+        </button>
+      </div>
+      <style jsx global>{`
+        @media (max-width: 900px) {
+          .container > div[style*='display: grid'] {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 600px) {
+          .container > div[style*='display: grid'] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }

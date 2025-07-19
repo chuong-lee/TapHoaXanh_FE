@@ -49,6 +49,7 @@ function CheckoutPage() {
   const [selectedShippingVoucher, setSelectedShippingVoucher] = useState<string | null>(null)
   const router = useRouter();
   const [errorFields, setErrorFields] = useState<string[]>([]);
+  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
 
   useEffect(() => {
     const local = localStorage.getItem("cart_local");
@@ -71,10 +72,21 @@ function CheckoutPage() {
     // Có thể fetch thêm thông tin voucher nếu cần
   }, [])
 
+  useEffect(() => {
+    const voucherStr = localStorage.getItem('selectedVoucher');
+    if (voucherStr) {
+      setSelectedVoucher(JSON.parse(voucherStr));
+    }
+  }, []);
+
   // Tính tổng tiền
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = subtotal > 300000 ? 0 : 15000 // miễn phí nếu > 300k
-  const total = subtotal + shipping
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let discount = 0;
+  if (selectedVoucher && subtotal >= selectedVoucher.min_order_value) {
+    discount = Math.min(selectedVoucher.max_discount, subtotal);
+  }
+  const shipping = subtotal > 300000 ? 0 : 15000;
+  const total = subtotal - discount + shipping;
 
   const requiredFields = [
     { key: 'fullName', label: 'Họ và tên' },
@@ -157,6 +169,12 @@ function CheckoutPage() {
         <div className="col-md-5">
           <div className="bg-white p-3 rounded-3 mb-4" style={{border: '1.5px solid #f3f3f3'}}>
             <h5 className="fw-bold mb-3">Đơn hàng của bạn</h5>
+            {/* Thông báo điều kiện voucher */}
+            {selectedVoucher && subtotal < selectedVoucher.min_order_value && (
+              <div className="alert alert-warning mt-2">
+                Bạn không đủ điều kiện để dùng voucher này (Đơn tối thiểu: {selectedVoucher.min_order_value.toLocaleString('vi-VN')}₫)
+              </div>
+            )}
             <table className="table mb-3">
               <thead>
                 <tr>
@@ -174,6 +192,10 @@ function CheckoutPage() {
                 <tr>
                   <td><b>Tạm tính</b></td>
                   <td className="text-end">{subtotal.toLocaleString('vi-VN')}₫</td>
+                </tr>
+                <tr>
+                  <td>Giảm giá voucher</td>
+                  <td className="text-end">-{discount.toLocaleString('vi-VN')}₫</td>
                 </tr>
                 <tr>
                   <td>Phí vận chuyển</td>

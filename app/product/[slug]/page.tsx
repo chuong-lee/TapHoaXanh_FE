@@ -47,6 +47,7 @@ export default function ProductDetailPage() {
   const [tab, setTab] = useState<'desc' | 'profile' | 'review' | 'related'>('desc')
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null)
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   // Lấy chi tiết sản phẩm theo slug
   useEffect(() => {
@@ -83,12 +84,28 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch {
+      } catch (e) {
         setVariants([]);
       }
     };
     fetchVariants();
   }, [product])
+
+  // Lấy 4 sản phẩm bất kỳ từ API (không trùng với sản phẩm hiện tại)
+  useEffect(() => {
+    const fetchRelated = async () => {
+      try {
+        const res = await api.get<Product[]>('/products');
+        let products = res.data.filter((item) => item.slug !== slug);
+        // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
+        products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
+        setRelatedProducts(products);
+      } catch (e) {
+        setRelatedProducts([]);
+      }
+    };
+    fetchRelated();
+  }, [slug]);
 
   if (loading) return <p>Đang tải sản phẩm...</p>
   if (!product) return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>
@@ -171,7 +188,7 @@ export default function ProductDetailPage() {
                   <Image
                     key={index}
                     src={safeImg}
-                    alt={`thumb-${index}`}
+                    alt={`Ảnh nhỏ ${index}`}
                     width={60}
                     height={60}
                     className={`border rounded product-thumb${selectedImage === img ? ' selected' : ''}`}
@@ -235,12 +252,12 @@ export default function ProductDetailPage() {
                   <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
                 </div>
                 <div className="mt-2 d-flex gap-2">
-                  <a href="#"><Image src="/images/social-fb.png" alt="fb" width={28} height={28} /></a>
-                  <a href="#"><Image src="/images/social-ig.png" alt="ig" width={28} height={28} /></a>
-                  <a href="#"><Image src="/images/social-x.png" alt="x" width={28} height={28} /></a>
-                  <a href="#"><Image src="/images/social-yt.png" alt="yt" width={28} height={28} /></a>
-                  <a href="#"><Image src="/images/social-tg.png" alt="tg" width={28} height={28} /></a>
-                  <a href="#"><Image src="/images/social-in.png" alt="in" width={28} height={28} /></a>
+                  <a href="#"><img src="/images/social-fb.png" alt="fb" width={28} /></a>
+                  <a href="#"><img src="/images/social-ig.png" alt="ig" width={28} /></a>
+                  <a href="#"><img src="/images/social-x.png" alt="x" width={28} /></a>
+                  <a href="#"><img src="/images/social-yt.png" alt="yt" width={28} /></a>
+                  <a href="#"><img src="/images/social-tg.png" alt="tg" width={28} /></a>
+                  <a href="#"><img src="/images/social-in.png" alt="in" width={28} /></a>
                 </div>
               </div>
             </div>
@@ -262,35 +279,45 @@ export default function ProductDetailPage() {
                   <span className="mx-3 fs-5 fw-bold">{quantity}</span>
                   <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
                 </div>
-                <button
-                  className="btn btn-success btn-lg w-100 mb-2 fw-bold"
-                  style={{ borderRadius: 8 }}
-                  onClick={() => {
-                    if (!selectedVariant) return;
-                    const variant = variants.find(v => v.id === selectedVariant);
-                    addToCart({
-                      ...product,
-                      variant_id: variant?.id,
-                      variant_name: variant?.variant_name,
-                      price: product.price + (variant?.price_modifier || 0),
-                      stock: variant?.stock || 0,
-                      images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-                    });
-                    router.push('/cart');
-                  }}
-                  disabled={!selectedVariant}
-                >
-                  Thêm vào giỏ hàng
-                </button>
-                <button className="btn btn-warning btn-lg w-100 mb-3 fw-bold" style={{ borderRadius: 8 }} disabled={!selectedVariant}>
-                  Mua với PayPal
-                </button>
+                {variants.length > 0 ? (
+                  <>
+                    <button
+                      className="btn btn-success btn-lg w-100 mb-2 fw-bold"
+                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      onClick={() => {
+                        if (!selectedVariant) return;
+                        const variant = variants.find(v => v.id === selectedVariant);
+                        addToCart({
+                          ...product,
+                          variant_id: variant?.id,
+                          variant_name: variant?.variant_name,
+                          price: product.price + (variant?.price_modifier || 0),
+                          stock: variant?.stock || 0,
+                          images: Array.isArray(product.images) ? product.images.join(',') : product.images,
+                        }, quantity);
+                        router.push('/cart');
+                      }}
+                      disabled={!selectedVariant}
+                    >
+                      Thêm vào giỏ hàng
+                    </button>
+                    <button
+                      className="btn btn-warning btn-lg w-100 mb-3 fw-bold"
+                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      disabled={!selectedVariant}
+                    >
+                      Mua với PayPal
+                    </button>
+                  </>
+                ) : (
+                  <div className="alert alert-warning mt-2">Sản phẩm này chưa có biến thể, không thể mua.</div>
+                )}
                 <div className="d-flex justify-content-between text-sm">
                   <a href="#" className="text-decoration-none text-success">Đã thêm vào yêu thích</a>
                   <a href="#" className="text-decoration-none text-muted">So sánh</a>
                 </div>
                 <hr />
-                <div className="mb-2"><Image src="/images/safe-checkout.png" alt="Thanh toán an toàn" width={100} height={24} /></div>
+                <div className="mb-2"><img src="/images/safe-checkout.png" alt="Thanh toán an toàn" style={{ height: 24 }} /></div>
                 <div className="mb-2 fw-bold">Đặt hàng nhanh 24/7<br /><span className="fw-normal">(025) 3886 25 16</span></div>
                 <div className="mb-2"><i className="bi bi-truck"></i> Giao từ <a href="#" className="text-decoration-none">Việt Nam</a></div>
               </div>
@@ -383,10 +410,48 @@ export default function ProductDetailPage() {
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
         <div className="row g-3">
-          {[1, 2, 3, 4].map(i => (
-            <div className="col-3" key={i}>
-              <div className="border rounded p-2 text-center">
-                <Image src="/images/lemons.png" alt="Sản phẩm liên quan" width={120} height={120} />
+          {relatedProducts.map((item, i) => (
+            <div className="col-3" key={item.id}>
+              <div className="custom-product-card h-100">
+                <span className="badge-hot">Hot</span>
+                <div className="product-image">
+                  <Image
+                    src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.png') : '/images/placeholder.png'))}
+                    alt={item.name}
+                    width={140}
+                    height={140}
+                    style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent'}}
+                  />
+                </div>
+                <div className="product-info">
+                  <div className="product-type">Đồ ăn vặt</div>
+                  <div className="product-name">{item.name}</div>
+                  <div className="product-brand">Bởi NestFood</div>
+                  <div className="product-price">
+                    <span className="price-main">{item.price.toLocaleString()}₫</span>
+                    <span className="price-old">{(item.price + (item.discount || 0)).toLocaleString()}₫</span>
+                  </div>
+                  <div className="product-rating">
+                    <span className="star">★</span> <span>4.0</span>
+                  </div>
+                </div>
+                <a
+                  href={item.slug ? `/product/${item.slug}` : '#'}
+                  className="btn-add-cart"
+                  style={{
+                    background: '#38bdf8',
+                    color: '#fff',
+                    borderRadius: 999,
+                    fontWeight: 600,
+                    display: 'inline-block',
+                    textAlign: 'center',
+                    padding: '12px 24px',
+                    cursor: item.slug ? 'pointer' : 'not-allowed',
+                    pointerEvents: item.slug ? 'auto' : 'none'
+                  }}
+                >
+                  Xem chi tiết <i className="fa fa-eye"></i>
+                </a>
               </div>
             </div>
           ))}
