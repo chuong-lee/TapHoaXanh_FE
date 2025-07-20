@@ -208,7 +208,7 @@ export default function HomePage() {
                       alt={product.name}
                       width={120}
                       height={120}
-                      style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent'}}
+                      style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
                     />
                   </div>
                   {/* Nhãn giảm giá */}
@@ -286,7 +286,7 @@ export default function HomePage() {
                       alt={product.name}
                       width={140}
                       height={140}
-                      style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent'}}
+                      style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
                     />
                   </div>
                   <div className="product-info">
@@ -390,6 +390,7 @@ export default function HomePage() {
                     <img
                       src={fixImgSrc(product.images)}
                       alt={product.name}
+                      style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
                     />
                   </div>
                   <div className="brand-row">

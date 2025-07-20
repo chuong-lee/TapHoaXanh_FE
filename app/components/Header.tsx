@@ -40,6 +40,9 @@ const Header = () => {
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">
                 <i className="fa-solid fa-envelope"></i> Liên Hệ
               </Link>
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/orders">
+                <i className="fa-solid fa-box"></i> Đơn hàng
+              </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/cart">
                 <i className="fa-solid fa-cart-shopping"></i> Giỏ Hàng
               </Link>

@@ -80,6 +80,39 @@ main {
   color: #fff;
 }
 
+/* Đảm bảo header luôn giữ màu xanh và text trắng */
+.custom-header,
+.custom-header.scrolled {
+  background: var(--primary-green) !important;
+  color: #fff !important;
+}
+
+.custom-header .navbar-brand,
+.custom-header .nav-link,
+.custom-header .navbar-toggler,
+.custom-header .navbar-toggler i,
+.custom-header .marquee-text {
+  color: #fff !important;
+}
+
+.custom-header.scrolled .navbar-brand,
+.custom-header.scrolled .nav-link,
+.custom-header.scrolled .navbar-toggler,
+.custom-header.scrolled .navbar-toggler i,
+.custom-header.scrolled .marquee-text {
+  color: #fff !important;
+}
+
+/* Đảm bảo header-slogan luôn hiển thị đúng */
+.header-slogan {
+  background: var(--primary-green) !important;
+  color: #fff !important;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 .main-content {
   padding-top: 70px !important; /* hoặc 80px nếu header cao 80px */
   padding-left: 0;
@@ -123,7 +156,7 @@ main {
 .marquee-text {
   display: inline-block;
   white-space: nowrap;
-  animation: marquee 18s linear infinite;
+  animation: marquee 9s linear infinite;
   color: #fff;
   font-weight: 500;
   font-size: 1.05rem;
@@ -880,7 +913,10 @@ input[type="range"].custom-range::-ms-fill-upper {
   border-radius: 4px;
 }
 
-header, .navbar, .main-header {
+/* Header styles - đảm bảo không bị ghi đè */
+header:not(.custom-header), 
+.navbar:not(.custom-header .navbar), 
+.main-header {
   background: var(--primary-green) !important;
   color: #fff;
 }
@@ -943,4 +979,97 @@ a:hover, .link:hover {
 .custom-product-card:hover,
 .featured-product-card:hover {
   border-color: #e5e7eb !important; /* xám nhạt */
+}
+
+/* Chống ghi đè styles cho header */
+.custom-header,
+.custom-header.scrolled,
+.custom-header .navbar-brand,
+.custom-header .nav-link,
+.custom-header .navbar-toggler,
+.custom-header .navbar-toggler i,
+.custom-header .marquee-text,
+.header-slogan {
+  background: var(--primary-green) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.08) !important;
+}
+
+/* Khi scroll, header mất nền và chữ chuyển xanh */
+.custom-header.scrolled {
+  background: #fff !important;
+  color: var(--primary-green) !important;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.08) !important;
+}
+.custom-header.scrolled .navbar-brand,
+.custom-header.scrolled .nav-link,
+.custom-header.scrolled .navbar-toggler,
+.custom-header.scrolled .navbar-toggler i,
+.custom-header.scrolled .marquee-text {
+  color: var(--primary-green) !important;
+}
+
+/* Khi scroll, các link trên header có viền xanh và nền nhạt để nổi bật */
+.custom-header.scrolled .nav-link,
+.custom-header.scrolled .navbar-brand {
+  color: var(--primary-green) !important;
+  background: #e0fbe2 !important;   /* nền xanh nhạt */
+  border-radius: 8px;
+  padding: 4px 12px;
+  border: 1.5px solid var(--primary-green);
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+.custom-header.scrolled .nav-link:hover,
+.custom-header.scrolled .navbar-brand:hover {
+  background: #bbf7d0 !important;   /* xanh nhạt hơn khi hover */
+  color: var(--primary-green-dark) !important;
+  border-color: var(--primary-green-dark);
+}
+
+/* Căn giữa marquee với các mục menu */
+.header-marquee {
+  display: flex;
+  align-items: center;
+  height: 40px; /* hoặc 100% nếu muốn full chiều cao header */
+  min-height: 40px;
+  margin: 0 12px;
+  padding: 0;
+}
+
+.marquee-text {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: inherit;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Khi scroll, đảm bảo chữ marquee hiện rõ màu xanh */
+.custom-header.scrolled .marquee-text {
+  color: var(--primary-green) !important;
+  font-weight: 600;
+}
+
+/* Khi scroll, đảm bảo vùng marquee không bị nền xanh che */
+.custom-header.scrolled .header-marquee {
+  background: transparent !important;
+}
+
+/* Đảm bảo vùng marquee chiếm đủ không gian */
+.header-marquee {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Xóa nền xanh của dòng chữ chạy khi scroll */
+.custom-header.scrolled .marquee-text,
+.custom-header.scrolled .marquee-text *,
+.custom-header.scrolled .marquee-text span {
+  background: transparent !important;
 }

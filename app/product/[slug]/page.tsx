@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
   const totalPrice = getSelectedPrice() * quantity;
 
   return (
-    <div className="container py-4">
+    <div className="container main-content py-4" style={{ paddingTop: 110 }}>
       <style jsx>{`
         .option-btn {
           border: 2px solid #ddd;
