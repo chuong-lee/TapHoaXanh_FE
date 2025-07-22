@@ -1075,3 +1075,14 @@ a:hover, .link:hover {
 .custom-header.scrolled .marquee-text span {
   background: transparent !important;
 }
+
+.banner-sale {
+  background: #dc3545;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 8px 28px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  display: inline-block;
+}

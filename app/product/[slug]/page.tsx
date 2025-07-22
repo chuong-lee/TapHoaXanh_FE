@@ -111,9 +111,19 @@ export default function ProductDetailPage() {
   if (!product) return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>
 
   const getSelectedPrice = () => {
-    const base = product.price * (1 - product.discount / 100);
     const variant = variants.find(v => v.id === selectedVariant);
-    return base + (variant?.price_modifier || 0);
+    const priceModifier = variant?.price_modifier || 0;
+
+    // Nếu priceModifier = 0, giá gốc là product.price
+    // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
+    const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
+
+    // Giá sau giảm
+    const finalPrice = basePrice - product.discount;
+
+    // Phần trăm giảm giá (nếu muốn hiển thị badge)
+    const percent = Math.round((product.discount / basePrice) * 100);
+    return finalPrice;
   };
   const totalPrice = getSelectedPrice() * quantity;
 
@@ -302,11 +312,22 @@ export default function ProductDetailPage() {
                       onClick={() => {
                         if (!selectedVariant) return;
                         const variant = variants.find(v => v.id === selectedVariant);
+                        const priceModifier = variant?.price_modifier || 0;
+
+                        // Nếu priceModifier = 0, giá gốc là product.price
+                        // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
+                        const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
+
+                        // Giá sau giảm
+                        const finalPrice = basePrice - product.discount;
+
+                        // Phần trăm giảm giá (nếu muốn hiển thị badge)
+                        const percent = Math.round((product.discount / basePrice) * 100);
                         addToCart({
                           ...product,
                           variant_id: variant?.id,
                           variant_name: variant?.variant_name,
-                          price: product.price + (variant?.price_modifier || 0),
+                          price: finalPrice,
                           stock: variant?.stock || 0,
                           images: Array.isArray(product.images) ? product.images.join(',') : product.images,
                         }, quantity);
@@ -430,10 +451,15 @@ export default function ProductDetailPage() {
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
         <div className="row g-3">
-          {relatedProducts.map((item, i) => (
+          {relatedProducts.map((item, i) => {
+            const basePrice = item.price;
+            const finalPrice = basePrice - item.discount;
+            return (
             <div className="col-3" key={item.id}>
               <div className="custom-product-card h-100">
-                <span className="badge-hot">Hot</span>
+                  <span className="badge-hot">
+                    -{Math.round((item.discount / item.price) * 100)}%
+                  </span>
                 <div className="product-image">
                   <Image
                     src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.png') : '/images/placeholder.png'))}
@@ -448,8 +474,8 @@ export default function ProductDetailPage() {
                   <div className="product-name">{item.name}</div>
                   <div className="product-brand">Bởi NestFood</div>
                   <div className="product-price">
-                    <span className="price-main">{item.price.toLocaleString()}₫</span>
-                    <span className="price-old">{(item.price + (item.discount || 0)).toLocaleString()}₫</span>
+                      <span className="price-main">{finalPrice.toLocaleString()}₫</span>
+                      <span className="price-old">{basePrice.toLocaleString()}₫</span>
                   </div>
                   <div className="product-rating">
                     <span className="star">★</span> <span>4.0</span>
@@ -474,7 +500,8 @@ export default function ProductDetailPage() {
                 </a>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

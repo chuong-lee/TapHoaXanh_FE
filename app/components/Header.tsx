@@ -28,7 +28,7 @@ const Header = () => {
               </div>
             </div>
             <div className="d-none d-lg-flex align-items-center gap-4">
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/home">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/">
                 <i className="fa-solid fa-house"></i> Trang Chủ
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product">
