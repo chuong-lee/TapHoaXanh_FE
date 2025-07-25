@@ -37,41 +37,43 @@ export default function NewsDetailPage() {
   if (!news) return <div>Đang tải...</div>
 
   return (
-    <div className="container py-4" style={{display: 'flex', gap: 32}}>
-      {/* Main content */}
-      <div style={{flex: 3}}>
-        <div>
-          <div style={{color: '#1dbf73', fontWeight: 700, marginBottom: 8, fontSize: 18}}>Recipes</div>
-          <h1 style={{fontWeight: 800, fontSize: 36, marginBottom: 8}}>{news.title}</h1>
-          <div style={{color: '#888', marginBottom: 16}}>
-            by <b>Sugar Rock</b> · {news.date} · {news.readTime} read
-          </div>
-          <img src={news.image} alt={news.title} style={{width: '100%', maxHeight: 350, objectFit: 'cover', borderRadius: 12, marginBottom: 24}} />
-          <div style={{fontWeight: 600, fontSize: 20, marginBottom: 12}}>
-            {/* Nếu description có nhiều đoạn, tách và render từng đoạn */}
-            {news.description.split('\n').map((line, idx) =>
-              idx === 0 ? (
-                <span key={idx} style={{fontWeight: 700, fontSize: 22, display: 'block', marginBottom: 8}}>
-                  {line}
-                </span>
-              ) : (
-                <span key={idx} style={{fontWeight: 400, display: 'block', marginBottom: 8}}>
-                  {line}
-                </span>
-              )
-            )}
-          </div>
-          {/* Nội dung chính, có thể render thêm nếu backend trả về */}
-          <div style={{color: '#222', fontSize: 17, lineHeight: 1.7}}>
-            {/* Nếu có trường content thì render ở đây */}
-            {/* {news.content} */}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet in enim libero...
+    <main className="main-content">
+      <div className="container py-4" style={{display: 'flex', gap: 32}}>
+        {/* Main content */}
+        <div style={{flex: 3}}>
+          <div>
+            <div style={{color: '#1dbf73', fontWeight: 700, marginBottom: 8, fontSize: 18}}>Recipes</div>
+            <h1 style={{fontWeight: 800, fontSize: 36, marginBottom: 8}}>{news.title}</h1>
+            <div style={{color: '#888', marginBottom: 16}}>
+              by <b>Sugar Rock</b> · {news.date} · {news.readTime} read
+            </div>
+            <img src={news.image} alt={news.title} style={{width: '100%', maxHeight: 350, objectFit: 'cover', borderRadius: 12, marginBottom: 24}} />
+            <div style={{fontWeight: 600, fontSize: 20, marginBottom: 12}}>
+              {/* Nếu description có nhiều đoạn, tách và render từng đoạn */}
+              {news.description.split('\n').map((line, idx) =>
+                idx === 0 ? (
+                  <span key={idx} style={{fontWeight: 700, fontSize: 22, display: 'block', marginBottom: 8}}>
+                    {line}
+                  </span>
+                ) : (
+                  <span key={idx} style={{fontWeight: 400, display: 'block', marginBottom: 8}}>
+                    {line}
+                  </span>
+                )
+              )}
+            </div>
+            {/* Nội dung chính, có thể render thêm nếu backend trả về */}
+            <div style={{color: '#222', fontSize: 17, lineHeight: 1.7}}>
+              {/* Nếu có trường content thì render ở đây */}
+              {/* {news.content} */}
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet in enim libero...
+            </div>
           </div>
         </div>
+        {/* Related posts */}
+        <RelatedPosts currentId={news.id} />
       </div>
-      {/* Related posts */}
-      <RelatedPosts currentId={news.id} />
-    </div>
+    </main>
   )
 }
 
