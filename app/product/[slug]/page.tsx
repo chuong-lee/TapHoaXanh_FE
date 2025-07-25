@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch {
+      } catch (e) {
         setVariants([]);
       }
     };
@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
         // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
         products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
         setRelatedProducts(products);
-      } catch {
+      } catch (e) {
         setRelatedProducts([]);
       }
     };
@@ -111,14 +111,24 @@ export default function ProductDetailPage() {
   if (!product) return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>
 
   const getSelectedPrice = () => {
-    const base = product.price * (1 - product.discount / 100);
     const variant = variants.find(v => v.id === selectedVariant);
-    return base + (variant?.price_modifier || 0);
+    const priceModifier = variant?.price_modifier || 0;
+
+    // Nếu priceModifier = 0, giá gốc là product.price
+    // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
+    const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
+
+    // Giá sau giảm
+    const finalPrice = basePrice - product.discount;
+
+    // Phần trăm giảm giá (nếu muốn hiển thị badge)
+    const percent = Math.round((product.discount / basePrice) * 100);
+    return finalPrice;
   };
   const totalPrice = getSelectedPrice() * quantity;
 
   return (
-    <div className="container py-4">
+    <div className="container main-content py-4" style={{ paddingTop: 110 }}>
       <style jsx>{`
         .option-btn {
           border: 2px solid #ddd;
@@ -205,14 +215,18 @@ export default function ProductDetailPage() {
             {/* Left part of right column: Info */}
             <div className="col-md-7">
               <h4 className="mb-1">{product.name}</h4>
-              <div className="mb-2 text-muted">
-                Mã SP: COCA330 | DANH MỤC: Nước giải khát | THƯƠNG HIỆU: Coca-Cola
-              </div>
-              <ul>
-                <li>Nước giải khát có gas, hương vị truyền thống</li>
-                <li>Thể tích: 330ml/lon</li>
-                <li>Thích hợp cho mọi bữa tiệc, dã ngoại, giải khát tức thì</li>
-              </ul>
+              <div
+                style={{
+                  fontSize: 16,
+                  color: '#555',
+                  fontStyle: 'italic',
+                  lineHeight: 1.7,
+                  marginBottom: 12
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: product.description.replace(/\\n/g, '<br />')
+                }}
+              />
               <div className="mb-2">
                 <span className="text-success fw-bold">MIỄN PHÍ GIAO HÀNG</span>
                 <span className="text-danger ms-3 fw-bold">QUÀ TẶNG MIỄN PHÍ</span>
@@ -266,7 +280,11 @@ export default function ProductDetailPage() {
               <div className="card shadow-sm p-3" style={{ borderRadius: 12 }}>
                 <div className="d-flex align-items-baseline">
                   <div className="fs-2 fw-bold text-dark">
-                    {totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}
+                    {selectedVariant ? (
+                      <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
+                    ) : (
+                      <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
+                    )}
                   </div>
                 </div>
                 <div className="my-3">
@@ -274,24 +292,42 @@ export default function ProductDetailPage() {
                     <i className="bi bi-check-circle-fill"></i> Còn hàng
                   </span>
                 </div>
-                <div className="d-flex align-items-center mb-3">
-                  <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                  <span className="mx-3 fs-5 fw-bold">{quantity}</span>
-                  <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
-                </div>
+                {selectedVariant && (
+                  <div className="d-flex align-items-center mb-3">
+                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                    <span className="mx-3 fs-5 fw-bold">{quantity}</span>
+                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
+                  </div>
+                )}
                 {variants.length > 0 ? (
                   <>
                     <button
-                      className="btn btn-success btn-lg w-100 mb-2 fw-bold"
-                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      className="btn w-100 mb-2 fw-bold"
+                      style={{
+                        background: '#22c55e',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
                       onClick={() => {
                         if (!selectedVariant) return;
                         const variant = variants.find(v => v.id === selectedVariant);
+                        const priceModifier = variant?.price_modifier || 0;
+
+                        // Nếu priceModifier = 0, giá gốc là product.price
+                        // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
+                        const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
+
+                        // Giá sau giảm
+                        const finalPrice = basePrice - product.discount;
+
+                        // Phần trăm giảm giá (nếu muốn hiển thị badge)
+                        const percent = Math.round((product.discount / basePrice) * 100);
                         addToCart({
                           ...product,
                           variant_id: variant?.id,
                           variant_name: variant?.variant_name,
-                          price: product.price + (variant?.price_modifier || 0),
+                          price: finalPrice,
                           stock: variant?.stock || 0,
                           images: Array.isArray(product.images) ? product.images.join(',') : product.images,
                         }, quantity);
@@ -302,8 +338,13 @@ export default function ProductDetailPage() {
                       Thêm vào giỏ hàng
                     </button>
                     <button
-                      className="btn btn-warning btn-lg w-100 mb-3 fw-bold"
-                      style={{ borderRadius: 8, opacity: !selectedVariant ? 0.6 : 1, pointerEvents: !selectedVariant ? 'none' : 'auto' }}
+                      className="btn w-100 mb-3 fw-bold"
+                      style={{
+                        background: '#fb923c',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
                       disabled={!selectedVariant}
                     >
                       Mua với PayPal
@@ -410,10 +451,15 @@ export default function ProductDetailPage() {
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
         <div className="row g-3">
-          {relatedProducts.map((item) => (
+          {relatedProducts.map((item, i) => {
+            const basePrice = item.price;
+            const finalPrice = basePrice - item.discount;
+            return (
             <div className="col-3" key={item.id}>
               <div className="custom-product-card h-100">
-                <span className="badge-hot">Hot</span>
+                  <span className="badge-hot">
+                    -{Math.round((item.discount / item.price) * 100)}%
+                  </span>
                 <div className="product-image">
                   <Image
                     src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.png') : '/images/placeholder.png'))}
@@ -428,8 +474,8 @@ export default function ProductDetailPage() {
                   <div className="product-name">{item.name}</div>
                   <div className="product-brand">Bởi NestFood</div>
                   <div className="product-price">
-                    <span className="price-main">{item.price.toLocaleString()}₫</span>
-                    <span className="price-old">{(item.price + (item.discount || 0)).toLocaleString()}₫</span>
+                      <span className="price-main">{finalPrice.toLocaleString()}₫</span>
+                      <span className="price-old">{basePrice.toLocaleString()}₫</span>
                   </div>
                   <div className="product-rating">
                     <span className="star">★</span> <span>4.0</span>
@@ -454,7 +500,8 @@ export default function ProductDetailPage() {
                 </a>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

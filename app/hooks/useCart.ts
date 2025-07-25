@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import api from "../lib/axios"
 
 export type CartItem = {
@@ -18,6 +18,8 @@ export type CartItem = {
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
+  const prevCartLength = useRef(cart.length);
 
   useEffect(() => {
     const local = localStorage.getItem("cart_local")
@@ -37,35 +39,46 @@ export function useCart() {
     }
   }, [])
 
+  useEffect(() => {
+    if (cart.length !== prevCartLength.current) {
+      setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
+      prevCartLength.current = cart.length;
+    }
+  }, [cart]);
+
   const saveToLocal = (items: CartItem[]) => {
     localStorage.setItem("cart_local", JSON.stringify(items))
     setCart(items)
   }
 
   const addToCart = (product: Omit<CartItem, "quantity">, quantity: number = 1) => {
-    const existing = cart.find((item) => item.slug === product.slug)
-    let updatedCart
-
-    if (existing) {
-      updatedCart = cart.map((item) =>
-        item.slug === product.slug ? { ...item, quantity: item.quantity + quantity } : item
-      )
-    } else {
-      updatedCart = [...cart, { ...product, quantity }]
-    }
-
-    saveToLocal(updatedCart)
+    setCart(prevCart => {
+      const existingIndex = prevCart.findIndex(
+        item => item.slug === product.slug && item.variant_id === product.variant_id
+      );
+      let updatedCart;
+      if (existingIndex !== -1) {
+        updatedCart = [...prevCart];
+        updatedCart[existingIndex].quantity += quantity;
+      } else {
+        updatedCart = [...prevCart, { ...product, quantity }];
+      }
+      saveToLocal(updatedCart); // <-- Thêm dòng này
+      return updatedCart;
+    });
   }
 
-  const removeFromCart = (slug: string) => {
-    const updatedCart = cart.filter((item) => item.slug !== slug)
-    saveToLocal(updatedCart)
-  }
+  const removeFromCart = (slug: string, variant_id?: number) => {
+    const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+    saveToLocal(updatedCart);
+  };
 
-  const updateQuantity = (slug: string, quantity: number) => {
+  const updateQuantity = (slug: string, variant_id: number | undefined, quantity: number) => {
     if (quantity < 1) return;
-    const updatedCart = cart.map(item => 
-      item.slug === slug ? { ...item, quantity } : item
+    const updatedCart = cart.map(item =>
+      item.slug === slug && item.variant_id === variant_id
+        ? { ...item, quantity }
+        : item
     );
     saveToLocal(updatedCart);
   };

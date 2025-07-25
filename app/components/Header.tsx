@@ -1,12 +1,12 @@
-"use client"
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
-import Footer from '../components/Footer';
 
-export default function HomeLayout({ children }: { children: React.ReactNode }) {
+const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -22,16 +22,14 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
               <Image className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh Logo" width={56} height={56} style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)'}} />
               <span className="fw-bold fs-4" style={{letterSpacing: 1}}>Tạp Hóa Xanh</span>
             </Link>
-            
             {/* Marquee chạy chữ */}
             <div className="header-marquee flex-grow-1 d-none d-lg-block mx-3">
               <div className="marquee-text">
                 🚚 Miễn phí giao hàng toàn quốc cho đơn từ 300.000đ! | 🎁 Ưu đãi thành viên mới lên đến 50.000đ | ☎️ Hotline: 0901 234 567
               </div>
             </div>
-
             <div className="d-none d-lg-flex align-items-center gap-4">
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/home">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/">
                 <i className="fa-solid fa-house"></i> Trang Chủ
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product">
@@ -42,6 +40,9 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">
                 <i className="fa-solid fa-envelope"></i> Liên Hệ
+              </Link>
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/orders">
+                <i className="fa-solid fa-box"></i> Đơn hàng
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/cart">
                 <i className="fa-solid fa-cart-shopping"></i> Giỏ Hàng
@@ -59,8 +60,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       <div className="header-slogan d-none d-lg-block fst-italic text-white">
         &quot;Tươi sạch mỗi ngày - Giao nhanh tận nhà&quot;
       </div>
-      <main className="main-content">{children}</main>
-      <Footer />
     </>
   )
 }
+
+export default Header;
