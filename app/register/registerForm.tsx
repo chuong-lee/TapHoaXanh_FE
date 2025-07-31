@@ -16,7 +16,7 @@ function RegisterForm() {
   const confirmPasswordRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/home'
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const handleRegister = async (e:FormEvent) => {
     e.preventDefault()
@@ -43,7 +43,7 @@ function RegisterForm() {
   return (
     <form onSubmit={handleRegister} className="mx-auto col-md-6 col-lg-5 col-12">
         <div className="mb-3">
-        <label className="form-label">tên người dùng</label>
+        <label className="form-label">Tên người dùng</label>
         <input
           type="text"
           className="form-control"
