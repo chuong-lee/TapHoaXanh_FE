@@ -13,7 +13,7 @@ function LoginForm() {
   const passwordRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/home'
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const handleLogin = async (e:FormEvent) => {
     e.preventDefault()
@@ -25,6 +25,12 @@ function LoginForm() {
         password: passwordRef.current?.value || ''
       }).then(res => {
         console.log(res);
+        // Lưu token vào localStorage
+        if (res.data?.token) {
+          localStorage.setItem('token', res.data.token);
+        } else if (res.data?.access_token) {
+          localStorage.setItem('token', res.data.access_token);
+        }
         router.push(redirectTo);
       } ).catch(err => {
         console.log(err);
