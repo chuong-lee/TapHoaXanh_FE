@@ -53,23 +53,35 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await api.get<Product[]>('/products')
-        const found = res.data.find((item) => item.slug === slug)
-        if (found) {
+        setLoading(true)
+        console.log('Đang tìm sản phẩm với slug:', slug);
+        
+        // Sử dụng API mới để lấy sản phẩm theo slug
+        const res = await api.get<Product>(`/products/slug/${slug}`)
+        console.log('Sản phẩm tìm thấy:', res.data);
+        
+        if (res.data) {
+          const found = res.data;
           const images: string[] = typeof found.images === 'string'
             ? found.images
                 .split(',')
                 .map(s => s && s.trim())
                 .filter(s => !!s && s !== 'null' && s !== 'undefined')
             : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
+          
+          console.log('Images đã xử lý:', images);
+          
           const productWithImagesArray = { ...found, images }
           setProduct(productWithImagesArray as Product)
           setSelectedImage(images[0] || null)
+          console.log('Đã set product thành công');
         } else {
+          console.log('Không tìm thấy sản phẩm với slug:', slug);
           setProduct(null)
         }
       } catch (err) {
         console.error('Lỗi lấy chi tiết sản phẩm:', err)
+        setProduct(null)
       } finally {
         setLoading(false)
       }

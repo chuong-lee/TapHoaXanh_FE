@@ -4,8 +4,10 @@ import api from "@/lib/axios";
 
 const STATUS_LABELS = [
   { key: "pending", label: "Chờ vận chuyển" },
-  { key: "shipping", label: "Đã vận chuyển" },
-  { key: "delivered", label: "Đã nhận hàng" },
+  { key: "confirmed", label: "Đã xác nhận" },
+  { key: "shipping", label: "Đang vận chuyển" },
+  { key: "delivered", label: "Đã giao hàng" },
+  { key: "cancelled", label: "Đã hủy" },
 ];
 
 export default function OrdersPage() {
@@ -15,15 +17,11 @@ export default function OrdersPage() {
 
   useEffect(() => {
     api.get("/order").then(res => {
-      // Giả lập status cho demo FE, backend nên trả về status thực tế
-      const fakeStatus = ["pending", "shipping", "delivered"];
       const data = Array.isArray(res.data) ? res.data : [];
-      setOrders(
-        data.map((o, i) => ({
-          ...o,
-          status: fakeStatus[i % 3], // Xoay vòng trạng thái cho demo
-        }))
-      );
+      setOrders(data);
+      setLoading(false);
+    }).catch(error => {
+      console.error('Error fetching orders:', error);
       setLoading(false);
     });
   }, []);
