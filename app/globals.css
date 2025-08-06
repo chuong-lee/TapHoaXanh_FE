@@ -1397,3 +1397,35 @@ a:hover, .link:hover {
 .login-card, .login-card form, .login-card .mb-3, .login-card .form-group {
   text-align: left !important;
 }
+
+.change-password-form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 2rem 1.5rem 2rem;
+  margin-top: 2rem;
+}
+.change-password-title {
+  font-weight: 600;
+  color: #198754;
+  letter-spacing: 0.5px;
+}
+.change-password-btn {
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.75rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(25,135,84,0.08);
+  transition: background 0.2s;
+}
+.change-password-btn:active {
+  background: #157347;
+}
+.form-label {
+  font-weight: 500;
+  color: #333;
+}
+.form-control:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(25,135,84,.15);
+}

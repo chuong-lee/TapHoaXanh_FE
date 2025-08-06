@@ -2,15 +2,20 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
+import { Dropdown } from 'react-bootstrap';
+import { useAuth } from '../context/AuthContext';
+import LogoutButton from './logout';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
   const router = useRouter();
+  const { profile } = useAuth();
+  const pathname = usePathname();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -101,13 +106,32 @@ const Header = () => {
                   </span>
                 )}
               </button>
-              <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
-                {/* SVG User/Đăng nhập */}
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </Link>
+              {profile ? (
+                <Dropdown align="end">
+                  <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 bg-transparent" style={{boxShadow: 'none'}}>
+                    {profile.image ? (
+                      <img src={profile.image} alt="avatar" width={32} height={32} style={{borderRadius: '50%', objectFit: 'cover', background: '#eee'}} />
+                    ) : (
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} href="/profile">Thông tin người dùng</Dropdown.Item>
+                    <Dropdown.Divider />
+                    <div className="px-3 py-1"><LogoutButton /></div>
+                  </Dropdown.Menu>
+                </Dropdown>
+              ) : (
+                <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </Link>
+              )}
             </div>
             {/* Nút menu mobile */}
             <button className="navbar-toggler text-highline border-0 pe-0 d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
