@@ -9,19 +9,50 @@ const api = axios.create({
 
 })
 // Add a request interceptor
-axios.interceptors.request.use(function (config) {
-  //them access token tại đây để truyền xuống backend.
+api.interceptors.request.use(
+  function (config) {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
-  }, function (error) {
+  },
+  function (error) {
     return Promise.reject(error);
-  });
+  }
+);
 
 // Add a response interceptor
-axios.interceptors.response.use(function (response) {
-  //them xử lý refresh token tại đây nếu api trả về 401.
-  //xử lý lại request sau khi có access mới.
+api.interceptors.response.use(
+  function (response) {
     return response;
-  }, function (error) {
+  },
+  async function (error) {
+    const originalRequest = error.config;
+    // Nếu lỗi là 401 và chưa từng retry
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        // Gọi API refresh token (giả sử backend trả về { token: '...' })
+        const res = await api.post('/auth/refresh', {}, { withCredentials: true });
+        const data = res.data as { token?: string };
+        const newToken = data.token;
+        if (newToken) {
+          localStorage.setItem('token', newToken);
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+           return api(originalRequest);
+          }
+      } catch (refreshError) {
+        // Nếu refresh thất bại, xóa token và chuyển về trang login
+        localStorage.removeItem('token');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
     return Promise.reject(error);
-  });
+  }
+);
 export default api

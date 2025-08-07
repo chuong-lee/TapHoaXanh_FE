@@ -3,7 +3,7 @@
 import { useState, useRef ,FormEvent} from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
-
+import { useAuth } from '../context/AuthContext';
 
 
 function LoginForm() {
@@ -14,6 +14,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
+  const { refreshProfile } = useAuth();
 
   const handleLogin = async (e:FormEvent) => {
     e.preventDefault()
@@ -23,14 +24,16 @@ function LoginForm() {
       await api.post('/auth/login', {
         email: emailRef.current?.value || '',
         password: passwordRef.current?.value || ''
-      }).then(res => {
+      }).then(async res => {
         console.log(res);
         // Lưu token vào localStorage
-        if (res.data?.token) {
-          localStorage.setItem('token', res.data.token);
-        } else if (res.data?.access_token) {
-          localStorage.setItem('token', res.data.access_token);
-        }
+        const data = res.data as { token?: string; access_token?: string };
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+            } else if (data.access_token) {
+                localStorage.setItem('token', data.access_token);
+            }
+        await refreshProfile();
         router.push(redirectTo);
       } ).catch(err => {
         console.log(err);
