@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type News = {
   id: number
@@ -14,31 +15,87 @@ type News = {
   category: string
 }
 
+// Hàm helper để xử lý URL hình ảnh
+const processImageUrl = (imageData: unknown): string => {
+  if (!imageData) return '/images/hinh1.jpg'
+  
+  // Nếu là array, lấy phần tử đầu tiên
+  if (Array.isArray(imageData)) {
+    return imageData.length > 0 ? imageData[0] : '/images/hinh1.jpg'
+  }
+  
+  // Nếu là string
+  if (typeof imageData === 'string') {
+    // Kiểm tra nếu là JSON array trong string
+    try {
+      const parsed = JSON.parse(imageData)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0]
+      }
+    } catch {
+      // Nếu không parse được, sử dụng string gốc
+      return imageData
+    }
+    return imageData
+  }
+  
+  return '/images/hinh1.jpg'
+}
+
 export default function NewsDetailPage() {
   const { id } = useParams()
   const [news, setNews] = useState<News | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:5000/news/${id}`)
-      .then(res => res.json())
-      .then(item => {
-        setNews({
-          id: item.id,
-          title: item.name,
-          image: item.images,
-          date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
-          views: Math.floor(Math.random() * 1000) + 100,
-          readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
-          description: item.description,
-          category: getRandomCategory(),
-        })
+    // Thử endpoint posts trước, nếu không có thì thử news
+    const fetchNewsDetail = async () => {
+      try {
+        console.log('Fetching news detail for ID:', id)
+        
+        // Thử endpoint posts trước
+        let response = await fetch(`http://localhost:4000/posts/${id}`)
+        
+        if (!response.ok) {
+          console.log('Posts endpoint không tìm thấy, thử news endpoint...')
+          response = await fetch(`http://localhost:4000/news/${id}`)
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const newsItem = await response.json()
+        console.log('API response:', newsItem)
+        
+        // Xử lý dữ liệu từ API
+        const newsData = {
+          id: newsItem.id,
+          title: newsItem.name || newsItem.title || 'Tiêu đề bài viết',
+          image: processImageUrl(newsItem.images || newsItem.image),
+          date: newsItem.createdAt ? new Date(newsItem.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
+          views: newsItem.views || Math.floor(Math.random() * 1000) + 100,
+          readTime: newsItem.readTime || (Math.floor(Math.random() * 10) + 3 + ' phút'),
+          description: newsItem.description || newsItem.content || 'Nội dung bài viết đang được cập nhật...',
+          category: typeof newsItem.category === 'string' 
+            ? newsItem.category 
+            : (typeof newsItem.category === 'object' && newsItem.category?.name 
+                ? newsItem.category.name 
+                : getRandomCategory()),
+        }
+        
+        console.log('Processed news data:', newsData)
+        setNews(newsData)
         setIsLoading(false)
-      })
-      .catch(error => {
-        console.error('Lỗi khi tải bài viết:', error)
+      } catch (error) {
+        console.error('Lỗi khi tải chi tiết bài viết:', error)
         setIsLoading(false)
-      })
+      }
+    }
+    
+    if (id) {
+      fetchNewsDetail()
+    }
   }, [id])
 
   const getRandomCategory = () => {
@@ -136,17 +193,22 @@ export default function NewsDetailPage() {
               </div>
 
               {/* Featured image */}
-              <img 
-                src={news.image} 
-                alt={news.title} 
-                style={{
-                  width: '100%',
-                  height: 400,
-                  objectFit: 'cover',
-                  borderRadius: 16,
-                  marginBottom: 32
-                }} 
-              />
+              <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: 32 }}>
+                <Image 
+                  src={news.image} 
+                  alt={news.title} 
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                    borderRadius: 16
+                  }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/images/hinh1.jpg';
+                  }}
+                />
+              </div>
 
               {/* Description */}
               <div style={{
@@ -327,29 +389,63 @@ function RelatedPosts({ currentId }: { currentId: number }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:5000/news')
-      .then(res => res.json())
-      .then(data => {
-        const mapped = data
-          .filter((item: any) => item.id !== currentId)
-          .map((item: any) => ({
-            id: item.id,
-            title: item.name,
-            image: item.images,
-            date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
-            views: Math.floor(Math.random() * 1000) + 100,
-            readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
-            description: item.description,
-            category: getRandomCategory(),
+    const fetchRelatedPosts = async () => {
+      try {
+        console.log('Fetching related posts...')
+        
+        // Thử endpoint posts trước
+        let response = await fetch('http://localhost:4000/posts')
+        
+        if (!response.ok) {
+          console.log('Posts endpoint không có, thử news endpoint...')
+          response = await fetch('http://localhost:4000/news')
+        }
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const relatedData = await response.json()
+        console.log('Related posts API response:', relatedData)
+        
+        const mapped = relatedData
+          .filter((postItem: { id: number }) => postItem.id !== currentId)
+          .map((postItem: {
+            id: number
+            name?: string
+            title?: string
+            images?: string | string[]
+            image?: string
+            createdAt?: string
+            description?: string
+            content?: string
+            category?: string | { name?: string }
+            views?: number
+            readTime?: string
+          }) => ({
+            id: postItem.id,
+            title: postItem.name || postItem.title || 'Tiêu đề bài viết',
+            image: processImageUrl(postItem.images || postItem.image),
+            date: postItem.createdAt ? new Date(postItem.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
+            views: postItem.views || Math.floor(Math.random() * 1000) + 100,
+            readTime: postItem.readTime || (Math.floor(Math.random() * 10) + 3 + ' phút'),
+            description: postItem.description || postItem.content || 'Mô tả bài viết...',
+            category: typeof postItem.category === 'string' 
+              ? postItem.category 
+              : (typeof postItem.category === 'object' && postItem.category?.name 
+                  ? postItem.category.name 
+                  : getRandomCategory()),
           }))
           .slice(0, 3)
         setRelated(mapped)
         setIsLoading(false)
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Lỗi khi tải bài viết liên quan:', error)
         setIsLoading(false)
-      })
+      }
+    }
+
+    fetchRelatedPosts()
   }, [currentId])
 
   const getRandomCategory = () => {
@@ -406,16 +502,22 @@ function RelatedPosts({ currentId }: { currentId: number }) {
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <img 
-              src={item.image} 
-              alt={item.title} 
-              style={{
-                width: 80, 
-                height: 60, 
-                objectFit: 'cover', 
-                borderRadius: 8
-              }} 
-            />
+            <div style={{ position: 'relative', width: '80px', height: '60px', flexShrink: 0 }}>
+              <Image 
+                src={item.image} 
+                alt={item.title} 
+                fill
+                style={{
+                  objectFit: 'cover',
+                  borderRadius: 8
+                }}
+                sizes="80px"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/images/hinh1.jpg';
+                }}
+              />
+            </div>
             <div style={{flex: 1}}>
               <div style={{
                 fontWeight: 600, 

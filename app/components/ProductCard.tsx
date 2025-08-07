@@ -1,21 +1,14 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { Product } from '@/lib/productService'
 
-type Product = {
-  id: number
-  name: string
-  price: number
-  slug: string
-  images: string
-  discount: number
-  description: string
-  brand?: string | { name: string }
-  rating?: number
-  category?: {
-    id: number
-    name: string
-  }
-  categoryId?: number
+interface ProductCardProps {
+  product: Product
+  onAddToCart?: (product: Product) => void
+  showBadge?: boolean
+  badgeText?: string
+  badgeClass?: string
+  layout?: 'default' | 'horizontal' | 'minimal'
 }
 
 function fixImgSrc(img: string) {
@@ -26,7 +19,14 @@ function fixImgSrc(img: string) {
   return '/images/products/' + img;
 }
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ 
+  product, 
+  onAddToCart,
+  showBadge = false,
+  badgeText,
+  badgeClass = 'badge-hot',
+  layout = 'default'
+}: ProductCardProps) {
   const router = useRouter();
 
   const handleViewDetail = () => {
@@ -39,9 +39,21 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="product-card" style={{
-      border: '1.5px solid #f3f3f3', borderRadius: 16, padding: 18, background: '#fff', minHeight: 340
-    }}>
+    <div
+      className="product-card"
+      style={{
+        border: '1.5px solid #f3f3f3',
+        borderRadius: 16,
+        padding: 18,
+        background: '#fff',
+        minHeight: 340,
+        cursor: 'pointer'
+      }}
+      onClick={handleViewDetail}
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter') handleViewDetail() }}
+      role="button"
+    >
       <div className="text-center mb-2">
         <Image
           src={fixImgSrc(product.images)}
@@ -69,9 +81,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="mb-1" style={{fontSize: 14, color: '#e11d48', fontWeight: 500}}>
         by <span style={{color: '#ff9800'}}>
-          {typeof product.brand === 'string' ? product.brand : 
-           typeof product.brand === 'object' && product.brand?.name ? product.brand.name : 
-           'brsmaket'}
+          {product.brand ? product.brand : 'brsmaket'}
         </span>
       </div>
       <div className="mb-1">
@@ -99,7 +109,7 @@ export default function ProductCard({ product }: { product: Product }) {
         onMouseLeave={(e) => {
           e.currentTarget.style.background = '#22c55e'
         }}
-        onClick={handleViewDetail}
+        // onClick removed, now handled by card
       >
         Xem chi tiết
       </button>

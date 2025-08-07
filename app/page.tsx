@@ -1,532 +1,713 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+import React from 'react'
 import { useRouter } from 'next/navigation'
-import api from '@/lib/axios'
-import Pagination from '@/components/Pagination'
-import Marquee from './components/Marquee';
+import Marquee from './components/Marquee'
+import { ProductListSkeleton, LoadingSpinner } from '@/components/LoadingSkeleton'
+import { withErrorBoundary } from '@/components/ErrorBoundary'
+import { useProducts } from '@/hooks/useProducts'
+import { Product, Category, productService } from '@/lib/productService'
+import { CategoryList } from '@/components/CategoryList'
 
 function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.png';
-  if (img.startsWith('http')) return img;
-  if (img.startsWith('/')) return img;
-  if (img.startsWith('client/images/')) return '/' + img;
-  return '/images/products/' + img;
+  if (!img) return '/images/placeholder.png'
+  if (img.startsWith('http')) return img
+  if (img.startsWith('/')) return img
+  if (img.startsWith('client/images/')) return '/' + img
+  return '/images/products/' + img
 }
 
-interface Category {
-  name: string
-  color: string
-  icon: string
-  count: number
+// Thêm hàm để lấy ảnh danh mục
+function getCategoryImage(category: Category, index: number) {
+  // Ưu tiên 1: Ảnh từ API (nếu có)
+  if (category.image) {
+    return fixImgSrc(category.image)
+  }
+  
+  // Ưu tiên 2: Icon từ API (nếu có)
+  if (category.icon) {
+    return fixImgSrc(category.icon)
+  }
+  
+  // Ưu tiên 3: Ảnh theo slug của danh mục
+  if (category.slug) {
+    return `./client/images/categories/${category.slug}.png`
+  }
+  
+  // Ưu tiên 4: Ảnh theo index/thứ tự
+  return `./client/images/categories/category-${index + 1}.png`
 }
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  slug: string
-  images: string
-  discount: number
-  description: string
-  category?: string
+// Mapping danh mục với ảnh cố định (fallback)
+const categoryImageMap: {[key: string]: string} = {
+  'do-uong': 'drinks.png',
+  'nong-san-thuc-pham': 'vegetables.png',
+  'thuy-hai-san': 'seafood.png',
+  'chan-nuoi': 'meat.png',
+  'thuc-pham-che-bien': 'processed.png',
+  'gia-vi-nguyen-lieu': 'spices.png',
+  'an-vat-banh-keo': 'snacks.png',
+  'thuc-uong-thuc-pham': 'beverages.png',
+  'dac-san-truyen-thong': 'specialty.png'
+}
+
+function getCategoryImageBySlug(slug: string, index: number) {
+  // Ưu tiên 1: Mapping theo slug
+  if (categoryImageMap[slug]) {
+    return `./client/images/categories/${categoryImageMap[slug]}`
+  }
+  
+  // Ưu tiên 2: Theo slug trực tiếp
+  return `./client/images/categories/${slug}.png`
 }
 
 export default function HomePage() {
   const router = useRouter()
-  const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 20
-  const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await api.get('/products')
-        const data: unknown = res.data
-        let productList: Product[] = []
-        if (Array.isArray(data)) {
-          productList = data as Product[]
-        } else if (
-          typeof data === 'object' &&
-          data !== null &&
-          Array.isArray((data as { products?: unknown }).products)
-        ) {
-          productList = (data as { products: Product[] }).products
-        } else {
-          console.error('❌ Dữ liệu sản phẩm không hợp lệ:', data)
-        }
-        console.log('Products loaded:', productList)
-        setAllProducts(productList)
-        setProducts(productList)
-      } catch (err: unknown) {
-        setAllProducts([])
-        setProducts([])
-      } finally {
-        setLoading(false)
-      }
+  const {
+    currentProducts,
+    categories,
+    featuredProducts,
+    bestSellingProducts,
+    loading,
+    categoriesLoading,
+    featuredLoading,
+    error,
+    fetchFeaturedProducts,
+    fetchBestSellingProducts,
+    filterByCategory,
+    currentPage,
+    setCurrentPage
+  } = useProducts({
+    itemsPerPage: 20
+  })
+
+  // State để quản lý sản phẩm theo danh mục
+  const [categoryProducts, setCategoryProducts] = React.useState<{[key: string]: Product[]}>({})
+  const [loadingCategories, setLoadingCategories] = React.useState<{[key: string]: boolean}>({})
+  const [categoryCounts, setCategoryCounts] = React.useState<{[key: number]: number}>({})
+  const [loadingCounts, setLoadingCounts] = React.useState(false)
+  const [categoriesProcessed, setCategoriesProcessed] = React.useState(false)
+
+  // Lấy sản phẩm theo từng danh mục
+  const fetchProductsByCategory = React.useCallback(async (categoryId: number, categoryName: string) => {
+    try {
+      setLoadingCategories(prev => ({...prev, [categoryName]: true}))
+      const products = await productService.getProductsByCategory(categoryId, {limit: 4})
+      setCategoryProducts(prev => ({...prev, [categoryName]: products}))
+    } catch (err) {
+      console.error(`Error fetching products for category ${categoryName}:`, err)
+    } finally {
+      setLoadingCategories(prev => ({...prev, [categoryName]: false}))
     }
-    fetchData()
-
-    // Lấy categories từ API
-    const fetchCategories = async () => {
-      try {
-        const res = await api.get('/categories');
-        setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
-      } catch (err) {
-        setCategories([]);
-      }
-    };
-    fetchCategories();
   }, [])
 
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentProducts = products.slice(startIndex, endIndex)
+  // Hàm lấy số lượng sản phẩm cho tất cả danh mục
+  const fetchCategoryCounts = React.useCallback(async () => {
+    if (categories.length === 0) return
+    
+    setLoadingCounts(true)
+    try {
+      const counts: {[key: number]: number} = {}
+      
+      await Promise.all(
+        categories.map(async (category) => {
+          try {
+            const products = await productService.getProductsByCategory(category.id, {limit: 1000})
+            counts[category.id] = products.length
+          } catch (error) {
+            console.error(`Error fetching count for category ${category.name}:`, error)
+            counts[category.id] = 0
+          }
+        })
+      )
+      
+      setCategoryCounts(counts)
+    } catch (error) {
+      console.error('Error fetching category counts:', error)
+    } finally {
+      setLoadingCounts(false)
+    }
+  }, [categories])
+
+  // Lấy featured products và best selling products - chỉ chạy 1 lần
+  React.useEffect(() => {
+    fetchFeaturedProducts(8)
+    fetchBestSellingProducts(12)
+  }, [])
+
+  // Load số lượng sản phẩm khi categories được load
+  React.useEffect(() => {
+    if (categories.length > 0 && !categoriesProcessed) {
+      setCategoriesProcessed(true)
+      
+      fetchCategoryCounts()
+      
+      const mainCategories = categories.slice(0, 5)
+      mainCategories.forEach((cat, index) => {
+        fetchProductsByCategory(cat.id, `category-${index + 1}`)
+      })
+    }
+  }, [categories.length, categoriesProcessed])
+
+  // Reset flag khi categories thay đổi hoàn toàn
+  React.useEffect(() => {
+    if (categories.length === 0) {
+      setCategoriesProcessed(false)
+    }
+  }, [categories.length])
 
   const handleAddToCart = (product: Product) => {
-    // Bỏ kiểm tra đăng nhập, cho phép thao tác tự do
-    router.push(`/product/${product.slug}`);
-  };
+    router.push(`/product/${product.slug}`)
+  }
 
-  const handleViewDetail = (product: Product) => {
-    // Bỏ kiểm tra đăng nhập, cho phép thao tác tự do
-    router.push(`/product/${product.slug}`);
-  };
+  const handleCategoryClick = (category: Category) => {
+    router.push(`/category/${category.id}?name=${encodeURIComponent(category.name)}`)
+  }
+
+  // Debug để kiểm tra categories
+  console.log('🔍 Homepage Debug:', {
+    currentProducts: currentProducts?.length || 0,
+    categories: categories?.length || 0,
+    featuredProducts: featuredProducts?.length || 0,
+    loading,
+    categoriesLoading,
+    error,
+    useProducts_working: true,
+    api_url: process.env.NEXT_PUBLIC_API_URL,
+    categories_data: categories,
+    categories_names: categories.map(cat => cat.name)
+  })
 
   return (
     <>
       <Marquee />
-      <main className="main-content" style={{ paddingTop: 0 }}>
-        <div className="home-page min-vh-100 bg-light">
-          {/* Banner/Hero Section */}
-          <section className="hero-section-green mb-4" style={{background: '#f3f4f6', borderRadius: '0 0 32px 32px', marginTop: 0, paddingTop: 0, paddingBottom: 40}}>
+      <section>
+        <div className="home">
+          {/* Hero Section */}
+          <div className="hero-subscribe-section">
             <div className="container">
-              <div className="row align-items-center">
-                <div className="col-lg-7 mb-4 mb-lg-0">
-                  <div className="mb-2">
-                    <span className="badge bg-danger bg-opacity-10 text-danger px-3 py-2 fw-bold" style={{fontSize: '1rem'}}>100% Rau củ hữu cơ</span>
+              <div className="row align-items-center hero-subscribe-section-lg">
+                <div className="col-lg-7 col-md-12 mb-4 mb-lg-0">
+                  <div className="text-label mb-2">
+                    <span className="text-danger fw-bold">100%</span> Rau củ hữu cơ
                   </div>
-                  <h1 className="fw-bold display-4 mb-3" style={{lineHeight: 1.1, fontSize: '2.8rem'}}>
-                    Cách tốt nhất để<br />làm đầy ví của bạn.
+                  <h1 className="hero-title mb-3">
+                    Cách tốt nhất để<br />tiết kiệm cho ví của bạn.
                   </h1>
-                  <p className="lead text-secondary mb-4" style={{fontSize: '1.05rem'}}>
-                    Chào mừng bạn đến với Tạp Hóa Xanh! Nơi cung cấp thực phẩm sạch, an toàn và chất lượng cho gia đình bạn.
+                  <p className="text-muted mb-4">
+                    Mua sắm thông minh với Tạp Hoá Xanh - nơi cung cấp thực phẩm tươi ngon, 
+                    chất lượng cao với giá cả phải chăng nhất thị trường.
                   </p>
-                  <form className="d-flex mb-3" style={{maxWidth: 420}}>
-                    <div className="position-relative flex-grow-1">
-                      <span className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3" style={{color: '#888'}}>
-                        <i className="fa-solid fa-envelope"></i>
+                  <form className="d-flex align-items-center gap-2 hero-subscribe-form">
+                    <div className="input-group rounded-pill bg-white shadow-sm overflow-hidden">
+                      <span className="input-group-text bg-white border-0">
+                        <i className="fa fa-envelope text-muted"></i>
                       </span>
-                      <input
-                        type="email"
-                        className="form-control ps-5"
-                        placeholder="Nhập email của bạn"
-                        style={{
-                          borderRadius: 24,
-                          height: 44,
-                          border: 'none',
-                          boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                        }}
+                      <input 
+                        className="form-control border-0" 
+                        type="email" 
+                        placeholder="Địa chỉ email của bạn" 
                       />
                     </div>
-                    <button
-                      className="btn fw-bold ms-2"
-                      type="submit"
-                      style={{
-                        borderRadius: 24,
-                        height: 44,
-                        minWidth: 120,
-                        fontWeight: 600,
-                        fontSize: 17,
-                        background: '#22c55e',
-                        color: '#fff',
-                        boxShadow: '0 2px 8px rgba(34,197,94,0.08)'
-                      }}
-                    >
-                      Đăng ký
-                    </button>
+                    <button className="btn btn-success rounded-pill px-4">Đăng ký</button>
                   </form>
                 </div>
-                <div className="col-lg-5 text-center d-flex justify-content-end align-items-end" style={{height: '100%'}}>
-                  <Image
-                    src="/client/images/banner.png"
-                    alt="Tạp Hóa Xanh"
-                    width={1000}
-                    height={800}
-                    style={{
-                      objectFit: 'contain',
-                      background: 'none',
-                      width: '100%',      // luôn chiếm hết chiều ngang cột
-                      height: 'auto',     // tự động chiều cao
-                      maxWidth: 'none',   // không giới hạn
-                      maxHeight: 'none'   // không giới hạn
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Featured Categories */}
-          <section className="container mb-5">
-            <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Danh mục nổi bật</h2>
-            <div className="categories-scroll d-flex flex-nowrap gap-3">
-              {categories.map((cat, idx) => (
-                <div
-                  className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
-                  key={cat.name}
-                  style={{
-                    background: cat.color,
-                    borderRadius: 16,
-                    minWidth: 170,
-                    minHeight: 120,
-                    flex: '0 0 170px'
-                  }}
-                >
-                  <Image src={cat.icon} alt={cat.name} width={40} height={40} style={{objectFit: 'contain'}} />
-                  <div className="fw-bold mt-2" style={{fontSize: 15}}>{cat.name}</div>
-                  <div className="text-secondary small">{cat.count} sản phẩm</div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Banner + Featured Products Section */}
-          <section className="container mb-5">
-            <div className="featured-banner-products d-flex align-items-stretch" style={{gap: '12px'}}>
-              {/* Banner bên trái */}
-              <div className="featured-banner bg-dark text-white rounded-4 p-4 d-flex flex-column justify-content-between h-100" style={{minWidth: 260, maxWidth: 320}}>
-                <div>
-                  <span className="badge bg-success mb-2">Khuyến mãi</span>
-                  <h3 className="fw-bold mb-3" style={{fontSize: '2rem'}}>Mang thiên nhiên<br/>vào ngôi nhà bạn</h3>
-                </div>
-                <button className="btn btn-danger fw-bold px-4 py-2 mt-3 align-self-start" style={{borderRadius: 24, fontSize: 18}}>Mua ngay</button>
-              </div>
-              {/* Sản phẩm nổi bật bên phải */}
-              <div className="featured-product-list d-flex flex-row align-items-stretch">
-                {products.slice(0, 4).map((product, idx) => (
-                  <div
-                    key={product.id}
-                    className="featured-product-card card border-0 shadow-sm position-relative p-3"
-                  >
-                    {/* Thêm ảnh sản phẩm ở đây */}
-                    <div className="featured-product-image d-flex align-items-center justify-content-center mb-2">
-                      <Image
-                        src={fixImgSrc(product.images)}
-                        alt={product.name}
-                        width={120}
-                        height={120}
-                        style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
-                      />
-                    </div>
-                    {/* Nhãn giảm giá */}
-                    {idx === 0 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 35%</span>}
-                    {idx === 1 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Giảm giá</span>}
-                    {idx === 2 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Bán chạy</span>}
-                    {idx === 3 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 15%</span>}
-                    {/* Brand + icon sao */}
-                    <div className="d-flex align-items-center mb-1">
-                      <span className="text-secondary small me-2">Hodo Foods</span>
-                      <span className="text-warning" style={{fontSize: 16}}>&#9733;</span>
-                    </div>
-                    {/* Tên sản phẩm */}
-                    <h6 className="fw-bold text-dark mb-2" style={{fontSize: '1.08rem'}}>{product.name}</h6>
-                    {/* Giá */}
-                    <div className="mb-2">
-                      <span className="fw-bold text-success me-2" style={{fontSize: 18}}>{product.price.toLocaleString()}₫</span>
-                      <span className="text-muted text-decoration-line-through small">{(product.price + product.discount).toLocaleString()}₫</span>
-                    </div>
-                    {/* Thanh tiến trình bán */}
-                    <div className="mb-2">
-                      <div className="progress" style={{height: 4, borderRadius: 8}}>
-                        <div className="progress-bar bg-danger" role="progressbar" style={{width: `${90/120*100}%`}} aria-valuenow={90} aria-valuemin={0} aria-valuemax={120}></div>
-                      </div>
-                      <div className="small text-muted mt-1">Đã bán: 90/120</div>
-                    </div>
-                    {/* Nút Add To Cart */}
-                    <button 
-                      className="btn btn-danger w-100 fw-bold mt-auto" 
-                      style={{borderRadius: 24, fontSize: 18, padding: '10px 0'}}
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <i className="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
+                <div className="col-lg-5 col-md-12 text-center position-relative">
+                  <div className="hero-tags d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                      <i className="fa fa-times-circle text-muted me-1"></i>Mua sắm
+                    </button>
+                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
+                      <i className="fa fa-times-circle text-muted me-1"></i>Công thức
+                    </button>
+                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                      <i className="fa fa-times-circle text-muted me-1"></i>Bếp núc
+                    </button>
+                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
+                      <i className="fa fa-times-circle text-muted me-1"></i>Tin tức
+                    </button>
+                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                      <i className="fa fa-times-circle text-muted me-1"></i>Thực phẩm
                     </button>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
-          </section>
+            <div className="hero-subscribe">
+              <img className="hero-lettuce" src="./client/images/banner.png" alt="Banner" />
+            </div>
+            <img className="hero-decor1 floating" src="./client/images/decor4.png" alt="decor" />
+            <img className="hero-decor2 floating" src="./client/images/decor2.png" alt="decor" />
+            <img className="hero-decor3 floating" src="./client/images/decor3.png" alt="decor" />
+            <img className="hero-decor4 floating" src="./client/images/decor1.png" alt="decor" />
+          </div>
 
-          {/* Popular Products */}
-          <section className="container mb-5">
-            <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Sản phẩm phổ biến</h2>
-            {loading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-success" role="status">
-                  <span className="visually-hidden">Đang tải...</span>
+          <div className="container">
+            {/* Featured Categories */}
+            <div className="section-featured-categories">
+              <div className="featured-categories-header">
+                <h2 className="featured-categories-title">Tất cả danh mục ({categories.length})</h2>
+                <div className="featured-categories-tabs">
+                  <span className="tab-item active">Tất cả ({categories.length})</span>
+                  {categories.slice(0, 4).map((cat) => (
+                    <span key={cat.id || cat.name} className="tab-item">
+                      {cat.name} ({categoryCounts[cat.id] || 0})
+                    </span>
+                  ))}
                 </div>
-                <p className="mt-3 text-muted">Đang tải sản phẩm...</p>
+                <div className="featured-categories-nav">
+                  <button className="nav-btn left">
+                    <i className="icon-arrow-left"></i>
+                  </button>
+                  <button className="nav-btn right">
+                    <i className="icon-arrow-right"></i>
+                  </button>
+                </div>
               </div>
-            ) : (
-              <div className="product-list-grid">
-                {currentProducts.map((product, idx) => (
-                  <div className="custom-product-card d-flex flex-column h-100 position-relative" key={product.id}>
-                    {product.discount > 0 && (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          top: 8,
-                          right: 8,
-                          zIndex: 2,
-                          background: '#fb923c',
-                          color: '#fff',
-                          borderRadius: 8,
-                          padding: '2px 10px',
-                          fontWeight: 700,
-                          fontSize: 13,
-                          minWidth: 0,
-                          textAlign: 'center',
-                          lineHeight: '18px',
-                          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                          letterSpacing: 0.5
-                        }}
-                      >
-                        -{Math.round((product.discount / (product.price + product.discount)) * 100)}%
-                      </span>
-                    )}
-                    <div className="product-image">
-                      <Image
-                        src={fixImgSrc(product.images)}
-                        alt={product.name}
-                        width={140}
-                        height={140}
-                        style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
-                      />
+              
+              <div className="featured-categories-list" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
+                gap: '15px',
+                padding: '20px 0'
+              }}>
+                {categoriesLoading || loadingCounts ? (
+                  Array.from({length: 9}).map((_, idx) => (
+                    <div className="featured-category-item placeholder-glow" key={idx} style={{ minHeight: '120px' }}>
+                      <div className="placeholder bg-secondary" style={{width: 50, height: 50, borderRadius: '50%', margin: '0 auto 10px'}}></div>
+                      <div className="placeholder bg-secondary" style={{height: '12px', width: '80%', margin: '0 auto 5px'}}></div>
+                      <div className="placeholder bg-secondary" style={{height: '10px', width: '60%', margin: '0 auto'}}></div>
                     </div>
-                    <div className="product-info">
-                      <div className="product-type">Đồ ăn vặt</div>
-                      <div className="product-name">{product.name}</div>
-                      <div className="product-brand" style={{color: '#e11d48'}}>Bởi NestFood</div>
-                      <div className="product-price">
-                        <span className="price-main" style={{color: '#e11d48'}}>{product.price.toLocaleString()}₫</span>
-                        <span className="price-old">{(product.price + product.discount).toLocaleString()}₫</span>
-                      </div>
-                      <div className="product-rating">
-                        <span className="star">★</span> <span>4.0</span>
-                      </div>
-                    </div>
-                    <div style={{ height: 18 }}></div>
-                    <Link
-                      href="#"
-                      className="btn btn-success"
-                      onClick={e => {
-                        e.preventDefault();
-                        handleViewDetail(product);
+                  ))
+                ) : error ? (
+                  <div className="text-center w-100 py-4" style={{ gridColumn: '1 / -1' }}>
+                    <p className="text-danger">Lỗi tải danh mục: {error}</p>
+                    <button 
+                      className="btn btn-outline-primary btn-sm" 
+                      onClick={() => window.location.reload()}
+                    >
+                      Thử lại
+                    </button>
+                  </div>
+                ) : categories.length > 0 ? (
+                  categories.map((cat, index) => (
+                    <div 
+                      className="featured-category-item" 
+                      key={cat.id || cat.name} 
+                      style={{ 
+                        background: cat.color || '#f8f9fa', 
+                        cursor: 'pointer',
+                        padding: '15px',
+                        borderRadius: '12px',
+                        textAlign: 'center',
+                        minHeight: '120px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onClick={() => handleCategoryClick(cat)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleCategoryClick(cat)
+                        }
                       }}
                     >
-                      Xem chi tiết <i className="fa fa-eye"></i>
-                    </Link>
+                      <img 
+                        src={getCategoryImage(cat, index)}
+                        alt={cat.name}
+                        style={{ 
+                          width: '50px', 
+                          height: '50px', 
+                          objectFit: 'cover', 
+                          borderRadius: '50%', 
+                          marginBottom: '8px' 
+                        }}
+                        onError={(e) => {
+                          // Fallback chain: thử nhiều nguồn ảnh
+                          const target = e.currentTarget as HTMLImageElement
+                          const currentSrc = target.src
+                          
+                          if (currentSrc.includes('categories/')) {
+                            // Thử ảnh theo slug
+                            target.src = getCategoryImageBySlug(cat.slug, index)
+                          } else if (currentSrc.includes(cat.slug)) {
+                            // Thử ảnh theo index
+                            target.src = `./client/images/categories/category-${index + 1}.png`
+                          } else if (currentSrc.includes('category-')) {
+                            // Cuối cùng dùng ảnh mặc định
+                            target.src = './client/images/category-default.png'
+                          }
+                        }}
+                      />
+                      <div className="category-name" style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        marginBottom: '4px',
+                        color: '#333'
+                      }}>
+                        {cat.name}
+                      </div>
+                      <div className="category-count" style={{ 
+                        fontSize: '12px', 
+                        color: '#666' 
+                      }}>
+                        {loadingCounts ? (
+                          <span className="placeholder-glow">
+                            <span className="placeholder" style={{width: '40px', height: '12px'}}></span>
+                          </span>
+                        ) : (
+                          `${categoryCounts[cat.id] || 0} sản phẩm`
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center w-100 py-4" style={{ gridColumn: '1 / -1' }}>
+                    <p className="text-muted">Không có danh mục nào</p>
+                    <small className="text-muted">
+                      Kiểm tra kết nối API: {process.env.NEXT_PUBLIC_API_URL || 'Chưa cấu hình'}
+                    </small>
                   </div>
-                ))}
+                )}
+              </div>
+            </div>
+
+            {/* Flash Sale Row */}
+            {featuredProducts.length > 0 && (
+              <div className="flash-sale-row my-5">
+                <div className="container">
+                  <div className="row g-4 align-items-stretch">
+                    <div className="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                      <div className="flash-sale-banner bg-dark text-white rounded-4 p-4 h-100 d-flex flex-column justify-content-center align-items-start">
+                        <img 
+                          className="mb-4 rounded-3" 
+                          src="./client/images/flash-banner.jpg" 
+                          alt="Banner" 
+                          style={{ width: '100%', maxWidth: 260 }} 
+                        />
+                        <h2 className="fw-bold mb-3">
+                          Mang thiên nhiên<br />vào ngôi nhà của bạn
+                        </h2>
+                        <a className="btn btn-danger rounded-pill px-4 py-2 mt-3" href="#">
+                          Mua ngay →
+                        </a>
+                      </div>
+                    </div>
+                    <div className="col-lg-9">
+                      <div className="flash-sale-slider position-relative">
+                        <button className="slick-prev custom-arrow" type="button">
+                          <i className="fa fa-chevron-left"></i>
+                        </button>
+                        <button className="slick-next custom-arrow" type="button">
+                          <i className="fa fa-chevron-right"></i>
+                        </button>
+                        <div className="flash-sale-track d-flex gap-3">
+                          {loading ? (
+                            // Loading skeleton
+                            Array.from({length: 4}).map((_, idx) => (
+                              <div className="flash-sale-card bg-white rounded-4 p-3 h-100 position-relative" key={idx}>
+                                <div className="placeholder-glow">
+                                  <div className="placeholder bg-secondary mb-3" style={{height: 110, width: '100%'}}></div>
+                                  <div className="placeholder bg-secondary col-8 mb-2"></div>
+                                  <div className="placeholder bg-secondary col-6 mb-2"></div>
+                                  <div className="placeholder bg-secondary col-4 mb-2"></div>
+                                </div>
+                              </div>
+                            ))
+                          ) : featuredProducts.length > 0 ? (
+                            featuredProducts.slice(0, 4).map((product, idx) => (
+                              <div className="flash-sale-card bg-white rounded-4 p-3 h-100 position-relative" key={product.id}>
+                                <div className={`badge position-absolute top-0 start-0 mt-3 ms-3 text-white fs-6 ${
+                                  ['bg-success', 'bg-info', 'bg-warning', 'bg-danger'][idx % 4]
+                                }`}>
+                                  {product.discount > 0 ? `Giảm ${Math.round((product.discount / (product.price + product.discount)) * 100)}%` : ['Khuyến mãi', 'Bán chạy', 'Nổi bật'][idx % 3]}
+                                </div>
+                                <img 
+                                  className="mx-auto d-block mb-3" 
+                                  src={fixImgSrc(product.images)} 
+                                  alt={product.name} 
+                                  style={{ height: 110, objectFit: 'contain' }} 
+                                />
+                                <div className="text-muted mb-1">Tạp Hoá Xanh</div>
+                                <div className="prod-title fw-semibold mb-2" title={product.name}>
+                                  {product.name.length > 30 ? product.name.substring(0, 30) + '...' : product.name}
+                                </div>
+                                <div className="d-flex align-items-center mb-2">
+                                  <i className="fa fa-star text-warning me-1"></i>
+                                  <span className="text-muted small">{product.rating || 4.5}</span>
+                                </div>
+                                <span className="text-success fw-bold me-2">
+                                  {product.price.toLocaleString()}đ
+                                </span>
+                                {product.discount > 0 && (
+                                  <span className="text-muted text-decoration-line-through">
+                                    {(product.price + product.discount).toLocaleString()}đ
+                                  </span>
+                                )}
+                                <div className="progress my-2" style={{ height: 6 }}>
+                                  <div className="progress-bar bg-danger" style={{ width: '75%' }}></div>
+                                </div>
+                                <div className="sold-text text-muted mb-2">Đã bán: {Math.floor(Math.random() * 100)}/{Math.floor(Math.random() * 50) + 100}</div>
+                                <button 
+                                  className="btn btn-danger w-100 rounded-pill" 
+                                  onClick={() => handleAddToCart(product)}
+                                >
+                                  Thêm vào giỏ
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            // No products found
+                            <div className="text-center w-100 py-4">
+                              <p className="text-muted">Không có sản phẩm nổi bật</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-          </section>
-          <section className="container mb-5">
-            <div className="row g-4 home-below-banners">
-              <div className="col-md-6">
-                <div
-                  className="double-banner-card left-banner d-flex flex-column justify-content-center align-items-start p-5"
-                  style={{
-                    backgroundImage: 'url(/client/images/water.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    borderRadius: 32,
-                    minHeight: 340,
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <span className="banner-sale">Giảm ngay 20%</span>
-                  <h2 style={{
-                    fontWeight: 800,
-                    fontSize: '2.3rem',
-                    color: '#222',
-                    marginBottom: 24,
-                    lineHeight: 1.1,
-                    wordBreak: 'break-word'
-                  }}>
-                    Rau củ tươi sạch<br />100% tự nhiên
-                  </h2>
-                  <button style={{
-                    background:'#ffc300',
-                    color:'#222',
-                    fontWeight:700,
-                    border:'none',
-                    borderRadius:10,
-                    padding:'12px 32px',
-                    fontSize:20,
-                    boxShadow:'0 2px 8px rgba(220,53,69,0.08)'
-                  }}>
-                    Mua ngay
-                  </button>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div
-                  className="double-banner-card right-banner d-flex flex-column justify-content-center align-items-start p-5"
-                  style={{
-                    background: "#ffd43b url('/client/images/coffe.png') no-repeat right bottom / contain",
-                    borderRadius: 32,
-                    minHeight: 340,
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <span style={{background:'#dc3545',color:'#fff',fontWeight:700,fontSize:22,padding:'8px 28px',borderRadius:12,marginBottom:24,display:'inline-block'}}>Giảm ngay 25%</span>
-                  <h2 style={{
-                    fontSize: '2.3rem',
-                    color: '#222',
-                    marginBottom: 24,
-                    lineHeight: 1.15,
-                    fontFamily: 'system-ui, Arial, Helvetica, sans-serif',
-                    fontWeight: 700,
-                    wordBreak: 'break-word'
-                  }}>
-                    <span style={{ display: 'block', fontWeight: 800 }}>Rau củ tươi sạch</span>
-                    <span style={{ display: 'block', fontWeight: 400 }}>100% tự nhiên</span>
-                  </h2>
-                  <button style={{background:'#ffd43b',color:'#222',fontWeight:700,border:'none',borderRadius:10,padding:'12px 32px',fontSize:20,boxShadow:'0 2px 8px rgba(220,53,69,0.08)'}}>Mua ngay</button>
-                </div>
-              </div>
-            </div>
-          </section>
 
-          {/* PHẦN SẢN PHẨM NẰM Ở ĐÂY */}
-          {[0, 1, 2, 3].map(rowIdx => (
-            <section className="container mb-5" key={rowIdx}>
-              <div className="featured-product-list">
-                {/* Banner ngoài cùng bên trái */}
-                <div className="featured-product-card banner-in-grid">
-                  <img
-                    src="/client/images/banne-milk.png"
-                    alt="Banner"
-                    className="banner-img-in-grid"
-                  />
+            {/* Popular Products */}
+            {currentProducts.length > 0 && (
+              <div className="products w-100 my-5">
+                <div className="d-flex justify-content-lg-between align-items-center align-items-center flex-wrap justify-content-center">
+                  <h2>Sản phẩm phổ biến</h2>
                 </div>
-                {/* Các sản phẩm còn lại */}
-                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product, idx) => (
-                  <div className="featured-product-card" key={product.id}>
-                    <div className="featured-product-image">
-                      <img
-                        src={fixImgSrc(product.images)}
-                        alt={product.name}
-                        style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
-                      />
+                <div className="tab-content" id="myTabContent">
+                  <div className="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabIndex={0}>
+                    <div className="product-list">
+                      <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
+                        {loading ? (
+                          // Loading skeleton
+                          Array.from({length: 10}).map((_, idx) => (
+                            <div className="col" key={idx}>
+                              <div className="p-lg-0">
+                                <div className="product-card selected placeholder-glow">
+                                  <div className="product-img">
+                                    <div className="placeholder bg-secondary" style={{height: 150, width: '100%'}}></div>
+                                  </div>
+                                  <div className="product-info">
+                                    <div className="placeholder bg-secondary col-6 mb-2"></div>
+                                    <div className="placeholder bg-secondary col-8 mb-2"></div>
+                                    <div className="placeholder bg-secondary col-7 mb-2"></div>
+                                    <div className="placeholder bg-secondary col-5"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : currentProducts.length > 0 ? (
+                          currentProducts.map((product, idx) => (
+                            <div className="col" key={product.id}>
+                              <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${idx * 0.1}s`} data-wow-duration="0.5s">
+                                <div className="product-card selected">
+                                  <div className="badge badge-hot">Nổi bật</div>
+                                  <div className="product-img">
+                                    <img src={fixImgSrc(product.images)} alt={product.name} />
+                                  </div>
+                                  <div className="product-info">
+                                    <div className="category">{product.category || 'Snack'}</div>
+                                    <div className="name" title={product.name}>
+                                      {product.name.length > 25 ? product.name.substring(0, 25) + '...' : product.name}
+                                    </div>
+                                    <div className="brand">
+                                      Bởi <span className="brand-name">Tạp Hoá Xanh</span>
+                                    </div>
+                                    <div className="price-row">
+                                      <div className="price">{product.price.toLocaleString()}đ</div>
+                                      {product.discount > 0 && (
+                                        <div className="old-price">
+                                          {(product.price + product.discount).toLocaleString()}đ
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="rating">
+                                      <i className="fa fa-star filled"></i>
+                                      <i className="fa fa-star filled"></i>
+                                      <i className="fa fa-star filled"></i>
+                                      <i className="fa fa-star filled"></i>
+                                      <i className="fa fa-star"></i>
+                                      <span className="rating">{product.rating || 4.0}</span>
+                                    </div>
+                                  </div>
+                                  <div className="add-cart-row">
+                                    <button className="add-cart" onClick={() => handleAddToCart(product)}>
+                                      Thêm vào giỏ<i className="fa fa-shopping-cart"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="col-12 text-center py-4">
+                            <p className="text-muted">Không có sản phẩm nào</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="brand-row">
-                      <span>Hodo Foods</span>
-                      <span className="star">&#9733;</span>
-                    </div>
-                    <div className="product-title">{product.name}</div>
-                    <div className="price-row">
-                      <span className="price-main">{product.price.toLocaleString()}₫</span>
-                      <span className="price-old">{(product.price + product.discount).toLocaleString()}₫</span>
-                    </div>
-                    <div className="progress" style={{height: 4, borderRadius: 8}}>
-                      <div className="progress-bar" style={{width: `${90/120*100}%`}}></div>
-                    </div>
-                    <div className="sold-row">Đã bán: 90/120</div>
-                    <Link href={product.slug ? `/product/${product.slug}` : '#'} passHref legacyBehavior>
-                      <a
-                        className="btn-featured-addcart"
-                        style={{
-                          background: '#22c55e',
-                          color: '#fff',
-                          borderRadius: 999,
-                          fontWeight: 600,
-                          fontSize: 16,
-                          padding: '10px 0',
-                          minHeight: 36,
-                          width: '92%',
-                          marginLeft: 'auto',
-                          marginRight: 'auto',
-                          marginTop: 'auto',
-                          marginBottom: 20,
-                          cursor: product.slug ? 'pointer' : 'not-allowed',
-                          pointerEvents: product.slug ? 'auto' : 'none',
-                          display: 'inline-block',
-                          textAlign: 'center'
-                        }}
-                      >
-                        Xem chi tiết <i className="fa fa-eye"></i>
-                      </a>
-                    </Link>
                   </div>
-                ))}
-              </div>
-            </section>
-          ))}
-          {/* SECTION ĐĂNG KÝ NHẬN TIN */}
-          <section className="container mb-5">
-            <div className="row align-items-center p-4" style={{background: '#eaf8f3', borderRadius: 18, minHeight: 320}}>
-              <div className="col-md-7 mb-4 mb-md-0">
-                <h2 className="fw-bold mb-3" style={{fontSize: '2.5rem', lineHeight: 1.15}}>
-                  Ở nhà & nhận mọi nhu cầu<br />hàng ngày từ cửa hàng của chúng tôi
-                </h2>
-                <div className="mb-3 text-secondary" style={{fontSize: '1.1rem'}}>
-                  Bắt đầu mua sắm cùng <span style={{color: '#e11d48', fontWeight: 700}}>TapHoaXanh</span>
                 </div>
-                <form className="d-flex" style={{maxWidth: 400}}>
-                  <div className="position-relative flex-grow-1">
-                    <span className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3" style={{color: '#888'}}>
-                      <i className="fa-solid fa-envelope"></i>
-                    </span>
-                    <input
-                      type="email"
-                      className="form-control ps-5"
-                      placeholder="Nhập email của bạn"
-                      style={{
-                        borderRadius: 24,
-                        height: 48,
-                        border: 'none',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
-                      }}
-                    />
-                  </div>
-                  <button
-                    className="btn fw-bold ms-2"
-                    type="submit"
-                    style={{
-                      borderRadius: 24,
-                      height: 48,
-                      minWidth: 120,
-                      fontWeight: 600,
-                      fontSize: 17,
-                      background: '#ffd43b',
-                      color: '#222',
-                      boxShadow: '0 2px 8px rgba(220,53,69,0.08)'
-                    }}
-                  >
-                    Đăng ký
-                  </button>
-                </form>
               </div>
-              <div className="col-md-5 text-center">
-                <img
-                  src="/images/girl-red-hoodie.png"
-                  alt="Cô gái áo đỏ"
-                  style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
-                />
+            )}
+
+            {/* Sản phẩm theo danh mục */}
+            <div className="section-best-sells">
+              {categories.slice(0, 5).map((category, categoryIndex) => {
+                const categoryKey = `category-${categoryIndex + 1}`
+                const products = categoryProducts[categoryKey] || []
+                const isLoading = loadingCategories[categoryKey]
+                
+                return (
+                  <div key={category.id} className="row g-3 my-4">
+                    <div className="col-lg-2 d-none d-lg-block h-100">
+                      <div className="promo-banner">
+                        <img 
+                          className="img-fluid rounded" 
+                          src={`./client/images/banner-${categoryIndex + 1}.png`} 
+                          style={{ height: 418, width: '100%', objectFit: 'cover' }} 
+                          alt={`Banner ${category.name}`}
+                          onError={(e) => {
+                            e.currentTarget.src = './client/images/banner-default.png'
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="col-12 d-block d-lg-none mb-2">
+                      <h5 className="fw-bold text-success">Danh mục: {category.name}</h5>
+                    </div>
+                    
+                    <div className="col-12 col-lg-10">
+                      <div className="row">
+                        {isLoading ? (
+                          [1, 2, 3, 4].map((item) => (
+                            <div key={item} className="col-12 col-md-6 col-lg-3 padd hvr-float">
+                              <div className="product-card d-flex flex-column justify-content-between h-100 placeholder-glow" style={{ minHeight: 420 }}>
+                                <div className="product-img">
+                                  <div className="placeholder bg-secondary" style={{height: 150, width: '100%'}}></div>
+                                </div>
+                                <div className="product-info">
+                                  <div className="placeholder bg-secondary col-6 mb-2"></div>
+                                  <div className="placeholder bg-secondary col-8 mb-2"></div>
+                                  <div className="placeholder bg-secondary col-7 mb-2"></div>
+                                  <div className="placeholder bg-secondary col-5"></div>
+                                </div>
+                                <div className="placeholder bg-secondary w-100 mt-2" style={{height: 40}}></div>
+                              </div>
+                            </div>
+                          ))
+                        ) : products.length > 0 ? (
+                          products.slice(0, 4).map((product, index) => (
+                            <div key={product.id} className="col-12 col-md-6 col-lg-3 padd hvr-float">
+                              <div className="product-card d-flex flex-column justify-content-between h-100" style={{ minHeight: 420 }}>
+                                {index === 0 && <div className="badge badge-hot">Hot</div>}
+                                {index === 2 && <div className="badge badge-new">New</div>}
+                                
+                                <div className="product-img">
+                                  <img 
+                                    className="img-fluid" 
+                                    src={fixImgSrc(product.images)} 
+                                    alt={product.name}
+                                    onError={(e) => {
+                                      e.currentTarget.src = './client/images/placeholder.png'
+                                    }}
+                                  />
+                                </div>
+                                
+                                <div className="product-info">
+                                  <div className="category">{category.name}</div>
+                                  <div className="name">{product.name}</div>
+                                  <div className="brand">
+                                    Bởi <span className="brand-name">Tạp Hoá Xanh</span>
+                                  </div>
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <div className="price-row d-flex flex-column">
+                                      <div className="price">{product.price.toLocaleString()}đ</div>
+                                      {product.discount > 0 && (
+                                        <div className="old-price">{(product.price + product.discount).toLocaleString()}đ</div>
+                                      )}
+                                    </div>
+                                    <div className="rating">
+                                      {[1, 2, 3, 4, 5].map(star => (
+                                        <i key={star} className={`fa fa-star ${star <= (product.rating || 5) ? 'filled' : ''}`} />
+                                      ))}
+                                      <span className="rating">{product.rating || '5.0'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <button 
+                                  className="add-cart btn w-100 mt-2"
+                                  onClick={() => handleAddToCart(product)}
+                                >
+                                  Thêm vào giỏ<i className="fa fa-shopping-cart ms-2" />
+                                </button>
+                                
+                                <div className="sold-bar mt-2">
+                                  <div className="progress">
+                                    <div className="progress-bar bg-pink" style={{ width: '75%' }} />
+                                  </div>
+                                  <div className="sold-text">Đã bán: {product.soldCount || Math.floor(Math.random() * 100)}/120</div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="col-12 text-center py-4">
+                            <p className="text-muted">Không có sản phẩm trong danh mục này</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Newsletter */}
+          <div className="newsletter-banner">
+            <div className="container">
+              <div className="row align-items-center">
+                <div className="col-lg-7 col-md-12">
+                  <div className="newsletter-content">
+                    <h1 className="title">
+                      Ở nhà & nhận nhu cầu hàng ngày<br />từ cửa hàng của chúng tôi
+                    </h1>
+                    <p className="subtitle">
+                      Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span>
+                    </p>
+                    <form className="newsletter-form">
+                      <div className="input-group">
+                        <span className="input-icon">
+                          <i className="fa fa-envelope"></i>
+                        </span>
+                        <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
+                        <button className="btn-subscribe" type="submit">Đăng ký</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div className="col-lg-5 col-md-12">
+                  <div className="newsletter-image position-relative">
+                    <img className="girl-img floating" src="client/images/girl.png" alt="Girl" draggable="false" />
+                  </div>
+                </div>
               </div>
             </div>
-          </section>
+          </div>
         </div>
-      </main>
+      </section>
     </>
   )
 }

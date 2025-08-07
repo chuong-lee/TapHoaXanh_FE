@@ -6,11 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "analyze": "cross-env ANALYZE=true next build",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "axios": "^1.10.0",
     "bootstrap": "^5.3.7",
+    "mysql2": "^3.14.3",
     "next": "^15.4.1",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",

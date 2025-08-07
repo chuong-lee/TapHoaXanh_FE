@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
-import { Dropdown } from 'react-bootstrap';
+// import { Dropdown } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import LogoutButton from './logout';
 
@@ -33,12 +33,12 @@ const Header = () => {
 
   return (
     <>
-      <div className={`header-index custom-header${scrolled ? ' scrolled' : ''}`}>  
+      <div className={`header header-index custom-header${scrolled ? ' scrolled' : ''}`}>  
         <nav className="navbar navbar-expand-lg py-2">
           <div className="container d-flex align-items-center justify-content-between" style={{gap: 0, minHeight: 70}}>
             {/* Logo + Tên */}
             <div className="d-flex align-items-center gap-2" style={{minWidth: 220}}>
-              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/home" style={{gap: 10}}>
+              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{gap: 10}}>
                 <img
                   src="/client/images/logo.png"
                   alt="Tạp Hóa Xanh Logo"
@@ -62,6 +62,12 @@ const Header = () => {
               </Link>
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">
                 Liên Hệ
+              </Link>
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/about-us">
+                Về Chúng Tôi
+              </Link>
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/about">
+                Chính Sách
               </Link>
               <button 
                 className="nav-link fw-semibold d-flex align-items-center gap-1 border-0 bg-transparent"

@@ -1,0 +1,8 @@
+<svg width="375" height="812" xmlns="http://www.w3.org/2000/svg">
+      <rect width="375" height="812" fill="#f9fafb"/>
+      <rect x="0" y="0" width="375" height="60" fill="#22c55e"/>
+      <text x="187.5" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" 
+            fill="white" text-anchor="middle">Tạp Hóa Xanh</text>
+      <text x="187.5" y="406" font-family="Arial, sans-serif" font-size="20" 
+            fill="#6b7280" text-anchor="middle">Mobile App</text>
+    </svg>

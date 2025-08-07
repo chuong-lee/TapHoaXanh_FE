@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
-import api from '@/lib/axios'
+import { productService } from '@/lib/productService'
 import Image from 'next/image'
 
 interface ProductVariant {
@@ -12,6 +12,21 @@ interface ProductVariant {
   price_modifier: number;
   stock: number;
   productId: number;
+}
+
+interface ApiProduct {
+  id: number
+  name: string
+  price: number
+  slug?: string
+  images: string | string[]
+  discount: number
+  description: string
+  category?: {
+    id: number
+    name: string
+  }
+  categoryId?: number
 }
 
 type Product = {
@@ -36,6 +51,56 @@ function fixImgSrc(src: string | null | undefined): string {
 }
 
 export default function ProductDetailPage() {
+  // State cho bình luận
+  type Comment = {
+    name: string;
+    content: string;
+    rating: number;
+    createdAt: string;
+  };
+  const [comments, setComments] = useState<Comment[]>([
+    // Dữ liệu mẫu ban đầu
+    {
+      name: 'Nguyễn Văn A',
+      content: 'Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.',
+      rating: 4,
+      createdAt: '29/09/2023 18:40',
+    },
+    {
+      name: 'Trần Thị B',
+      content: 'Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.',
+      rating: 4,
+      createdAt: '29/09/2023 18:40',
+    },
+    {
+      name: 'Lê Văn C',
+      content: 'Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.',
+      rating: 4,
+      createdAt: '29/09/2023 18:40',
+    },
+  ]);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentName, setCommentName] = useState('');
+  const [commentContent, setCommentContent] = useState('');
+  const [commentRating, setCommentRating] = useState(5);
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentName.trim() || !commentContent.trim()) return;
+    setComments([
+      {
+        name: commentName,
+        content: commentContent,
+        rating: commentRating,
+        createdAt: new Date().toLocaleString('vi-VN'),
+      },
+      ...comments,
+    ]);
+    setCommentName('');
+    setCommentContent('');
+    setCommentRating(5);
+    setShowCommentForm(false);
+  };
   const params = useParams()
   const slug = params.slug as string
   const router = useRouter()
@@ -49,70 +114,85 @@ export default function ProductDetailPage() {
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
+  // Tạo slug từ tên sản phẩm giống như trong trang listing
+  const generateSlug = (name: string, id: number) => {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Bỏ dấu tiếng Việt
+      .replace(/[đĐ]/g, 'd')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') + `-${id}`
+  }
+
   // Lấy chi tiết sản phẩm theo slug
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true)
         console.log('Đang tìm sản phẩm với slug:', slug);
-        
-        // Sử dụng API mới để lấy sản phẩm theo slug
-        const res = await api.get<Product>(`/products/slug/${slug}`)
-        console.log('Sản phẩm tìm thấy:', res.data);
-        
-        if (res.data) {
-          const found = res.data;
+        // Sử dụng productService để lấy đúng sản phẩm theo slug
+        const found = await productService.getProductBySlug(slug);
+        if (found) {
+          // Xử lý images về dạng mảng nếu cần
           const images: string[] = typeof found.images === 'string'
-            ? found.images
-                .split(',')
-                .map(s => s && s.trim())
-                .filter(s => !!s && s !== 'null' && s !== 'undefined')
-            : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
-          
-          console.log('Images đã xử lý:', images);
-          
-          const productWithImagesArray = { ...found, images }
-          setProduct(productWithImagesArray as Product)
-          setSelectedImage(images[0] || null)
-          console.log('Đã set product thành công');
+            ? found.images.split(',').map((s: string) => s && s.trim()).filter((s: string) => !!s && s !== 'null' && s !== 'undefined')
+            : (Array.isArray(found.images) ? found.images.filter((s: string) => !!s && s !== 'null' && s !== 'undefined') : []);
+          const productWithImagesArray = {
+            ...found,
+            images,
+            slug: found.slug || generateSlug(found.name, found.id)
+          };
+          setProduct(productWithImagesArray as Product);
+          setSelectedImage(images[0] || null);
+          console.log('Đã set product thành công với slug:', productWithImagesArray.slug);
         } else {
           console.log('Không tìm thấy sản phẩm với slug:', slug);
-          setProduct(null)
+          setProduct(null);
         }
       } catch (err) {
-        console.error('Lỗi lấy chi tiết sản phẩm:', err)
-        setProduct(null)
+        console.error('Lỗi lấy chi tiết sản phẩm:', err);
+        setProduct(null);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchProduct()
-  }, [slug])
+    };
+    fetchProduct();
+  }, [slug]);
 
   // Lấy biến thể đúng theo id của sản phẩm đang xem
   useEffect(() => {
     const fetchVariants = async () => {
       if (!product) return;
       try {
-        const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
-        setVariants(Array.isArray(res.data) ? res.data : []);
+        const response = await fetch(`http://localhost:4000/product-variant?productId=${product.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setVariants(Array.isArray(data) ? data : []);
+        } else {
+          setVariants([]);
+        }
       } catch (e) {
+        console.error('Lỗi lấy variants:', e);
         setVariants([]);
       }
     };
     fetchVariants();
   }, [product])
 
-  // Lấy 4 sản phẩm bất kỳ từ API (không trùng với sản phẩm hiện tại)
+  // Lấy tất cả sản phẩm liên quan (không trùng với sản phẩm hiện tại)
   useEffect(() => {
     const fetchRelated = async () => {
       try {
-        const res = await api.get<Product[]>('/products');
-        let products = res.data.filter((item) => item.slug !== slug);
-        // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
-        products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRelatedProducts(products);
+        // Lấy tất cả sản phẩm (limit lớn)
+        const products = await productService.getAllProducts({ limit: 1000 });
+        // Loại bỏ sản phẩm hiện tại
+        let filteredProducts = products.filter((item) => item.slug !== slug);
+        setRelatedProducts(filteredProducts);
       } catch (e) {
+        console.error('Lỗi lấy sản phẩm liên quan:', e);
         setRelatedProducts([]);
       }
     };
@@ -273,9 +353,9 @@ export default function ProductDetailPage() {
                 </ul>
                 <div className="text-secondary mb-2" style={{ fontSize: 14 }}>Khuyến mãi kết thúc lúc: <span className="fw-bold">9h00 tối, 25/5/2024</span></div>
                 <div className="mt-2" style={{ fontSize: 15 }}>
-                  <div><b>Mã SP:</b> <span className="text-success">ABCO25168</span></div>
-                  <div><b>Danh mục:</b> <span className="text-success">Điện thoại & Máy tính bảng</span></div>
-                  <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
+                  <div><b>Mã SP:</b> <span className="text-success">{product.id}</span></div>
+                  <div><b>Danh mục:</b> <span className="text-success">{product.category?.name || 'Không rõ'}</span></div>
+                  <div><b>Thương hiệu:</b> <span className="text-success">{(product as any).brand || 'Không rõ'}</span></div>
                 </div>
                 <div className="mt-2 d-flex gap-2">
                   <a href="#"><img src="/images/social-fb.png" alt="fb" width={28} /></a>
@@ -287,7 +367,7 @@ export default function ProductDetailPage() {
                 </div>
               </div>
             </div>
-            {/* Right part of right column: Purchase Card */}
+            {/* Right part */}
             <div className="col-md-5">
               <div className="card shadow-sm p-3" style={{ borderRadius: 12 }}>
                 <div className="d-flex align-items-baseline">
@@ -434,26 +514,53 @@ export default function ProductDetailPage() {
                 <div className="mb-3">
                   <b>Đánh giá sản phẩm này</b>
                   <div>Hãy cho mọi người biết cảm nhận của bạn</div>
-                  <button className="btn btn-outline-primary mt-2 w-100">Viết đánh giá</button>
+                  <button className="btn btn-outline-primary mt-2 w-100" onClick={() => setShowCommentForm(v => !v)}>
+                    {showCommentForm ? 'Đóng' : 'Viết đánh giá'}
+                  </button>
+                  {showCommentForm && (
+                    <form className="mt-3 border rounded p-3 bg-light" onSubmit={handleAddComment}>
+                      <div className="mb-2">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Tên của bạn"
+                          value={commentName}
+                          onChange={e => setCommentName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-2">
+                        <textarea
+                          className="form-control"
+                          placeholder="Nội dung đánh giá"
+                          value={commentContent}
+                          onChange={e => setCommentContent(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-2">
+                        <label className="me-2">Chấm điểm:</label>
+                        <select value={commentRating} onChange={e => setCommentRating(Number(e.target.value))}>
+                          {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} ★</option>)}
+                        </select>
+                      </div>
+                      <button type="submit" className="btn btn-success w-100">Gửi đánh giá</button>
+                    </form>
+                  )}
                 </div>
               </div>
               {/* Danh sách bình luận */}
               <div className="col-md-7">
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Nguyễn Văn A</b> <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.</div>
-                </div>
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Trần Thị B</b> <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.</div>
-                </div>
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Lê Văn C</b> <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng. Tôi sẽ cân nhắc kỹ hơn lần sau.</div>
-                </div>
+                {comments.length === 0 && (
+                  <div className="text-muted">Chưa có đánh giá nào.</div>
+                )}
+                {comments.map((c, idx) => (
+                  <div className="border rounded p-3 mb-2" key={idx}>
+                    <b className="text-danger">{c.name}</b> <span className="text-muted ms-2">{c.createdAt}</span>
+                    <span className="float-end fw-bold">{c.rating}.0 ★</span>
+                    <div className="mt-2">{c.content}</div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -466,6 +573,8 @@ export default function ProductDetailPage() {
           {relatedProducts.map((item, i) => {
             const basePrice = item.price;
             const finalPrice = basePrice - item.discount;
+            // Sử dụng slug nếu có, nếu không thì generateSlug
+            const detailSlug = item.slug ? item.slug : generateSlug(item.name, item.id);
             return (
             <div className="col-3" key={item.id}>
               <div className="custom-product-card h-100">
@@ -494,7 +603,7 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
                 <a
-                  href={item.slug ? `/product/${item.slug}` : '#'}
+                  href={`/product/${detailSlug}`}
                   className="btn-add-cart"
                   style={{
                     background: '#38bdf8',
@@ -504,8 +613,8 @@ export default function ProductDetailPage() {
                     display: 'inline-block',
                     textAlign: 'center',
                     padding: '12px 24px',
-                    cursor: item.slug ? 'pointer' : 'not-allowed',
-                    pointerEvents: item.slug ? 'auto' : 'none'
+                    cursor: detailSlug ? 'pointer' : 'not-allowed',
+                    pointerEvents: detailSlug ? 'auto' : 'none'
                   }}
                 >
                   Xem chi tiết <i className="fa fa-eye"></i>
@@ -517,5 +626,5 @@ export default function ProductDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
