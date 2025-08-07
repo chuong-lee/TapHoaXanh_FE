@@ -249,13 +249,15 @@ export default function HomePage() {
                       <div className="small text-muted mt-1">Đã bán: 90/120</div>
                     </div>
                     {/* Nút Add To Cart */}
-                    <button 
-                      className="btn btn-danger w-100 fw-bold mt-auto" 
-                      style={{borderRadius: 24, fontSize: 18, padding: '10px 0'}}
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      <i className="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
-                    </button>
+                    <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
+                      <button 
+                        className="btn btn-danger w-100 fw-bold" 
+                        style={{borderRadius: 24, fontSize: 18, padding: '10px 0'}}
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        <i className="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -319,18 +321,19 @@ export default function HomePage() {
                       <div className="product-rating">
                         <span className="star">★</span> <span>4.0</span>
                       </div>
+                      <Link
+                        href="#"
+                        className="btn btn-success"
+                        style={{ width: '80%', margin: '0 auto', display: 'block' }}
+                        onClick={e => {
+                          e.preventDefault();
+                          handleViewDetail(product);
+                        }}
+                      >
+                        Xem chi tiết <i className="fa fa-eye"></i>
+                      </Link>
                     </div>
                     <div style={{ height: 18 }}></div>
-                    <Link
-                      href="#"
-                      className="btn btn-success"
-                      onClick={e => {
-                        e.preventDefault();
-                        handleViewDetail(product);
-                      }}
-                    >
-                      Xem chi tiết <i className="fa fa-eye"></i>
-                    </Link>
                   </div>
                 ))}
               </div>

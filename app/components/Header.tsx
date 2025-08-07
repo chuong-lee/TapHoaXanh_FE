@@ -41,7 +41,7 @@ const Header = () => {
                   height={48}
                   style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)', objectFit: 'cover', background: '#fff', marginRight: 10, verticalAlign: 'middle'}}
                 />
-                <span className="fw-bold fs-4" style={{letterSpacing: 1, color: '#fff'}}>Tạp Hóa Xanh</span>
+                <span className="fw-bold fs-4" style={{letterSpacing: 1, color: scrolled ? '#22c55e' : '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.3)'}}>Tạp Hóa Xanh</span>
               </Link>
             </div>
             {/* Menu */}

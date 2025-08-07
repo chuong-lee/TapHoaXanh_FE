@@ -47,50 +47,30 @@ const calculateCRC16 = (data: string): string => {
 const generateClientSideQR = (amount: number, orderId: string, bankCode: string) => {
   // Danh sách ngân hàng hỗ trợ VIETQR
   const banks = {
-    '970436': { name: 'Vietcombank', accountNumber: '1234567890' },
-    '970403': { name: 'BIDV', accountNumber: '1234567890' },
-    '970415': { name: 'Agribank', accountNumber: '1234567890' },
-    '970416': { name: 'MB Bank', accountNumber: '1234567890' },
-    '970418': { name: 'Techcombank', accountNumber: '1234567890' },
-    '970419': { name: 'ACB', accountNumber: '1234567890' },
-    '970420': { name: 'Sacombank', accountNumber: '1234567890' },
-    '970421': { name: 'VPBank', accountNumber: '1234567890' },
-    '970422': { name: 'TPBank', accountNumber: '1234567890' },
-    '970423': { name: 'SeABank', accountNumber: '1234567890' },
-    '970424': { name: 'VIB', accountNumber: '1234567890' },
     '970425': { name: 'VietinBank', accountNumber: '108874779238' }
   };
 
-  const selectedBankInfo = banks[bankCode as keyof typeof banks] || banks['970436'];
+  const selectedBankInfo = banks[bankCode as keyof typeof banks] || banks['970425'];
   
-  // Thông tin ngân hàng
-  const bankInfo = {
-    bankCode: bankCode,
-    accountNumber: selectedBankInfo.accountNumber,
-    accountName: 'TAP HOA XANH',
-    bankName: selectedBankInfo.name
-  };
 
-  // Tạo chuỗi VIETQR theo chuẩn đơn giản hơn
+  
+  // Tạo chuỗi VIETQR đơn giản - chỉ với thông tin cần thiết
   const vietqrData = [
     { id: '00', value: '02' }, // Payload Format Indicator
-    { id: '01', value: '12' }, // Point of Initiation Method (12 = static QR)
+    { id: '01', value: '11' }, // Point of Initiation Method (11 = dynamic QR)
     { id: '26', value: [ // Merchant Account Information
-      { id: '00', value: 'A000000727' }, // Global Unique Identifier
-      { id: '01', value: bankInfo.bankCode }, // Bank Code
-      { id: '02', value: bankInfo.accountNumber }, // Account Number
-      { id: '03', value: 'PHAM TUAN KIET' } // Account Name - Sử dụng tên thực tế
+      { id: '00', value: 'A000000727' }, // Global Unique Identifier for VIETQR
+      { id: '01', value: bankCode }, // Bank Code
+      { id: '02', value: selectedBankInfo.accountNumber }, // Account Number
+      { id: '03', value: 'PHAM TUAN KIET' } // Account Name
     ]},
     { id: '52', value: '0000' }, // Merchant Category Code
     { id: '53', value: '704' }, // Transaction Currency (VND)
     { id: '54', value: amount.toString() }, // Transaction Amount
     { id: '55', value: 'VN' }, // Country Code
     { id: '58', value: 'VN' }, // Merchant City
-    { id: '59', value: 'PHAM TUAN KIET' }, // Merchant Name - Sử dụng tên thực tế
-    { id: '60', value: 'Ninh Thuan' }, // Merchant City - Cập nhật theo chi nhánh
-    { id: '62', value: [ // Additional Data Field Template
-      { id: '01', value: orderId } // Reference Label
-    ]}
+    { id: '59', value: 'PHAM TUAN KIET' }, // Merchant Name
+    { id: '60', value: 'Ninh Thuan' } // Merchant City
   ];
 
   // Tạo chuỗi VIETQR
@@ -361,40 +341,26 @@ function CheckoutPage() {
               {form.payment === 'qr' ? (
                 // Hiển thị mã QR khi chọn thanh toán QR
                 <div className="text-center">
-                  <div className="alert mb-4" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
-                    <h5 className="fw-bold">Thanh toán qua mã QR ngân hàng</h5>
-                    <p className="mb-0">
-                      <i className="fa-solid fa-university me-2"></i>
-                      Quét mã QR bên dưới bằng ứng dụng ngân hàng để thanh toán trực tiếp
-                    </p>
-                    <p className="mb-0 mt-2">
-                      <i className="fa-solid fa-lock me-2 text-success"></i>
-                      Mã QR ngân hàng đã được mã hóa với số tiền cố định - Không thể thay đổi
-                    </p>
-                  </div>
+                                      <div className="alert mb-4" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
+                      <h5 className="fw-bold">Thanh toán qua mã QR ngân hàng</h5>
+                      <p className="mb-0">
+                        <i className="fa-solid fa-university me-2"></i>
+                        Quét mã QR bên dưới bằng ứng dụng ngân hàng hoặc ví điện tử để thanh toán trực tiếp
+                      </p>
+                      <p className="mb-0 mt-2">
+                        <i className="fa-solid fa-lock me-2 text-success"></i>
+                        Mã QR ngân hàng đã được mã hóa với số tiền cố định - Không thể thay đổi
+                      </p>
+
+                    </div>
                                     <div className="bg-white p-4 rounded-3" style={{border: '1.5px solid #f3f3f3'}}>
                     {/* Chọn ngân hàng */}
                     <div className="mb-4">
                       <label className="form-label fw-bold">Chọn ngân hàng:</label>
-                      <select 
-                        className="form-select" 
-                        value={selectedBank} 
-                        onChange={(e) => setSelectedBank(e.target.value)}
-                        style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}}
-                      >
-                        <option value="970425">VietinBank (PHAM TUAN KIET)</option>
-                        <option value="970436">Vietcombank</option>
-                        <option value="970403">BIDV</option>
-                        <option value="970415">Agribank</option>
-                        <option value="970416">MB Bank</option>
-                        <option value="970418">Techcombank</option>
-                        <option value="970419">ACB</option>
-                        <option value="970420">Sacombank</option>
-                        <option value="970421">VPBank</option>
-                        <option value="970422">TPBank</option>
-                        <option value="970423">SeABank</option>
-                        <option value="970424">VIB</option>
-                      </select>
+                      <div className="alert mb-3" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
+                        <i className="fa-solid fa-info-circle me-2"></i>
+                        <strong>VietinBank QR Code:</strong> Khách hàng có thể sử dụng ứng dụng ngân hàng hoặc ví điện tử (MoMo, ZaloPay, VNPay) để quét mã QR này và thanh toán trực tiếp.
+                      </div>
                     </div>
                     
                     <div className="text-center">
@@ -437,8 +403,10 @@ function CheckoutPage() {
                       <h4 className="fw-bold text-success">{total.toLocaleString('vi-VN')}₫</h4>
                       <div className="alert mt-3" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
                         <i className="fa-solid fa-shield-alt me-2"></i>
-                        <strong>Bảo mật:</strong> Mã QR ngân hàng đã được mã hóa với số tiền {total.toLocaleString('vi-VN')}₫ cố định. 
+                        <strong>Bảo mật:</strong> 
+                        Mã QR ngân hàng đã được mã hóa với số tiền {total.toLocaleString('vi-VN')}₫ cố định. 
                         Số tiền này không thể thay đổi khi quét mã, đảm bảo an toàn cho giao dịch.
+                        Khách hàng có thể sử dụng ứng dụng ngân hàng hoặc ví điện tử (MoMo, ZaloPay, VNPay) để quét mã QR này.
                       </div>
                       <p className="text-muted small mt-2">
                         <i className="fa-solid fa-check-circle me-2 text-success"></i>
@@ -447,46 +415,7 @@ function CheckoutPage() {
                     </div>
                   </div>
                 </div>
-              ) : form.payment === 'bank' ? (
-                // Hiển thị form thông tin chuyển khoản ngân hàng
-                <div>
-                  <div className="alert mb-4" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
-                    <h5 className="fw-bold">Thông tin chuyển khoản ngân hàng</h5>
-                    <p className="mb-0">Vui lòng điền thông tin để nhận hướng dẫn chuyển khoản</p>
-                  </div>
-                  <div className="bg-white p-4 rounded-3" style={{border: '1.5px solid #f3f3f3'}}>
-                    <div className="row g-3">
-                      <div className="col-12">
-                        <label>Ngân hàng nhận tiền *</label>
-                        <select className="form-control" defaultValue="" style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}}>
-                          <option value="">Chọn ngân hàng</option>
-                          <option value="vietcombank">Vietcombank</option>
-                          <option value="agribank">Agribank</option>
-                          <option value="bidv">BIDV</option>
-                          <option value="techcombank">Techcombank</option>
-                          <option value="mbbank">MB Bank</option>
-                        </select>
-                      </div>
-                      <div className="col-12">
-                        <label>Số tài khoản *</label>
-                        <input className="form-control" placeholder="Nhập số tài khoản" style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}} />
-                      </div>
-                      <div className="col-12">
-                        <label>Tên chủ tài khoản *</label>
-                        <input className="form-control" placeholder="Nhập tên chủ tài khoản" style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}} />
-                      </div>
-                      <div className="col-12">
-                        <label>Nội dung chuyển khoản</label>
-                        <input className="form-control" placeholder="Nội dung chuyển khoản (không bắt buộc)" style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}} />
-                      </div>
-                      <div className="col-12">
-                        <div className="alert" style={{backgroundColor: '#fef3c7', borderColor: '#fde68a', color: '#92400e'}}>
-                          <strong>Lưu ý:</strong> Sau khi chuyển khoản, vui lòng giữ lại biên lai để xác nhận thanh toán.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+
               ) : form.payment === 'ewallet' ? (
                 // Hiển thị form thông tin ví điện tử
                 <div>
@@ -659,13 +588,7 @@ function CheckoutPage() {
                         <i className="fa-solid fa-check-circle me-2"></i>
                         <strong>Thông tin nhận hàng đã đầy đủ!</strong> Bây giờ bạn có thể chọn phương thức thanh toán.
                       </div>
-                      <div className="form-check">
-                        <input type="radio" className="form-check-input" checked={form.payment === 'bank'} onChange={() => setForm(f => ({...f, payment: 'bank'}))} />
-                        <label className="form-check-label"><b>Chuyển khoản ngân hàng</b></label>
-                        <div className="small text-muted ms-4">
-                          Vui lòng chuyển khoản theo hướng dẫn. Đơn hàng sẽ được xử lý sau khi nhận được tiền.
-                        </div>
-                      </div>
+
                       <div className="form-check mt-2">
                         <input type="radio" className="form-check-input" checked={form.payment === 'ewallet'} onChange={() => setForm(f => ({...f, payment: 'ewallet'}))} />
                         <label className="form-check-label"><b>Ví điện tử (MoMo, ZaloPay, VNPay)</b></label>

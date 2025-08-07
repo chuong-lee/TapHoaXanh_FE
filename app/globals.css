@@ -67,10 +67,10 @@ main {
   left: 0;
   width: 100%;
   z-index: 100;
-  background: var(--primary-green);
-  color: #fff;
+  background: #fff;
+  color: #333;
   transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-  box-shadow: 0 2px 8px rgba(34,197,94,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   height: 100px !important;
   min-height: 70px !important;
   padding: 0 32px !important;
@@ -105,33 +105,48 @@ main {
   border-radius: 8px;
   margin: 0 2px;
   transition: background 0.2s, color 0.2s;
+  background: #fff !important;
 }
 
 .custom-header .nav-link:hover {
-  background: var(--primary-green-dark) !important;
-  color: #fff !important;
+  background: #f3f4f6 !important;
+  color: #333 !important;
+}
+
+.custom-header.scrolled .nav-link {
+  background: #fff !important;
+}
+
+.custom-header.scrolled .nav-link:hover {
+  background: #f3f4f6 !important;
+  color: #22c55e !important;
 }
 
 .custom-header.scrolled {
-  background: var(--primary-green);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(34,197,94,0.08);
+  background: #fff;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.custom-header.scrolled .navbar-brand,
 .custom-header.scrolled .nav-link {
-  color: #fff !important;
+  color: #333 !important;
 }
 
 .custom-header.scrolled .marquee-text {
   color: #fff;
 }
 
-/* Đảm bảo header luôn giữ màu xanh và text trắng */
+/* Đảm bảo header có nền trắng và text tối */
 .custom-header,
 .custom-header.scrolled {
-  background: var(--primary-green) !important;
-  color: #fff !important;
+  background: #fff !important;
+  color: #333 !important;
+}
+
+/* Đảm bảo tất cả nav-link có background trắng */
+.custom-header .nav-link,
+.custom-header.scrolled .nav-link {
+  background: #fff !important;
 }
 
 .custom-header .navbar-brand,
@@ -139,15 +154,18 @@ main {
 .custom-header .navbar-toggler,
 .custom-header .navbar-toggler i,
 .custom-header .marquee-text {
-  color: #fff !important;
+  color: #333 !important;
 }
 
-.custom-header.scrolled .navbar-brand,
 .custom-header.scrolled .nav-link,
 .custom-header.scrolled .navbar-toggler,
 .custom-header.scrolled .navbar-toggler i,
 .custom-header.scrolled .marquee-text {
-  color: #fff !important;
+  color: #333 !important;
+}
+
+.custom-header.scrolled .navbar-brand {
+  color: var(--primary-green) !important;
 }
 
 /* Đảm bảo header-slogan luôn hiển thị đúng */
@@ -1134,11 +1152,11 @@ a:hover, .link:hover {
   color: var(--primary-green) !important;
 }
 
-/* Khi scroll, các link trên header có viền xanh và nền nhạt để nổi bật */
+/* Khi scroll, các link trên header có viền xanh và nền trắng để nổi bật */
 .custom-header.scrolled .nav-link,
 .custom-header.scrolled .navbar-brand {
   color: var(--primary-green) !important;
-  background: var(--primary-green-bg) !important;
+  background: #fff !important;
   border-radius: 8px;
   padding: 4px 12px;
   border: 1.5px solid var(--primary-green);
@@ -1147,7 +1165,7 @@ a:hover, .link:hover {
 
 .custom-header.scrolled .nav-link:hover,
 .custom-header.scrolled .navbar-brand:hover {
-  background: var(--primary-green-border) !important;
+  background: #f3f4f6 !important;
   color: var(--primary-green-dark) !important;
   border-color: var(--primary-green-dark);
 }
@@ -1313,6 +1331,29 @@ a:hover, .link:hover {
   display: flex;
   align-items: center;
   gap: 3.5rem !important;
+}
+
+.header-icons button,
+.header-icons a {
+  background: #fff !important;
+  border-radius: 8px;
+  padding: 8px;
+  transition: background 0.2s;
+}
+
+.header-icons button:hover,
+.header-icons a:hover {
+  background: #f3f4f6 !important;
+}
+
+.custom-header.scrolled .header-icons button,
+.custom-header.scrolled .header-icons a {
+  background: #fff !important;
+}
+
+.custom-header.scrolled .header-icons button:hover,
+.custom-header.scrolled .header-icons a:hover {
+  background: #f3f4f6 !important;
 }
 
 .login-card {
