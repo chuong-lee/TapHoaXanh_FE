@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
@@ -180,70 +180,70 @@ export default function HomePage() {
   })
 
   return (
-    <>
-      <Marquee />
-      <section>
-        <div className="home">
-          {/* Hero Section */}
-          <div className="hero-subscribe-section">
-            <div className="container">
-              <div className="row align-items-center hero-subscribe-section-lg">
-                <div className="col-lg-7 col-md-12 mb-4 mb-lg-0">
-                  <div className="text-label mb-2">
-                    <span className="text-danger fw-bold">100%</span> Rau củ hữu cơ
-                  </div>
-                  <h1 className="hero-title mb-3">
-                    Cách tốt nhất để<br />tiết kiệm cho ví của bạn.
-                  </h1>
-                  <p className="text-muted mb-4">
-                    Mua sắm thông minh với Tạp Hoá Xanh - nơi cung cấp thực phẩm tươi ngon, 
-                    chất lượng cao với giá cả phải chăng nhất thị trường.
-                  </p>
-                  <form className="d-flex align-items-center gap-2 hero-subscribe-form">
-                    <div className="input-group rounded-pill bg-white shadow-sm overflow-hidden">
-                      <span className="input-group-text bg-white border-0">
-                        <i className="fa fa-envelope text-muted"></i>
-                      </span>
-                      <input 
-                        className="form-control border-0" 
-                        type="email" 
-                        placeholder="Địa chỉ email của bạn" 
-                      />
-                    </div>
-                    <button className="btn btn-success rounded-pill px-4">Đăng ký</button>
-                  </form>
+  <>
+    <Marquee />
+    <section>
+      <div className="home">
+        {/* Hero Section */}
+        <div className="hero-subscribe-section position-relative">
+          <div className="container">
+            <div className="row align-items-center hero-subscribe-section-lg">
+              <div className="col-lg-7 col-md-12 mb-4 mb-lg-0">
+                <div className="text-label mb-2">
+                  <span className="text-danger fw-bold">100%</span> Rau củ hữu cơ
                 </div>
-                <div className="col-lg-5 col-md-12 text-center position-relative">
-                  <div className="hero-tags d-flex justify-content-center gap-2 mb-4 flex-wrap">
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
-                      <i className="fa fa-times-circle text-muted me-1"></i>Mua sắm
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
-                      <i className="fa fa-times-circle text-muted me-1"></i>Công thức
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
-                      <i className="fa fa-times-circle text-muted me-1"></i>Bếp núc
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
-                      <i className="fa fa-times-circle text-muted me-1"></i>Tin tức
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
-                      <i className="fa fa-times-circle text-muted me-1"></i>Thực phẩm
-                    </button>
+                <h1 className="hero-title mb-3">
+                  Cách tốt nhất để<br />tiết kiệm cho ví của bạn.
+                </h1>
+                <p className="text-muted mb-4">
+                  Mua sắm thông minh với Tạp Hoá Xanh - nơi cung cấp thực phẩm tươi ngon, 
+                  chất lượng cao với giá cả phải chăng nhất thị trường.
+                </p>
+                <form className="d-flex align-items-center gap-2 hero-subscribe-form">
+                  <div className="input-group rounded-pill bg-white shadow-sm overflow-hidden">
+                    <span className="input-group-text bg-white border-0">
+                      <i className="fa fa-envelope text-muted"></i>
+                    </span>
+                    <input 
+                      className="form-control border-0" 
+                      type="email" 
+                      placeholder="Địa chỉ email của bạn" 
+                    />
                   </div>
+                  <button className="btn btn-success rounded-pill px-4">Đăng ký</button>
+                </form>
+              </div>
+              <div className="col-lg-5 col-md-12 text-center position-relative">
+                <div className="hero-tags d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                  <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                    <i className="fa fa-times-circle text-muted me-1"></i>Mua sắm
+                  </button>
+                  <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
+                    <i className="fa fa-times-circle text-muted me-1"></i>Công thức
+                  </button>
+                  <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                    <i className="fa fa-times-circle text-muted me-1"></i>Bếp núc
+                  </button>
+                  <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float">
+                    <i className="fa fa-times-circle text-muted me-1"></i>Tin tức
+                  </button>
+                  <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float">
+                    <i className="fa fa-times-circle text-muted me-1"></i>Thực phẩm
+                  </button>
                 </div>
               </div>
             </div>
-            <div className="hero-subscribe">
-              <img className="hero-lettuce" src="./client/images/banner.png" alt="Banner" />
-            </div>
-            <img className="hero-decor1 floating" src="./client/images/decor4.png" alt="decor" />
-            <img className="hero-decor2 floating" src="./client/images/decor2.png" alt="decor" />
-            <img className="hero-decor3 floating" src="./client/images/decor3.png" alt="decor" />
-            <img className="hero-decor4 floating" src="./client/images/decor1.png" alt="decor" />
           </div>
+          <div className="hero-subscribe">
+            <img className="hero-lettuce" src="./client/images/banner.png" alt="Banner" />
+          </div>
+          <img className="hero-decor1 floating" src="./client/images/decor4.png" alt="decor" />
+          <img className="hero-decor2 floating" src="./client/images/decor2.png" alt="decor" />
+          <img className="hero-decor3 floating" src="./client/images/decor3.png" alt="decor" />
+          <img className="hero-decor4 floating" src="./client/images/decor1.png" alt="decor" />
+        </div>
 
-          <div className="container">
+        <div className="container">
             {/* Featured Categories */}
             <div className="section-featured-categories">
               <div className="featured-categories-header">
@@ -675,39 +675,39 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Newsletter */}
-          <div className="newsletter-banner">
-            <div className="container">
-              <div className="row align-items-center">
-                <div className="col-lg-7 col-md-12">
-                  <div className="newsletter-content">
-                    <h1 className="title">
-                      Ở nhà & nhận nhu cầu hàng ngày<br />từ cửa hàng của chúng tôi
-                    </h1>
-                    <p className="subtitle">
-                      Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span>
-                    </p>
-                    <form className="newsletter-form">
-                      <div className="input-group">
-                        <span className="input-icon">
-                          <i className="fa fa-envelope"></i>
-                        </span>
-                        <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
-                        <button className="btn-subscribe" type="submit">Đăng ký</button>
-                      </div>
-                    </form>
-                  </div>
+        {/* Newsletter */}
+        <div className="newsletter-banner">
+          <div className="container">
+            <div className="row align-items-center">
+              <div className="col-lg-7 col-md-12">
+                <div className="newsletter-content">
+                  <h1 className="title">
+                    Ở nhà & nhận nhu cầu hàng ngày<br />từ cửa hàng của chúng tôi
+                  </h1>
+                  <p className="subtitle">
+                    Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span>
+                  </p>
+                  <form className="newsletter-form">
+                    <div className="input-group">
+                      <span className="input-icon">
+                        <i className="fa fa-envelope"></i>
+                      </span>
+                      <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
+                      <button className="btn-subscribe" type="submit">Đăng ký</button>
+                    </div>
+                  </form>
                 </div>
-                <div className="col-lg-5 col-md-12">
-                  <div className="newsletter-image position-relative">
-                    <img className="girl-img floating" src="client/images/girl.png" alt="Girl" draggable="false" />
-                  </div>
+              </div>
+              <div className="col-lg-5 col-md-12">
+                <div className="newsletter-image position-relative">
+                  <img className="girl-img floating" src="client/images/girl.png" alt="Girl" draggable="false" />
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </>
-  )
+      </div>
+    </section>
+  </>
+  );
 }

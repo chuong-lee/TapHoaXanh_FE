@@ -74,13 +74,34 @@ class ProductService {
         }
       }
 
-      // Xử lý các format response khác nhau từ API
+      // Chuẩn hóa danh sách sản phẩm để luôn có slug
+      let products: Product[] = [];
       if (data.success && Array.isArray(data.data)) {
-        return data.data
+        products = data.data
       } else if (Array.isArray(data)) {
-        return data
+        products = data
       } else if (data.products && Array.isArray(data.products)) {
-        return data.products
+        products = data.products
+      }
+
+      // Đảm bảo mỗi sản phẩm đều có slug, nếu không thì tạo slug từ name hoặc id
+      products = products.map((p: any) => {
+        if (!p.slug) {
+          // Tạo slug từ name (loại bỏ dấu, khoảng trắng, ký tự đặc biệt)
+          const name = p.name || '';
+          const generatedSlug = name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '') || String(p.id);
+          return { ...p, slug: generatedSlug };
+        }
+        return p;
+      });
+
+      if (products.length > 0) {
+        return products;
       }
 
       console.warn('Unexpected API response format:', data)
@@ -122,7 +143,7 @@ class ProductService {
     }
 
     try {
-      const response = await api.get(`/products/slug/${slug}`)
+      const response = await api.get(`/products/${slug}`)
       const data: any = response.data
       
       if (data.success && data.data) {
