@@ -93,10 +93,10 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
   }, [category, search])
 
   // Fetch categories
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (withCount: boolean = true) => {
     try {
       setCategoriesLoading(true)
-      const data = await categoryService.getAllCategories()
+      const data = await categoryService.getAllCategories(withCount)
       setCategories(data)
     } catch (err) {
       console.error('Error fetching categories:', err)

@@ -32,10 +32,15 @@ CREATE TABLE `address` (
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
+  `fullName` varchar(255) NOT NULL,
   `street` varchar(255) NOT NULL,
   `city` varchar(255) NOT NULL,
   `district` varchar(255) NOT NULL,
-  `is_default` tinyint(4) NOT NULL,
+  `zipCode` varchar(20) DEFAULT NULL,
+  `phone` varchar(20) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `is_default` tinyint(4) NOT NULL DEFAULT 0,
   `usersId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

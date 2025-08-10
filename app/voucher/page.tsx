@@ -21,7 +21,7 @@ export default function VoucherPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('http://localhost:5000/voucher')
+    fetch('http://localhost:4000/voucher')
       .then(res => res.json())
       .then(data => setVouchers(data))
   }, [])

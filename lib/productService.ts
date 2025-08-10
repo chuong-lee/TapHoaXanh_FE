@@ -1,6 +1,6 @@
 // lib/productService.ts
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = '/api';
 
 export interface Category {
   id: number;
@@ -23,6 +23,10 @@ export interface Product {
   discount: number;
   images: string;
   category: string;
+  brand?: {
+    id: number;
+    name: string;
+  };
   rating: number;
   soldCount?: number;
   description?: string;

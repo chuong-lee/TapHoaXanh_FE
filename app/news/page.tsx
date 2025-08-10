@@ -43,17 +43,11 @@ export default function PostPage() {
   }
 
   useEffect(() => {
-    // Thử gọi API posts từ server backend
-    fetch('http://localhost:4000/posts')
+    // Gọi API posts từ local API routes
+    fetch('/api/posts')
       .then(res => {
         if (!res.ok) {
-          // Nếu không có API posts, thử với news
-          return fetch('http://localhost:4000/news').then(r => {
-            if (!r.ok) {
-              throw new Error(`API Error: ${r.status}`);
-            }
-            return r.json();
-          });
+          throw new Error(`API Error: ${res.status}`);
         }
         return res.json();
       })

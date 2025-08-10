@@ -1,5 +1,12 @@
 "use client"
 
+// Declare global bootstrap type
+declare global {
+  interface Window {
+    bootstrap: any;
+  }
+}
+
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -10,17 +17,43 @@ import "../globals.css"
 import { useAuth } from '../context/AuthContext';
 import LogoutButton from './logout';
 
+// CSS to hide dropdown marker
+const dropdownStyles = `
+  .dropdown-toggle::after {
+    display: none !important;
+  }
+  .dropdown a.dropdown-toggle::marker {
+    display: none !important;
+  }
+`;
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
   const router = useRouter();
   const { profile } = useAuth();
-  const pathname = usePathname();
+  // const pathname = usePathname();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: Event) => {
+      const target = e.target as HTMLElement;
+      // Close dropdown when clicking outside
+      if (!target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+          menu.classList.remove('show');
+        });
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   // Tính tổng số lượng sản phẩm trong giỏ hàng
@@ -33,6 +66,7 @@ const Header = () => {
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: dropdownStyles }} />
       <div className={`header header-index custom-header${scrolled ? ' scrolled' : ''}`}>  
         <nav className="navbar navbar-expand-lg py-2">
           <div className="container d-flex align-items-center justify-content-between" style={{gap: 0, minHeight: 70}}>
@@ -69,13 +103,13 @@ const Header = () => {
               <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/about">
                 Chính Sách
               </Link>
-              <button 
+              {/* <button 
                 className="nav-link fw-semibold d-flex align-items-center gap-1 border-0 bg-transparent"
                 onClick={() => handleProtectedRoute('/orders')}
                 style={{color: scrolled ? '#22c55e' : 'white'}}
               >
                 Đơn hàng
-              </button>
+              </button> */}
             </div>
             {/* Icon */}
             <div className="header-icons d-flex align-items-center gap-4" style={{minWidth: 100, justifyContent: 'flex-end', marginLeft: '30px'}}>
@@ -113,23 +147,27 @@ const Header = () => {
                 )}
               </button>
               {profile ? (
-                <Dropdown align="end">
-                  <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 bg-transparent" style={{boxShadow: 'none'}}>
-                    {profile.image ? (
-                      <img src={profile.image} alt="avatar" width={32} height={32} style={{borderRadius: '50%', objectFit: 'cover', background: '#eee'}} />
-                    ) : (
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item as={Link} href="/profile">Thông tin người dùng</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <div className="px-3 py-1"><LogoutButton /></div>
-                  </Dropdown.Menu>
-                </Dropdown>
+                <li className="nav-item dropdown">
+                  <a 
+                    className="nav-link me-lg-2 dropdown-toggle" 
+                    href="myaccount.html" 
+                    role="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                    style={{color: scrolled ? "#22c55e" : "white"}}
+                  >
+                    <i className="fa-solid fa-user"></i>
+                  </a>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <Link className="dropdown-item" href="/profile">Cá Nhân</Link>
+                    </li>
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <LogoutDropdownItem />
+                    </li>
+                  </ul>
+                </li>
               ) : (
                 <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -147,10 +185,73 @@ const Header = () => {
         </nav>
       </div>
       <div className="header-slogan d-none d-lg-block fst-italic text-white">
-        "Tươi sạch mỗi ngày - Giao nhanh tận nhà"
+        &quot;Tươi sạch mỗi ngày - Giao nhanh tận nhà&quot;
       </div>
+      
+      {/* Custom CSS for dropdown */}
+      <style jsx>{`
+        .dropdown-menu.show {
+          display: block;
+        }
+        .dropdown-menu {
+          display: none;
+        }
+        .dropdown-toggle::after {
+          display: none;
+        }
+      `}</style>
     </>
   )
+}
+
+// Component LogoutButton tùy chỉnh cho dropdown
+function LogoutDropdownItem() {
+  const { setProfile } = useAuth();
+  const router = useRouter();
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      // Clear localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userProfile');
+      
+      // Update auth context
+      setProfile(null);
+      
+      // Redirect to login
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
+  return (
+    <button 
+      className="dropdown-item text-start w-100 border-0 bg-transparent"
+      onClick={handleLogout} 
+      disabled={logoutLoading}
+      style={{
+        cursor: logoutLoading ? 'not-allowed' : 'pointer',
+        opacity: logoutLoading ? 0.6 : 1
+      }}
+    >
+      {logoutLoading ? (
+        <>
+          <i className="fa-solid fa-spinner fa-spin me-2"></i>
+          Đang đăng xuất...
+        </>
+      ) : (
+        <>
+          <i className="fa-solid fa-sign-out-alt me-2"></i>
+          Đăng Xuất
+        </>
+      )}
+    </button>
+  );
 }
 
 export default Header;

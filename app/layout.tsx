@@ -5,6 +5,7 @@ import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import PWAComponents from './components/PWAComponents';
+import QueryProvider from './providers/QueryProvider';
 
 export const metadata = {
   title: {
@@ -22,14 +23,6 @@ export const metadata = {
     telephone: false,
   },
   manifest: '/manifest.json',
-  themeColor: '#22c55e',
-  colorScheme: 'light',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   icons: {
     icon: '/icons/icon-192x192.png',
     shortcut: '/icons/icon-192x192.png',
@@ -63,6 +56,15 @@ export const metadata = {
   },
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#22c55e',
+  colorScheme: 'light',
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
@@ -79,14 +81,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ErrorBoundary>
-          <AuthProvider>
-            <Header />
-            <main>
-              {children}
-            </main>
-            <Footer />
-            <PWAComponents />
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <Header />
+              <main>
+                {children}
+              </main>
+              <Footer />
+              <PWAComponents />
+            </AuthProvider>
+          </QueryProvider>
         </ErrorBoundary>
         
         {/* Bootstrap JS */}

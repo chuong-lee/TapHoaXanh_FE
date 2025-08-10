@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
+import locationService, { MappedProvince, MappedDistrict, MappedWard } from '../../lib/locationService'
 
 // Tạo mã QR ngân hàng thông qua API backend
 const generateBankQR = async (amount: number, orderId: string, bankCode: string) => {
@@ -131,15 +132,18 @@ type CartItem = {
 }
 
 function CheckoutPage() {
+  console.log('🔥 CheckoutPage component rendered');
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     fullName: '',
     address: '',
     address2: '',
     city: '',
+    cityCode: '',
     state: '',
+    stateCode: '',
     zip: '',
+    zipCode: '',
     phone: '',
     email: '',
     createAccount: false,
@@ -150,18 +154,31 @@ function CheckoutPage() {
     voucher: ''
   });
 
-  // Danh sách voucher mẫu
-  const voucherList = [
-    { code: '', label: 'Không sử dụng voucher' },
-    { code: 'SALE10', label: 'SALE10 - Giảm 10%' },
-    { code: 'FREESHIP', label: 'FREESHIP - Miễn phí vận chuyển' }
-  ];
+  // Location data states
+  const [provinces, setProvinces] = useState<MappedProvince[]>([]);
+  const [districts, setDistricts] = useState<MappedDistrict[]>([]);
+  const [wards, setWards] = useState<MappedWard[]>([]);
+  const [locationLoading, setLocationLoading] = useState({
+    provinces: false,
+    districts: false,
+    wards: false
+  });
+
+  // Debug log for provinces state
+  console.log('📊 Current state - Provinces:', provinces.length, 'Districts:', districts.length, 'Wards:', wards.length);
+
+
 
   const [selectedProductVoucher, setSelectedProductVoucher] = useState<string | null>(null)
   const [selectedShippingVoucher, setSelectedShippingVoucher] = useState<string | null>(null)
   const router = useRouter();
   const [errorFields, setErrorFields] = useState<string[]>([]);
-  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<{
+    id?: number;
+    code: string;
+    min_order_value: number;
+    max_discount: number;
+  } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
@@ -189,7 +206,6 @@ function CheckoutPage() {
         }
       }
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -212,7 +228,6 @@ function CheckoutPage() {
     const saved = localStorage.getItem('checkout_user_info');
     if (saved) {
       const savedData = JSON.parse(saved);
-      // Reset payment về trống khi vào trang checkout
       setForm(f => ({ 
         ...f, 
         ...savedData,
@@ -228,6 +243,80 @@ function CheckoutPage() {
       payment: '' // Luôn reset về trống
     }));
   }, []);
+
+  // Load danh sách tỉnh/thành phố khi component mount
+  useEffect(() => {
+    console.log('🔄 useEffect for provinces triggered');
+    const loadProvinces = async () => {
+      console.log('🚀 Starting to load provinces...');
+      setLocationLoading(prev => ({ ...prev, provinces: true }));
+      try {
+        console.log('📡 Calling locationService.getProvinces()...');
+        const provincesData = await locationService.getProvinces();
+        console.log('✅ Successfully loaded provinces:', provincesData.length, provincesData.slice(0, 3));
+        setProvinces(provincesData);
+        console.log('💾 Provinces state updated');
+      } catch (error) {
+        console.error('❌ Error loading provinces:', error);
+      } finally {
+        setLocationLoading(prev => ({ ...prev, provinces: false }));
+      }
+    };
+
+    loadProvinces();
+  }, []);
+
+  // Load danh sách huyện/quận khi chọn tỉnh
+  useEffect(() => {
+    const loadDistricts = async () => {
+      if (form.cityCode) {
+        setLocationLoading(prev => ({ ...prev, districts: true }));
+        setDistricts([]);
+        setWards([]);
+        setForm(prev => ({ ...prev, state: '', stateCode: '', zip: '', zipCode: '' }));
+        
+        try {
+          const districtsData = await locationService.getDistrictsByProvince(parseInt(form.cityCode));
+          setDistricts(districtsData);
+          console.log('Loaded districts for province', form.cityCode, ':', districtsData.length);
+        } catch (error) {
+          console.error('Error loading districts:', error);
+        } finally {
+          setLocationLoading(prev => ({ ...prev, districts: false }));
+        }
+      } else {
+        setDistricts([]);
+        setWards([]);
+      }
+    };
+
+    loadDistricts();
+  }, [form.cityCode]);
+
+  // Load danh sách xã/phường khi chọn huyện
+  useEffect(() => {
+    const loadWards = async () => {
+      if (form.stateCode) {
+        setLocationLoading(prev => ({ ...prev, wards: true }));
+        setWards([]);
+        setForm(prev => ({ ...prev, zip: '', zipCode: '' }));
+        
+        try {
+          const wardsData = await locationService.getWardsByDistrict(parseInt(form.stateCode));
+          setWards(wardsData);
+          console.log('Loaded wards for district', form.stateCode, ':', wardsData.length);
+        } catch (error) {
+          console.error('Error loading wards:', error);
+        } finally {
+          setLocationLoading(prev => ({ ...prev, wards: false }));
+        }
+      } else {
+        setWards([]);
+      }
+    };
+
+    loadWards();
+  }, [form.stateCode]);
 
 
 
@@ -271,6 +360,52 @@ function CheckoutPage() {
     { key: 'email', label: 'Email' }
   ];
 
+  // Handlers for location selection
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCode = e.target.value;
+    const selectedProvince = provinces.find(p => p.code.toString() === selectedCode);
+    
+    console.log('🏙️ Province selected:', selectedCode, selectedProvince?.name);
+    
+    setForm(prev => ({
+      ...prev,
+      cityCode: selectedCode,
+      city: selectedProvince ? selectedProvince.name : '',
+      state: '',
+      stateCode: '',
+      zip: '',
+      zipCode: ''
+    }));
+  };
+
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCode = e.target.value;
+    const selectedDistrict = districts.find(d => d.code.toString() === selectedCode);
+    
+    console.log('🏘️ District selected:', selectedCode, selectedDistrict?.name);
+    
+    setForm(prev => ({
+      ...prev,
+      stateCode: selectedCode,
+      state: selectedDistrict ? selectedDistrict.name : '',
+      zip: '',
+      zipCode: ''
+    }));
+  };
+
+  const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCode = e.target.value;
+    const selectedWard = wards.find(w => w.code.toString() === selectedCode);
+    
+    console.log('🏠 Ward selected:', selectedCode, selectedWard?.name);
+    
+    setForm(prev => ({
+      ...prev,
+      zipCode: selectedCode,
+      zip: selectedWard ? selectedWard.name : ''
+    }));
+  };
+
   // Kiểm tra xem đã nhập đầy đủ thông tin nhận hàng chưa
   const isShippingInfoComplete = () => {
     return requiredFields.every(field => {
@@ -289,24 +424,34 @@ function CheckoutPage() {
     setErrorFields([]);
     try {
       // Gửi đúng các trường backend yêu cầu
-      await api.post('/order', {
-        price: total,
-        quantity: cart.reduce((sum, item) => sum + item.quantity, 0),
-        images: cart.map(item => item.images).join(','),
+      const orderData = {
+        totalPrice: total,
+        paymentMethod: form.payment || 'COD',
         comment: form.notes || '',
-        orderItems: cart.map(item => ({
+        discount: discount || 0,
+        shippingFee: shipping || 0,
+        voucherId: selectedVoucher?.id || null,
+        currency: 'VND',
+        items: cart.map(item => ({
           product: item.id,
           quantity: item.quantity,
           images: item.images,
           unit_price: item.price
         }))
-      });
+      };
+      
+      console.log('🚀 Sending order data:', orderData);
+      console.log('🚀 Cart items:', cart);
+      console.log('🚀 Total price:', total);
+      console.log('🚀 Payment method:', form.payment);
+      
+      await api.post('/order', orderData);
 
       // Nếu thành công mới xóa giỏ hàng và chuyển trang
-      const cartLocal = JSON.parse(localStorage.getItem('cart_local') || '[]');
-      const cartSelected = JSON.parse(localStorage.getItem('cart_selected') || '[]');
-      const updatedCart = cartLocal.filter((item: any) =>
-        !cartSelected.some((sel: any) => sel.id === item.id && sel.variant_id === item.variant_id)
+      const cartLocal = JSON.parse(localStorage.getItem('cart_local') || '[]') as CartItem[];
+      const cartSelected = JSON.parse(localStorage.getItem('cart_selected') || '[]') as CartItem[];
+      const updatedCart = cartLocal.filter((item: CartItem) =>
+        !cartSelected.some((sel: CartItem) => sel.id === item.id && sel.variant_id === item.variant_id)
       );
       localStorage.setItem('cart_local', JSON.stringify(updatedCart));
       localStorage.removeItem('cart_selected');
@@ -314,10 +459,22 @@ function CheckoutPage() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        window.location.href = '/orders';
+        window.location.href = '/profile?tab=orders';
       }, 1500);
-    } catch (err: any) {
-      alert('Có lỗi khi đặt hàng: ' + (err?.response?.data?.message || err.message));
+    } catch (err: unknown) {
+      console.error('🚨 Order error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
+      const apiError = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data;
+      const statusCode = (err as { response?: { status?: number } })?.response?.status;
+      
+      console.error('🚨 Error details:', {
+        message: errorMessage,
+        apiError,
+        statusCode,
+        fullError: err
+      });
+      
+      alert('Có lỗi khi đặt hàng: ' + (apiError?.error || apiError?.message || errorMessage) + (statusCode ? ` (${statusCode})` : ''));
     }
   };
 
@@ -550,15 +707,59 @@ function CheckoutPage() {
                     </div>
                     <div className="col-md-6">
                       <label>Tỉnh/Thành phố *</label>
-                      <input className="form-control" placeholder="Nhập tỉnh hoặc thành phố" value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} />
+                      <select 
+                        className="form-control" 
+                        value={form.cityCode} 
+                        onChange={handleProvinceChange}
+                        disabled={locationLoading.provinces}
+                      >
+                        <option value="">
+                          {locationLoading.provinces ? 'Đang tải tỉnh/thành phố...' : 'Chọn tỉnh/thành phố'}
+                        </option>
+                        {provinces.map(province => (
+                          <option key={province.code} value={province.code}>
+                            {province.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-md-3">
                       <label>Huyện/Quận *</label>
-                      <input className="form-control" placeholder="Nhập huyện hoặc quận" value={form.state} onChange={e => setForm(f => ({...f, state: e.target.value}))} />
+                      <select 
+                        className="form-control" 
+                        value={form.stateCode} 
+                        onChange={handleDistrictChange}
+                        disabled={!form.cityCode || locationLoading.districts}
+                      >
+                        <option value="">
+                          {!form.cityCode ? 'Chọn tỉnh trước' : 
+                           locationLoading.districts ? 'Đang tải huyện/quận...' : 'Chọn huyện/quận'}
+                        </option>
+                        {districts.map(district => (
+                          <option key={district.code} value={district.code}>
+                            {district.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-md-3">
                       <label>Xã/Thị trấn *</label>
-                      <input className="form-control" placeholder="Nhập xã hoặc thị trấn" value={form.zip} onChange={e => setForm(f => ({...f, zip: e.target.value}))} />
+                      <select 
+                        className="form-control" 
+                        value={form.zipCode} 
+                        onChange={handleWardChange}
+                        disabled={!form.stateCode || locationLoading.wards}
+                      >
+                        <option value="">
+                          {!form.stateCode ? 'Chọn huyện trước' : 
+                           locationLoading.wards ? 'Đang tải xã/phường...' : 'Chọn xã/phường'}
+                        </option>
+                        {wards.map(ward => (
+                          <option key={ward.code} value={ward.code}>
+                            {ward.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-md-6">
                       <label>Số điện thoại *</label>
@@ -693,6 +894,9 @@ function CheckoutPage() {
                     Tôi đã đọc và đồng ý với <a href="#" target="_blank">điều khoản & chính sách</a>
                   </label>
                 </div>
+                {/* Debug info - Location API */}
+                
+
                 {/* Thông báo lỗi nếu thiếu thông tin */}
                 {errorFields.length > 0 && (
                   <div className="alert alert-danger">
@@ -709,7 +913,7 @@ function CheckoutPage() {
                     opacity: (form.agree && isShippingInfoComplete() && form.payment) ? 1 : 0.7,
                     cursor: (form.agree && isShippingInfoComplete() && form.payment) ? 'pointer' : 'not-allowed'
                   }}
-                  disabled={!form.agree || !isShippingInfoComplete() || !form.payment}
+                  disabled={!(form.agree && isShippingInfoComplete() && form.payment)}
                   onClick={handleOrder}
                 >
                   {!isShippingInfoComplete() ? 'Vui lòng nhập đầy đủ thông tin' : 

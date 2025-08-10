@@ -9,20 +9,20 @@ export interface ProfileDto {
 
 export const profileService = {
   getProfile: async (): Promise<ProfileDto> => {
-    const res = await api.get('/users/profile');
-    return res.data as ProfileDto;
+    const res = await api.get('/auth/profile');
+    return res.data.user as ProfileDto;
   },
   updateProfile: async (data: Partial<ProfileDto>): Promise<ProfileDto> => {
-    const res = await api.put('/users', data);
-    return res.data as ProfileDto;
+    const res = await api.put('/auth/profile', data);
+    return res.data.user as ProfileDto;
   },
   updatePassword: async (data: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
-    const res = await api.put('/users/password', data);
+    const res = await api.put('/auth/password', data);
     return res.data;
   },
   logout: async () => {
-    // Nếu controller là @Post('logout') trong users, endpoint là /users/logout
-    const res = await api.post('/auth/logout');
-    return res.data;
+    // Remove token from localStorage
+    localStorage.removeItem('token');
+    return { success: true };
   },
 };

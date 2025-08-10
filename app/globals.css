@@ -3875,15 +3875,25 @@ input[type=number] {
   background: url("/public/images/icon/arrow-right.svg") no-repeat center/contain;
 }
 .section-featured-categories .featured-categories-list {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 18px;
-  overflow-x: auto;
   padding: 0 32px;
+  max-width: 100%;
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .section-featured-categories .featured-categories-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    padding: 0 16px;
+  }
+}
+
 .section-featured-categories .featured-categories-list .featured-category-item {
   min-width: 150px;
-  max-width: 170px;
-  flex: 0 0 150px;
+  max-width: 200px;
   background: #f8fafb;
   border-radius: 12px;
   display: flex;

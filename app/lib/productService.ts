@@ -36,8 +36,8 @@ export interface ApiResponse<T> {
   limit?: number
 }
 
-// Flag to enable/disable mock mode - Disable mock when API URL is set
-const USE_MOCK_DATA = !process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'development'
+// Flag to enable/disable mock mode - Force to use real API
+const USE_MOCK_DATA = false
 
 class ProductService {
   // Lấy tất cả sản phẩm
@@ -269,14 +269,15 @@ class ProductService {
 
 class CategoryService {
   // Lấy tất cả danh mục
-  async getAllCategories(): Promise<Category[]> {
+  async getAllCategories(withCount: boolean = false): Promise<Category[]> {
     if (USE_MOCK_DATA) {
       console.log('🔧 Using mock data for categories')
       return mockCategoryService.getAllCategories()
     }
 
     try {
-      const response = await api.get('/categories')
+      const params = withCount ? { withCount: 'true' } : {}
+      const response = await api.get('/category', { params })
       const data: unknown = response.data
       
       if (typeof data === 'object' && data !== null && 'success' in data && Array.isArray((data as any).data)) {
@@ -299,7 +300,7 @@ class CategoryService {
     }
 
     try {
-      const response = await api.get(`/categories/${id}`)
+      const response = await api.get(`/category/${id}`)
       const data: unknown = response.data
       
       if (typeof data === 'object' && data !== null && 'success' in data && (data as any).data) {

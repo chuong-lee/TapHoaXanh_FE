@@ -236,3 +236,7 @@ export const skeletonCSS = `
   border-width: 0.3em;
 }
 `
+
+// Default export
+const LoadingSkeleton = ProductCardSkeleton
+export default LoadingSkeleton

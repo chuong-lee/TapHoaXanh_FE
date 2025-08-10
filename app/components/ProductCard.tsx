@@ -12,11 +12,46 @@ interface ProductCardProps {
 }
 
 function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.png';
+  // Fallback to available product image nếu không có image
+  if (!img) return '/client/images/product.png';
   if (img.startsWith('http')) return img;
   if (img.startsWith('/')) return img;
-  if (img.startsWith('client/images/')) return '/' + img;
-  return '/images/products/' + img;
+  
+  // Nếu là path từ database dạng 'client/images/...'
+  if (img.startsWith('client/images/')) {
+    // Kiểm tra nếu là những hình không tồn tại thì fallback ngay
+    const problematicImages = [
+      'client/images/product-40.jpg',
+      'client/images/product-45.jpg', 
+      'client/images/product-17.jpg',
+      'client/images/product-7.jpg',
+      'client/images/product-27.jpg',
+      'client/images/product-48.jpg',
+      'client/images/product-20.jpg',
+      'client/images/product-22.jpg',
+      'client/images/product-21.jpg',
+      'client/images/product-5.jpg',
+      'client/images/product-38.jpg',
+      'client/images/product-59.jpg',
+      'client/images/product-26.jpg',
+      'client/images/product-6.jpg',
+      'client/images/product-54.jpg',
+      'client/images/product-51.jpg',
+      'client/images/product-4.jpg',
+      'client/images/product-1.jpg',
+      'client/images/product-19.jpg',
+      'client/images/product-2.jpg'
+    ];
+    
+    if (problematicImages.includes(img)) {
+      return '/client/images/product.png';
+    }
+    
+    return '/' + img;
+  }
+  
+  // Fallback cho các trường hợp khác - dùng product.png
+  return '/client/images/product.png';
 }
 
 export default function ProductCard({ 
@@ -29,12 +64,45 @@ export default function ProductCard({
 }: ProductCardProps) {
   const router = useRouter();
 
+  // Tạo slug từ tên sản phẩm nếu không có slug
+  const createSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   const handleViewDetail = () => {
-    // Bỏ kiểm tra đăng nhập, cho phép truy cập tự do
-    if (product.slug) {
-      router.push(`/product/${product.slug}`);
-    } else {
-      alert('Không tìm thấy sản phẩm!');
+    try {
+      let productSlug = ''
+      
+      // Ưu tiên dùng slug có sẵn
+      if (product.slug) {
+        productSlug = product.slug
+      } 
+      // Nếu không có slug, tạo từ tên
+      else if (product.name) {
+        productSlug = createSlug(product.name)
+      }
+      // Nếu không có gì thì dùng ID
+      else {
+        productSlug = `product-${product.id}`
+      }
+
+      // Normalize slug để đảm bảo tương thích URL
+      const finalSlug = createSlug(productSlug)
+      
+      router.push(`/product/${finalSlug}`)
+      
+    } catch (error) {
+      console.error('❌ Lỗi chuyển trang:', error)
+      // Fallback: chuyển về trang chủ
+      router.push('/')
     }
   };
 
@@ -61,6 +129,10 @@ export default function ProductCard({
           width={120}
           height={120}
           style={{objectFit: 'contain', width: '100%', height: 120}}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/client/images/product.png';
+          }}
         />
       </div>
       <div className="text-secondary small mb-1">Snack</div>
@@ -81,7 +153,7 @@ export default function ProductCard({
       </div>
       <div className="mb-1" style={{fontSize: 14, color: '#e11d48', fontWeight: 500}}>
         by <span style={{color: '#ff9800'}}>
-          {product.brand ? product.brand : 'brsmaket'}
+          {product.brand?.name || 'Tạp Hoá Xanh'}
         </span>
       </div>
       <div className="mb-1">

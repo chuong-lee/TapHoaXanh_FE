@@ -25,10 +25,23 @@ api.interceptors.request.use(
 // Add a response interceptor
 api.interceptors.response.use(
   function (response) {
+    // Check if response is HTML instead of JSON
+    if (typeof response.data === 'string' && response.data.includes('<!DOCTYPE')) {
+      console.error('Received HTML response instead of JSON:', response.data.substring(0, 200));
+      throw new Error('Server returned HTML instead of JSON. Check API endpoint.');
+    }
     return response;
   },
   async function (error) {
     const originalRequest = error.config;
+    console.log('Axios error interceptor:', error.response?.status, error.response?.data);
+    
+    // Check if error response is HTML
+    if (error.response && typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE')) {
+      console.error('Received HTML error response:', error.response.data.substring(0, 200));
+      error.message = `API Error ${error.response.status}: Server returned HTML instead of JSON`;
+    }
+    
     // Nếu lỗi là 401 và chưa từng retry
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -43,9 +56,10 @@ api.interceptors.response.use(
            return api(originalRequest);
           }
       } catch (refreshError) {
-        // Nếu refresh thất bại, xóa token và chuyển về trang login
+        // Nếu refresh thất bại, xóa token và chuyển về trang login  
         localStorage.removeItem('token');
-        if (window.location.pathname !== '/login') {
+        // TEMPORARY: Không redirect về login cho product pages
+        if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/product/')) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
