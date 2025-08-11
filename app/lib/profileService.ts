@@ -21,7 +21,6 @@ export const profileService = {
     return res.data;
   },
   logout: async () => {
-    // Nếu controller là @Post('logout') trong users, endpoint là /users/logout
     const res = await api.post('/auth/logout');
     return res.data;
   },
