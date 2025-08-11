@@ -38,7 +38,7 @@ const Header = () => {
           <div className="container d-flex align-items-center justify-content-between" style={{gap: 0, minHeight: 70}}>
             {/* Logo + Tên */}
             <div className="d-flex align-items-center gap-2" style={{minWidth: 220}}>
-              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/home" style={{gap: 10}}>
+              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{gap: 10}}>
                 <img
                   src="/client/images/logo.png"
                   alt="Tạp Hóa Xanh Logo"

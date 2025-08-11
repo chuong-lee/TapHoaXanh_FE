@@ -1,34 +1,38 @@
-import { type ImgHTMLAttributes } from "react"
+import Image from "next/image"
+import { ImgHTMLAttributes } from "react"
 
 type AvatarProps = {
-  src?: string
-  alt?: string
-  fallback?: string
+  image?: string // URL ảnh từ database
+  name?: string  // Tên người dùng
   size?: number
   className?: string
-} & ImgHTMLAttributes<HTMLImageElement>
+} & Omit<ImgHTMLAttributes<HTMLImageElement>, "width" | "height">
 
 const Avatar = ({
-  src,
-  alt,
-  fallback = "?",
+  image,
+  name = "",
   size = 40,
   className = "",
   ...rest
 }: AvatarProps) => {
-  if (src) {
+  // Lấy chữ cái đầu của tên cuối
+  const getInitial = (fullName: string) => {
+    const clean = fullName.trim().replace(/\s+/g, " ")
+    if (!clean) return "?"
+    const parts = clean.split(" ")
+    return parts.at(-1)?.[0]?.toUpperCase() || "?"
+  }
+
+  const fallback = getInitial(name)
+
+  if (image && image.trim() !== "") {
     return (
-      <img
-        src={src}
-        alt={alt}
-        style={{
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          objectFit: "cover",
-          display: "block",
-        }}
-        className={className}
+      <Image
+        src={image}
+        alt={name || "Avatar"}
+        width={size}
+        height={size}
+        className={`rounded-full object-cover block ${className}`}
         {...rest}
       />
     )
@@ -50,7 +54,6 @@ const Avatar = ({
         userSelect: "none",
       }}
       className={className}
-      {...rest}
     >
       {fallback}
     </div>

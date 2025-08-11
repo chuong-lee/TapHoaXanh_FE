@@ -11,10 +11,10 @@ const api = axios.create({
 // Add a request interceptor
 api.interceptors.request.use(
   function (config) {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (token) {
+    const access_token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+    if (access_token) {
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${access_token}`;
     }
     return config;
   },
@@ -30,25 +30,36 @@ api.interceptors.response.use(
   },
   async function (error) {
     const originalRequest = error.config;
+    const pathname = window.location.pathname;
+    const responseUrl = error.response?.config?.url;
     // Nếu lỗi là 401 và chưa từng retry
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry &&
+      pathname !== '/login' &&
+      responseUrl !== "/auth/refresh-token" &&
+      responseUrl !== "/auth/logout") {
       originalRequest._retry = true;
       try {
-        // Gọi API refresh token (giả sử backend trả về { token: '...' })
-        const res = await api.post('/auth/refresh', {}, { withCredentials: true });
-        const data = res.data as { token?: string };
-        const newToken = data.token;
-        if (newToken) {
-          localStorage.setItem('token', newToken);
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-           return api(originalRequest);
-          }
+  
+        const res = await api.post('/auth/refresh-token', {
+          refresh_token: localStorage.getItem('refresh_token'),
+        }, { withCredentials: true });
+        const { access_token, refresh_token } = res.data as { access_token?: string; refresh_token?: string };
+
+        if (access_token) {
+          localStorage.setItem('access_token', access_token);
+          originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
+        }
+
+        if (refresh_token) {
+          localStorage.setItem('refresh_token', refresh_token);
+        }
+
+        return api(originalRequest);
       } catch (refreshError) {
         // Nếu refresh thất bại, xóa token và chuyển về trang login
-        localStorage.removeItem('token');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
-        }
+        localStorage.removeItem('access_token');
+        if (window.location.pathname !== '/login') window.location.href = '/login';
+        
         return Promise.reject(refreshError);
       }
     }
