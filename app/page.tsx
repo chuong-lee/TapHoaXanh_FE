@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Product } from "./lib/productService";
 import ProductCard from "./components/ProductCard";
 import LoadingSkeleton from "./components/LoadingSkeleton";
+import Link from 'next/link'
 
 const bannerList = [
   {},
@@ -225,16 +226,21 @@ export default function Home() {
                 </div>
                 <div className="col-lg-5 col-md-12 text-center position-relative">
                   <div className="hero-tags d-flex justify-content-center gap-2 mb-4 flex-wrap">
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float"><i className="fa fa-times-circle text-muted me-1" />Mua sắm
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float"><i className="fa fa-times-circle text-muted me-1" />Công thức
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float"><i className="fa fa-times-circle text-muted me-1" />Bếp núc
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float"><i className="fa fa-times-circle text-muted me-1" />Tin tức
-                    </button>
-                    <button className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float"><i className="fa fa-times-circle text-muted me-1" />Thực phẩm
-                    </button>
+                    <Link href="/categories" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
+                      <i className="fa fa-times-circle text-muted me-1" />Mua sắm
+                    </Link>
+                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float text-decoration-none">
+                      <i className="fa fa-times-circle text-muted me-1" />Công thức
+                    </Link>
+                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
+                      <i className="fa fa-times-circle text-muted me-1" />Bếp núc
+                    </Link>
+                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float text-decoration-none">
+                      <i className="fa fa-times-circle text-muted me-1" />Tin tức
+                    </Link>
+                    <Link href="/categories" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
+                      <i className="fa fa-times-circle text-muted me-1" />Thực phẩm
+                    </Link>
                   </div>
                 </div>
               </div>
