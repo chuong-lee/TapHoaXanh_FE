@@ -1,12 +1,11 @@
 import Image from "next/image"
-import { ImgHTMLAttributes } from "react"
 
 type AvatarProps = {
   image?: string // URL ảnh từ database
   name?: string  // Tên người dùng
   size?: number
   className?: string
-} & Omit<ImgHTMLAttributes<HTMLImageElement>, "width" | "height">
+} 
 
 const Avatar = ({
   image,
@@ -24,6 +23,7 @@ const Avatar = ({
   }
 
   const fallback = getInitial(name)
+  
 
   if (image && image.trim() !== "") {
     return (

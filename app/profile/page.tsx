@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useReducer } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { profileService } from '../lib/profileService';
@@ -24,6 +24,15 @@ export default function ProfilePage() {
   const passwordLoadingRef = useRef(false);
   const passwordSuccessRef = useRef<string | null>(null);
   const passwordErrorRef = useRef<string | null>(null);
+
+  // Avatar upload state - sử dụng useRef để tối ưu
+  const avatarFileRef = useRef<File | null>(null);
+  const avatarLoadingRef = useRef(false);
+  const avatarSuccessRef = useRef<string | null>(null);
+  const avatarErrorRef = useRef<string | null>(null);
+
+  // Force update function để trigger re-render khi cần
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   useEffect(() => {
     if (profile) {
@@ -83,6 +92,57 @@ export default function ProfilePage() {
     }
   };
 
+  // Handle avatar file selection - tự động upload ngay
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      avatarFileRef.current = file;
+      avatarErrorRef.current = null;
+      avatarSuccessRef.current = null;
+      
+      // Tự động upload ngay lập tức
+      await handleAvatarUpload();
+    }
+  };
+
+  // Handle avatar upload
+  const handleAvatarUpload = async () => {
+    if (!avatarFileRef.current) return;
+    
+    avatarLoadingRef.current = true;
+    avatarErrorRef.current = null;
+    avatarSuccessRef.current = null;
+    
+    try {
+      const result = await profileService.uploadAvatar(avatarFileRef.current);
+      
+      // Cập nhật profile với avatar mới
+      if (profile) {
+        const updatedProfile = { 
+          name: profile.name, 
+          phone: profile.phone, 
+          email: profile.email, 
+          image: result.imageUrl 
+        };
+        setProfile(updatedProfile);
+        setForm(prev => ({ ...prev, image: result.imageUrl }));
+      }
+      
+      avatarSuccessRef.current = result.message;
+      avatarFileRef.current = null;
+      
+      // Reset input file
+      const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+      
+    } catch {
+      avatarErrorRef.current = 'Upload avatar thất bại. Vui lòng thử lại.';
+    } finally {
+      avatarLoadingRef.current = false;
+      forceUpdate();
+    }
+  };
+
   useEffect(() => {
     refreshProfile()
   }, [])
@@ -109,6 +169,27 @@ export default function ProfilePage() {
                         <Avatar image={form.image} name={form.name} size={100} />
                         <div className="edit-icon"><i className="fas fa-edit"></i></div>
                       </div>
+                                              <div className="avatar-upload-section ms-4">
+                          <div className="mb-3">
+                            <label htmlFor="avatar-input" className="form-label">Thay đổi avatar</label>
+                            <input
+                              type="file"
+                              id="avatar-input"
+                              className="form-control"
+                              accept="image/*"
+                              onChange={handleAvatarChange}
+                            />
+                          </div>
+                          {avatarLoadingRef.current && (
+                            <div className="text-info mt-2">Đang upload avatar...</div>
+                          )}
+                          {avatarSuccessRef.current && (
+                            <div className="text-success mt-2">{avatarSuccessRef.current}</div>
+                          )}
+                          {avatarErrorRef.current && (
+                            <div className="text-danger mt-2">{avatarErrorRef.current}</div>
+                          )}
+                        </div>
                     </div>
                     <form className="profile-form" id="profile-form" onSubmit={handleSubmit}>
                       <div className="mb-3">
@@ -116,7 +197,7 @@ export default function ProfilePage() {
                         <input className="form-control" id="name" type="text" value={form.name} onChange={handleChange} required />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="email">Địa chỉ email</label>
+                        <label className="form-label" htmlFor="email">Địa chỉ email<span className="text-danger">*</span></label>
                         <Form.Control type="email" id="email" value={form.email} onChange={handleChange} disabled />
                       </div>
                       <div className="mb-3">
