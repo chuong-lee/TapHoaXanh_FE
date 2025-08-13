@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef ,FormEvent} from 'react'
+import { useState, useRef, FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
+import { useAuth } from '@/context/AuthContext'
 
 
 
@@ -17,32 +18,62 @@ function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
+  const { refreshProfile } = useAuth();
 
-  const handleRegister = async (e:FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
-    
+  const handleRegister = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Lưu thông tin đăng ký để sử dụng cho login
+      const email = emailRef.current?.value || '';
+      const password = passwordRef.current?.value || '';
+
+      // Đăng ký tài khoản
       await api.post('/auth/register', {
         name: nameRef.current?.value || '',
         phone: phoneRef.current?.value || '',
-        email: emailRef.current?.value || '',
-        password: passwordRef.current?.value || '',
-        confirmPassword: confirmPasswordRef.current?.value || ''
-      }).then(res => {
-        console.log(res);
+        email: email,
+        password: password,
+        confirmPassword: confirmPasswordRef.current?.value || '',
+      });
+
+      // Tự động login sau khi đăng ký thành công
+      try {
+        const loginRes = await api.post('/auth/login', {
+          email: email,
+          password: password,
+        });
+
+        const { access_token, refresh_token } = loginRes.data as { access_token?: string; refresh_token?: string };
+
+        if (access_token) localStorage.setItem('access_token', access_token);
+        if (refresh_token) localStorage.setItem('refresh_token', refresh_token);
+
+        await refreshProfile();
         router.push(redirectTo);
-      } ).catch(err => {
-        console.log(err);
-        setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.');
-      } ).finally(() => {
-        setIsLoading(false);
-      })
-  }
+      } catch (loginErr) {
+        // Nếu login thất bại, vẫn chuyển về trang login để user login thủ công
+        console.error('Tự động login thất bại:', loginErr);
+        setError('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      }
+    } catch (err) {
+      const error = err as Error & { response?: { data?: { message?: string } } };  
+      console.error(error);
+      setError(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra thông tin.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <form onSubmit={handleRegister} className="mx-auto col-md-6 col-lg-5 col-12">
-        <div className="mb-3">
+      <div className="mb-3">
         <label className="form-label">Tên người dùng</label>
         <input
           type="text"
@@ -87,7 +118,7 @@ function RegisterForm() {
           required
         />
       </div>
-     {isLoading ? <>Đang load</> : <button type="submit" className="btn btn-primary w-100">Đăng Ký</button>} 
+      {isLoading ? <>Đang load</> : <button type="submit" className="btn btn-primary w-100">Đăng Ký</button>}
       {error && <p className="text-danger">{error}</p>}
     </form>
   )
