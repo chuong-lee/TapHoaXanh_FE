@@ -2,20 +2,20 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
-import { Dropdown } from 'react-bootstrap';
+
 import { useAuth } from '../context/AuthContext';
 import LogoutButton from './logout';
+import Avatar from './Avatar';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
   const router = useRouter();
   const { profile } = useAuth();
-  const pathname = usePathname();
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -107,30 +107,30 @@ const Header = () => {
                 )}
               </button>
               {profile ? (
-                <Dropdown align="end">
-                  <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 bg-transparent" style={{boxShadow: 'none'}}>
-                    {profile.image ? (
-                      <img src={profile.image} alt="avatar" width={32} height={32} style={{borderRadius: '50%', objectFit: 'cover', background: '#eee'}} />
-                    ) : (
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item as={Link} href="/profile">Thông tin người dùng</Dropdown.Item>
-                    <Dropdown.Divider />
+                <div className="avatar-dropdown-container">
+                  <div className="avatar-trigger">
+                    <Avatar 
+                      image={profile.image} 
+                      name={profile.name} 
+                      size={55}
+                      className="border-2 border-white"
+                    />
+                  </div>
+                  <div className="avatar-dropdown-menu">
+                    <Link href="/profile" className="dropdown-item">Thông tin người dùng</Link>
+                    <div className="dropdown-divider"></div>
                     <div className="px-3 py-1"><LogoutButton /></div>
-                  </Dropdown.Menu>
-                </Dropdown>
+                  </div>
+                </div>
               ) : (
-                <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </Link>
+                <div className="d-flex align-items-center gap-3">
+                  <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
+                    <span style={{color: scrolled ? '#22c55e' : 'white'}}>Đăng nhập</span>
+                  </Link>
+                  <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/register" title="Đăng Ký">
+                    <span style={{color: scrolled ? '#22c55e' : 'white'}}>Đăng ký</span>
+                  </Link>
+                </div>
               )}
             </div>
             {/* Nút menu mobile */}
@@ -141,7 +141,7 @@ const Header = () => {
         </nav>
       </div>
       <div className="header-slogan d-none d-lg-block fst-italic text-white">
-        "Tươi sạch mỗi ngày - Giao nhanh tận nhà"
+        &ldquo;Tươi sạch mỗi ngày - Giao nhanh tận nhà&rdquo;
       </div>
     </>
   )

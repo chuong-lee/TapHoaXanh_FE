@@ -1429,3 +1429,197 @@ a:hover, .link:hover {
   border-color: #198754;
   box-shadow: 0 0 0 0.2rem rgba(25,135,84,.15);
 }
+
+/* Header Avatar Styles */
+.avatar-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-trigger {
+  cursor: pointer;
+}
+
+/* Làm avatar trong header tròn và rõ hơn */
+.avatar-trigger .rounded-full,
+.avatar-trigger img,
+.avatar-trigger .avatar-component {
+  border-radius: 50% !important;
+  object-fit: cover;
+  border: 3px solid #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.avatar-trigger .rounded-full:hover,
+.avatar-trigger img:hover,
+.avatar-trigger .avatar-component:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  border-color: var(--primary-green-light) !important;
+}
+
+/* Style cho avatar fallback (initials) trong header */
+.avatar-trigger div[style*="border-radius: 50%"] {
+  border: 3px solid #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  background: var(--primary-green) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  transition: all 0.3s ease;
+}
+
+.avatar-trigger div[style*="border-radius: 50%"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  border-color: var(--primary-green-light) !important;
+  background: var(--primary-green-dark) !important;
+}
+
+.avatar-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 8px 0;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.avatar-dropdown-container:hover .avatar-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.avatar-dropdown-menu .dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.avatar-dropdown-menu .dropdown-item:hover {
+  background: #f8f9fa;
+  color: var(--primary-green);
+  text-decoration: none;
+}
+
+.avatar-dropdown-menu .dropdown-divider {
+  height: 1px;
+  background: #e9ecef;
+  margin: 4px 0;
+}
+
+/* Login/Register Links Styles */
+.header-icons .nav-link {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.header-icons .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.header-icons .nav-link span {
+  transition: color 0.2s ease;
+}
+
+/* Avatar Upload Styles */
+.avatar-upload-section {
+  flex: 1;
+  max-width: 400px;
+}
+
+.profile-image {
+  position: relative;
+  display: inline-block;
+}
+
+/* Làm avatar tròn và đẹp */
+.profile-image img,
+.profile-image .avatar-component,
+.profile-image .rounded-full {
+  border-radius: 50% !important;
+  object-fit: cover;
+  border: 3px solid #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.profile-image img:hover,
+.profile-image .avatar-component:hover,
+.profile-image .rounded-full:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  border-color: var(--primary-green-light) !important;
+}
+
+/* Style cho avatar trong profile */
+.profile-image .rounded-full {
+  border: 3px solid #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Style cho avatar fallback (initials) trong profile */
+.profile-image div[style*="border-radius: 50%"] {
+  border: 3px solid #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  background: var(--primary-green) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+
+.profile-image .edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--primary-green);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profile-image .edit-icon:hover {
+  background: var(--primary-green-dark);
+}
+
+.avatar-upload-section .form-control {
+  border: 2px dashed #ddd;
+  background: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.avatar-upload-section .form-control:hover {
+  border-color: var(--primary-green);
+  background: #fff;
+}
+
+.avatar-upload-section .form-control:focus {
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 0.2rem rgba(34,197,94,.15);
+  background: #fff;
+}
