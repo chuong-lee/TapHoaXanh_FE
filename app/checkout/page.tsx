@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '../context/AuthContext'
 import locationService, { MappedProvince, MappedDistrict, MappedWard } from '../../lib/locationService'
 
 // Tạo mã QR ngân hàng thông qua API backend
@@ -133,6 +134,7 @@ type CartItem = {
 
 function CheckoutPage() {
   console.log('🔥 CheckoutPage component rendered');
+  const { profile } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [form, setForm] = useState({
     fullName: '',
@@ -444,8 +446,30 @@ function CheckoutPage() {
       console.log('🚀 Cart items:', cart);
       console.log('🚀 Total price:', total);
       console.log('🚀 Payment method:', form.payment);
+      // Kiểm tra xem user đã đăng nhập chưa
+      if (!profile) {
+        alert('Vui lòng đăng nhập để đặt hàng');
+        router.push('/login');
+        return;
+      }
       
-      await api.post('/order', orderData);
+      // Lấy token từ localStorage
+      const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+      console.log('🚀 Token:', token ? 'Present' : 'Missing');
+      
+      // Kiểm tra xem có token không
+      if (!token) {
+        alert('Vui lòng đăng nhập để đặt hàng');
+        router.push('/login');
+        return;
+      }
+      
+      // Gửi request với token trong header
+      await api.post('/order', orderData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       // Nếu thành công mới xóa giỏ hàng và chuyển trang
       const cartLocal = JSON.parse(localStorage.getItem('cart_local') || '[]') as CartItem[];

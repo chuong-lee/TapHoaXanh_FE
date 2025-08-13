@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('authorization');
@@ -27,11 +27,11 @@ export async function PUT(
     }
 
     const userId = decoded.userId;
-    const orderId = params.id;
+    const { id: orderId } = await params;
 
     // Kiểm tra đơn hàng thuộc về user và có thể hủy
     const checkQuery = `
-      SELECT id, status FROM \`order\` 
+      SELECT id, payment_status FROM \`order\` 
       WHERE id = ? AND usersId = ? AND deletedAt IS NULL
     `;
     
@@ -44,7 +44,7 @@ export async function PUT(
       );
     }
 
-    const currentStatus = order[0].status;
+    const currentStatus = order[0].payment_status;
     
     // Chỉ cho phép hủy đơn hàng ở trạng thái pending hoặc confirmed
     if (!['pending', 'confirmed'].includes(currentStatus)) {
@@ -57,7 +57,7 @@ export async function PUT(
     // Cập nhật trạng thái đơn hàng thành cancelled
     const updateQuery = `
       UPDATE \`order\` 
-      SET status = 'cancelled', updatedAt = NOW() 
+      SET payment_status = 'cancelled', updatedAt = NOW() 
       WHERE id = ? AND usersId = ?
     `;
     
