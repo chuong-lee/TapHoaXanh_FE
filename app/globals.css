@@ -1464,7 +1464,7 @@ a:hover, .link:hover {
 .avatar-trigger div[style*="border-radius: 50%"] {
   border: 3px solid #fff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-  background: var(--primary-green) !important;
+  background: #6b7280 !important;
   color: #fff !important;
   font-weight: 700 !important;
   transition: all 0.3s ease;
@@ -1582,7 +1582,7 @@ a:hover, .link:hover {
 .profile-image div[style*="border-radius: 50%"] {
   border: 3px solid #fff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-  background: var(--primary-green) !important;
+  background: #6b7280 !important;
   color: #fff !important;
   font-weight: 700 !important;
 }

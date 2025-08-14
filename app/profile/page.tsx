@@ -25,7 +25,7 @@ export default function ProfilePage() {
   const passwordSuccessRef = useRef<string | null>(null);
   const passwordErrorRef = useRef<string | null>(null);
 
-  // Avatar upload state - sử dụng useRef để tối ưu
+  // Avatar upload 
   const avatarFileRef = useRef<File | null>(null);
   const avatarLoadingRef = useRef(false);
   const avatarSuccessRef = useRef<string | null>(null);
@@ -92,7 +92,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Handle avatar file selection - tự động upload ngay
+  // avatar tự động upload
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                     <div className="profile-header d-flex align-items-center mb-4">
                       <div className="profile-image position-relative">
                         <Avatar image={form.image} name={form.name} size={100} />
-                        <div className="edit-icon"><i className="fas fa-edit"></i></div>
+                        {/* <div className="edit-icon"><i className="fas fa-edit"></i></div> */}
                       </div>
                                               <div className="avatar-upload-section ms-4">
                           <div className="mb-3">
