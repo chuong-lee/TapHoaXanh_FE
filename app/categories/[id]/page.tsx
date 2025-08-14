@@ -1,8 +1,8 @@
 'use client'
 
-import { useProducts } from '@/app/hooks/useProducts'
-import { ProductCard } from '@/components/ProductCard'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useProducts } from '@/hooks/useProducts'
+import ProductCard from '@/components/product/ProductCard'
+import { Skeleton } from '@/components/ui/LoadingSkeleton'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 

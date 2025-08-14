@@ -1,4 +1,4 @@
-import FeaturesDemo from '@/components/FeaturesDemo'
+import FeaturesDemo from '@/components/ui/FeaturesDemo'
 
 export default function DemoPage() {
   return <FeaturesDemo />

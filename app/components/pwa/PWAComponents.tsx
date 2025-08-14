@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { usePWA, useServiceWorker, usePushNotifications } from '@/hooks/usePWA'
 
 // Install App Banner Component
@@ -213,13 +213,13 @@ const NotificationPermission = () => {
 
 // Main PWA Components Container
 const PWAComponents = () => {
-  const [mounted, setMounted] = useState(false)
+  const mountedRef = useRef(false)
 
   useEffect(() => {
-    setMounted(true)
+    mountedRef.current = true
   }, [])
 
-  if (!mounted) return null
+  if (!mountedRef.current) return null
 
   return (
     <>

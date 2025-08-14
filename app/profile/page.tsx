@@ -7,10 +7,10 @@ import Image from 'next/image';
 import { useAuth } from '../context/AuthContext';
 import { profileService } from '../lib/profileService';
 
-import AddressManager from '../components/AddressManager';
-import OrderList from '../components/OrderList';
-import PaymentStatus from '../components/PaymentStatus';
-import PaymentStatusTester from '../components/PaymentStatusTester';
+import AddressManager from '../components/user/AddressManager';
+import OrderList from '../components/order/OrderList';
+import PaymentStatus from '../components/payment/PaymentStatus';
+import PaymentStatusTester from '../components/payment/PaymentStatusTester';
 import api from '@/lib/axios';
 
 interface OrderItem {

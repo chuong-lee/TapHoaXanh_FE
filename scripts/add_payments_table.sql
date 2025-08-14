@@ -1,4 +1,4 @@
--- Tạo bảng payments để lưu thông tin thanh toán
+-- Tạo bảng payments để lưu thông tin thanh toán SePay
 CREATE TABLE IF NOT EXISTS `payments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `transaction_id` varchar(100) NOT NULL,
@@ -28,7 +28,3 @@ CREATE TABLE IF NOT EXISTS `payments` (
 ALTER TABLE `order` 
 ADD COLUMN IF NOT EXISTS `payment_date` datetime DEFAULT NULL AFTER `payment_status`;
 
--- Tạo index cho performance
-CREATE INDEX IF NOT EXISTS `idx_payments_status` ON `payments` (`status`);
-CREATE INDEX IF NOT EXISTS `idx_payments_order_id` ON `payments` (`order_id`);
-CREATE INDEX IF NOT EXISTS `idx_payments_created_at` ON `payments` (`created_at`); 

@@ -1,4 +1,4 @@
-import { CategoryList } from '@/components/CategoryList'
+import { CategoryList } from '../../components/CategoryList'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

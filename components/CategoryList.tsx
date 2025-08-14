@@ -1,8 +1,7 @@
 'use client'
 
-import { useProducts } from '@/app/hooks/useProducts'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useProducts } from '@/hooks/useProducts'
+import { Skeleton } from '@/components/ui/LoadingSkeleton'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
@@ -43,12 +42,10 @@ export function CategoryList({
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {Array.from({ length: 8 }).map((_, index) => (
-              <Card key={index} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <Skeleton className="w-full h-20 mb-3" />
-                  <Skeleton className="h-4 w-full" />
-                </CardContent>
-              </Card>
+              <div key={index} className="overflow-hidden border rounded-lg p-4">
+                <Skeleton className="w-full h-20 mb-3" />
+                <Skeleton className="h-4 w-full" />
+              </div>
             ))}
           </div>
         </div>
@@ -86,18 +83,17 @@ export function CategoryList({
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {displayCategories.map((category) => (
-            <Card
+            <div
               key={category.id}
-              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow border rounded-lg p-4 text-center"
               onClick={() => handleCategoryClick(category.id, category.name)}
             >
-              <CardContent className="p-4 text-center">
-                {category.image && (
-                  <div className="relative w-full h-20 mb-3">
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      fill
+              {category.image && (
+                <div className="relative w-full h-20 mb-3">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
                       className="object-cover rounded-md"
                     />
                   </div>
@@ -110,8 +106,7 @@ export function CategoryList({
                     {category.description}
                   </p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
           ))}
         </div>
       </div>

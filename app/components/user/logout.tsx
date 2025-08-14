@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { profileService } from '../lib/profileService';
-import { useAuth } from '../context/AuthContext';
+import { profileService } from '../../lib/profileService';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LogoutButton() {
   const { setProfile } = useAuth();

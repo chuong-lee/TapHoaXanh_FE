@@ -8,14 +8,14 @@ declare global {
 }
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import "bootstrap/dist/css/bootstrap.min.css"
-import "../globals.css"
+import "../../globals.css"
 // import { Dropdown } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
-import LogoutButton from './logout';
+import { useAuth } from '../../context/AuthContext';
+import LogoutButton from '../user/logout';
 
 // CSS to hide dropdown marker
 const dropdownStyles = `
@@ -28,17 +28,26 @@ const dropdownStyles = `
 `;
 
 const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
+  const scrolledRef = useRef(false);
   const { cart } = useCart();
   const router = useRouter();
   const { profile } = useAuth();
   // const pathname = usePathname();
   
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolledRef.current) {
+        scrolledRef.current = isScrolled;
+        // Force re-render only when scroll state actually changes
+        setScrolled(isScrolled);
+      }
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  const [scrolled, setScrolled] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {

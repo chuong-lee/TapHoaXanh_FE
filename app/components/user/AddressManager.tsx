@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '@/lib/axios'
-import locationService, { MappedProvince, MappedDistrict, MappedWard } from '../../lib/locationService'
+import locationService, { MappedProvince, MappedDistrict, MappedWard } from '../../../lib/locationService'
 
 interface Address {
   id: number;
@@ -20,6 +20,7 @@ interface AddressFormData {
   street: string;
   city: string;
   district: string;
+  zipCode?: string;
   is_default: boolean;
 }
 
@@ -39,7 +40,7 @@ export default function AddressManager() {
   const [provinces, setProvinces] = useState<MappedProvince[]>([]);
   const [districts, setDistricts] = useState<MappedDistrict[]>([]);
   const [wards, setWards] = useState<MappedWard[]>([]);
-  const [locationLoading, setLocationLoading] = useState({
+  const locationLoadingRef = useRef({
     provinces: false,
     districts: false,
     wards: false
@@ -60,14 +61,14 @@ export default function AddressManager() {
 
   // Load provinces
   const loadProvinces = async () => {
-    setLocationLoading(prev => ({ ...prev, provinces: true }));
+    locationLoadingRef.current.provinces = true;
     try {
       const provincesData = await locationService.getProvinces();
       setProvinces(provincesData);
     } catch (error) {
       console.error('Error loading provinces:', error);
     } finally {
-      setLocationLoading(prev => ({ ...prev, provinces: false }));
+      locationLoadingRef.current.provinces = false;
     }
   };
 
@@ -115,14 +116,10 @@ export default function AddressManager() {
 
   const resetForm = () => {
     setFormData({
-      fullName: '',
       street: '',
       city: '',
       district: '',
       zipCode: '',
-      phone: '',
-      email: '',
-      company: '',
       is_default: false
     });
     setEditingAddress(null);
@@ -151,8 +148,8 @@ export default function AddressManager() {
       
       loadAddresses();
       resetForm();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra';
       alert(errorMessage);
     }
   };
@@ -177,8 +174,8 @@ export default function AddressManager() {
       await api.delete(`/address?id=${address.id}`);
       alert('Địa chỉ đã được xóa thành công');
       loadAddresses();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra';
       alert(errorMessage);
     }
   };
@@ -194,8 +191,8 @@ export default function AddressManager() {
       });
       alert('Đã đặt làm địa chỉ mặc định');
       loadAddresses();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra';
       alert(errorMessage);
     }
   };

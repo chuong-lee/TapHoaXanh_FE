@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
 
@@ -62,7 +62,7 @@ const ORDER_STATUS_CONFIG = {
 } as const;
 
 export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoadingRef = useRef(false);
   const [showDetails, setShowDetails] = useState(false);
   const router = useRouter();
 
@@ -81,7 +81,7 @@ export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
       return;
     }
 
-    setIsLoading(true);
+    isLoadingRef.current = true;
     try {
       await api.put(`/order/${order.id}/cancel`);
       alert('Đơn hàng đã được hủy thành công');
@@ -90,7 +90,7 @@ export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
       const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra khi hủy đơn hàng';
       alert(errorMessage);
     } finally {
-      setIsLoading(false);
+      isLoadingRef.current = false;
     }
   };
 
@@ -161,9 +161,9 @@ export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
                 <button
                   className="btn btn-outline-danger btn-sm"
                   onClick={handleCancelOrder}
-                  disabled={isLoading}
+                  disabled={isLoadingRef.current}
                 >
-                  {isLoading ? (
+                  {isLoadingRef.current ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-1" />
                       Đang hủy...
