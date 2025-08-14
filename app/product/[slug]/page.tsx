@@ -54,33 +54,27 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true)
-        console.log('Đang tìm sản phẩm với slug:', slug);
+        // Lấy tất cả sản phẩm và tìm theo slug
+        const res = await api.get<Product[]>('/products')
         
-        // Sử dụng API mới để lấy sản phẩm theo slug
-        const res = await api.get<Product>(`/products/slug/${slug}`)
-        console.log('Sản phẩm tìm thấy:', res.data);
+        // Tìm sản phẩm theo slug
+        const found = res.data.find(product => product.slug === slug);
         
-        if (res.data) {
-          const found = res.data;
-          const images: string[] = typeof found.images === 'string'
-            ? found.images
-                .split(',')
-                .map(s => s && s.trim())
-                .filter(s => !!s && s !== 'null' && s !== 'undefined')
-            : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
-          
-          console.log('Images đã xử lý:', images);
-          
-          const productWithImagesArray = { ...found, images }
-          setProduct(productWithImagesArray as Product)
-          setSelectedImage(images[0] || null)
-          console.log('Đã set product thành công');
-        } else {
-          console.log('Không tìm thấy sản phẩm với slug:', slug);
-          setProduct(null)
-        }
+                  if (found) {
+            const images: string[] = typeof found.images === 'string'
+              ? found.images
+                  .split(',')
+                  .map(s => s && s.trim())
+                  .filter(s => !!s && s !== 'null' && s !== 'undefined')
+              : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
+            
+            const productWithImagesArray = { ...found, images }
+            setProduct(productWithImagesArray as Product)
+            setSelectedImage(images[0] || null)
+          } else {
+            setProduct(null)
+          }
       } catch (err) {
-        console.error('Lỗi lấy chi tiết sản phẩm:', err)
         setProduct(null)
       } finally {
         setLoading(false)
@@ -93,15 +87,55 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchVariants = async () => {
       if (!product) return;
-      try {
-        const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
-        setVariants(Array.isArray(res.data) ? res.data : []);
+            try {
+        // Gọi đúng endpoint của BE: /product-variant/search?product=<productId>
+        // BE trả về dạng { data, meta }
+        const res = await api.get(`/product-variant/search`, {
+          params: { product: product.id, limit: 1000 },
+        });
+        const items: any[] = Array.isArray(res?.data?.data) ? res.data.data : [];
+        const normalized: ProductVariant[] = items.map((i: any) => ({
+          id: Number(i.id),
+          variant_name: String(i.variant_name ?? ''),
+          price_modifier: Number(i.price_modifier ?? 0),
+          stock: Number(i.stock ?? 0),
+          productId: Number(i.productId ?? product.id),
+        }));
+        
+        // Fallback: nếu search không có dữ liệu, thử lấy tất cả rồi lọc theo product
+        if (normalized.length === 0) {
+          try {
+            const allRes = await api.get(`/product-variant`);
+            const allItems: any[] = Array.isArray(allRes?.data) ? allRes.data : [];
+            const filtered: ProductVariant[] = allItems
+              .filter((i: any) => Number(i.productId ?? i?.product?.id) === Number(product.id))
+              .map((i: any) => ({
+                id: Number(i.id),
+                variant_name: String(i.variant_name ?? ''),
+                price_modifier: Number(i.price_modifier ?? 0),
+                stock: Number(i.stock ?? 0),
+                productId: Number(i.productId ?? i?.product?.id ?? product.id),
+              }));
+            setVariants(filtered);
+          } catch {
+            setVariants([]);
+          }
+        } else {
+          setVariants(normalized);
+        }
       } catch (e) {
         setVariants([]);
       }
     };
     fetchVariants();
   }, [product])
+
+  // Tự động chọn biến thể đầu tiên khi có biến thể
+  useEffect(() => {
+    if (variants.length > 0 && !selectedVariant) {
+      setSelectedVariant(variants[0].id);
+    }
+  }, [variants, selectedVariant]);
 
   // Lấy 4 sản phẩm bất kỳ từ API (không trùng với sản phẩm hiện tại)
   useEffect(() => {
@@ -123,6 +157,11 @@ export default function ProductDetailPage() {
   if (!product) return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>
 
   const getSelectedPrice = () => {
+    if (variants.length === 0) {
+      // Nếu không có biến thể, trả về giá sản phẩm sau giảm
+      return product.price - product.discount;
+    }
+    
     const variant = variants.find(v => v.id === selectedVariant);
     const priceModifier = variant?.price_modifier || 0;
 
@@ -138,6 +177,8 @@ export default function ProductDetailPage() {
     return finalPrice;
   };
   const totalPrice = getSelectedPrice() * quantity;
+
+
 
   return (
     <div className="container main-content py-4" style={{ paddingTop: 110 }}>
@@ -244,28 +285,30 @@ export default function ProductDetailPage() {
                 <span className="text-danger ms-3 fw-bold">QUÀ TẶNG MIỄN PHÍ</span>
               </div>
               {/* Chọn biến thể */}
-              <div className="mb-3">
-                <span className="fw-bold">CHỌN PHIÊN BẢN:</span>
-                <div className="d-flex flex-wrap gap-2 mt-1">
-                  {Array.isArray(variants) && variants.length > 0 ? variants.map(v => (
-                    <label key={v.id} className={`btn option-btn${v.id === selectedVariant ? ' active' : ''} rounded-3 px-3 py-2`} style={{ minWidth: 120 }}>
-                      <input
-                        type="radio"
-                        name="variant"
-                        value={v.id}
-                        checked={v.id === selectedVariant}
-                        onChange={() => setSelectedVariant(v.id)}
-                        className="d-none"
-                      />
-                      <div>{v.variant_name}</div>
-                      <div className="fw-bold">
-                        {v.price_modifier > 0 ? `+${v.price_modifier.toLocaleString()}₫` : ''}
-                      </div>
-                      <div className="text-muted small">Kho: {v.stock}</div>
-                    </label>
-                  )) : <span className="text-muted">Không có phiên bản</span>}
+              {variants.length > 0 && (
+                <div className="mb-3">
+                  <span className="fw-bold">CHỌN PHIÊN BẢN:</span>
+                  <div className="d-flex flex-wrap gap-2 mt-1">
+                    {variants.map(v => (
+                      <label key={v.id} className={`btn option-btn${v.id === selectedVariant ? ' active' : ''} rounded-3 px-3 py-2`} style={{ minWidth: 120 }}>
+                        <input
+                          type="radio"
+                          name="variant"
+                          value={v.id}
+                          checked={v.id === selectedVariant}
+                          onChange={() => setSelectedVariant(v.id)}
+                          className="d-none"
+                        />
+                        <div>{v.variant_name}</div>
+                        <div className="fw-bold">
+                          {v.price_modifier > 0 ? `+${v.price_modifier.toLocaleString()}₫` : ''}
+                        </div>
+                        <div className="text-muted small">Kho: {v.stock}</div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="bg-light rounded p-3 mb-3">
                 <ul className="mb-2">
                   <li>Mua <span className="text-success fw-bold">02</span> hộp tặng <a href="#" className="text-primary">Khay Snack</a></li>
@@ -292,10 +335,14 @@ export default function ProductDetailPage() {
               <div className="card shadow-sm p-3" style={{ borderRadius: 12 }}>
                 <div className="d-flex align-items-baseline">
                   <div className="fs-2 fw-bold text-dark">
-                    {selectedVariant ? (
-                      <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
+                    {variants.length > 0 ? (
+                      selectedVariant ? (
+                        <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
+                      ) : (
+                        <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
+                      )
                     ) : (
-                      <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
+                      <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
                     )}
                   </div>
                 </div>
@@ -304,7 +351,7 @@ export default function ProductDetailPage() {
                     <i className="bi bi-check-circle-fill"></i> Còn hàng
                   </span>
                 </div>
-                {selectedVariant && (
+                {(selectedVariant || variants.length === 0) && (
                   <div className="d-flex align-items-center mb-3">
                     <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
                     <span className="mx-3 fs-5 fw-bold">{quantity}</span>
@@ -363,7 +410,39 @@ export default function ProductDetailPage() {
                     </button>
                   </>
                 ) : (
-                  <div className="alert alert-warning mt-2">Sản phẩm này chưa có biến thể, không thể mua.</div>
+                  <>
+                    <button
+                      className="btn w-100 mb-2 fw-bold"
+                      style={{
+                        background: '#22c55e',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
+                      onClick={() => {
+                        addToCart({
+                          ...product,
+                          price: product.price - product.discount,
+                          stock: 100,
+                          images: Array.isArray(product.images) ? product.images.join(',') : product.images,
+                        }, quantity);
+                        router.push('/cart');
+                      }}
+                    >
+                      Thêm vào giỏ hàng
+                    </button>
+                    <button
+                      className="btn w-100 mb-3 fw-bold"
+                      style={{
+                        background: '#fb923c',
+                        color: '#fff',
+                        borderRadius: 8,
+                        fontWeight: 600
+                      }}
+                    >
+                      Mua với PayPal
+                    </button>
+                  </>
                 )}
                 <div className="d-flex justify-content-between text-sm">
                   <a href="#" className="text-decoration-none text-success">Đã thêm vào yêu thích</a>

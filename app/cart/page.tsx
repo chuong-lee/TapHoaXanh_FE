@@ -151,7 +151,6 @@ export default function CartPage() {
                             {item.name}
                             {item.variant_name && <span className="text-muted"> ({item.variant_name})</span>}
                           </h6>
-                          <p className="card-text text-muted small">(Hộp 500g)</p>
                           <p className="card-text fw-bold">{(item.price * (1-item.discount/100)).toLocaleString()}₫</p>
                         </div>
                       </div>
@@ -201,12 +200,7 @@ export default function CartPage() {
               </>
             )}
 
-            {/* Đã bỏ phần ghi chú đơn hàng ở đây */}
-            {/* <div className="mt-4">
-              <label htmlFor="order-notes" className="form-label fw-bold">Ghi chú đơn hàng</label>
-              <textarea className="form-control" id="order-notes" rows={4}></textarea>
-            </div>
-            <button className="btn btn-success mt-3" style={{backgroundColor: '#005246'}}>LƯU THÔNG TIN</button> */}
+
           </div>
 
           {/* Right Column: Order Summary */}
@@ -234,11 +228,6 @@ export default function CartPage() {
                   </tbody>
                 </table>
                 <div className="d-flex justify-content-between">
-                  <span>Tạm tính</span>
-                  <span>{total.toLocaleString()}₫</span>
-                </div>
-                <hr/>
-                <div className="d-flex justify-content-between align-items-center mb-2">
                   <span>Tạm tính</span>
                   <span>{total.toLocaleString()}₫</span>
                 </div>
@@ -373,12 +362,7 @@ export default function CartPage() {
                 </button>
               </div>
             </div>
-            <div className="card border-0" style={{backgroundColor: '#e6f6f2'}}>
-              <div className="card-body">
-                <h6 className="card-title fw-bold">Chính sách mua hàng</h6>
-                <p className="card-text small">Mua trên 100.000đ để có thể áp dụng mã giảm giá từ shop</p>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

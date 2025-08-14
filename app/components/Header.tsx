@@ -16,6 +16,7 @@ const Header = () => {
   const { cart } = useCart();
   const router = useRouter();
   const { profile } = useAuth();
+    const linkColor = scrolled ? '#22c55e' : 'white';
   
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -33,12 +34,12 @@ const Header = () => {
 
   return (
     <>
-      <div className={`header-index custom-header${scrolled ? ' scrolled' : ''}`}>  
+      <div className={`header-index custom-header${scrolled ? ' scrolled' : ''}`}>
         <nav className="navbar navbar-expand-lg py-2">
-          <div className="container d-flex align-items-center justify-content-between" style={{gap: 0, minHeight: 70}}>
+          <div className="container d-flex align-items-center" style={{ minHeight: 70 }}>
             {/* Logo + Tên */}
-            <div className="d-flex align-items-center gap-2" style={{minWidth: 220}}>
-              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{gap: 10}}>
+            <div className="d-flex align-items-center gap-2" style={{ minWidth: 220 }}>
+              <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{ gap: 10 }}>
                 <img
                   src="/client/images/logo.png"
                   alt="Tạp Hóa Xanh Logo"
@@ -50,29 +51,29 @@ const Header = () => {
               </Link>
             </div>
             {/* Menu */}
-            <div className="d-none d-lg-flex align-items-center justify-content-center flex-nowrap" style={{flex: 1, gap: 36, marginLeft: '120px'}}>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/">
+            <div className="d-none d-lg-flex align-items-center justify-content-center flex-grow-1 gap-4">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/" style={{ color: linkColor }}>
                 Trang Chủ
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product" style={{ color: linkColor }}>
                 Sản Phẩm
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/news">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/news" style={{ color: linkColor }}>
                 Bài Viết
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact" style={{ color: linkColor }}>
                 Liên Hệ
               </Link>
               <button 
                 className="nav-link fw-semibold d-flex align-items-center gap-1 border-0 bg-transparent"
                 onClick={() => handleProtectedRoute('/orders')}
-                style={{color: scrolled ? '#22c55e' : 'white'}}
+                style={{ color: linkColor }}
               >
                 Đơn hàng
               </button>
             </div>
             {/* Icon */}
-            <div className="header-icons d-flex align-items-center gap-4" style={{minWidth: 100, justifyContent: 'flex-end', marginLeft: '30px'}}>
+            <div className="header-icons d-flex align-items-center gap-4 ms-auto">
               <button 
                 className="nav-link fw-semibold d-flex align-items-center p-0 position-relative border-0 bg-transparent"
                 onClick={() => handleProtectedRoute('/cart')}
@@ -125,10 +126,7 @@ const Header = () => {
               ) : (
                 <div className="d-flex align-items-center gap-3">
                   <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
-                    <span style={{color: scrolled ? '#22c55e' : 'white'}}>Đăng nhập</span>
-                  </Link>
-                  <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/register" title="Đăng Ký">
-                    <span style={{color: scrolled ? '#22c55e' : 'white'}}>Đăng ký</span>
+                    <span style={{ color: linkColor }}>Đăng nhập</span>
                   </Link>
                 </div>
               )}
