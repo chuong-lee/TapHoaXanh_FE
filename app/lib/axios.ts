@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -10,7 +10,7 @@ const api = axios.create({
 // Add a request interceptor
 api.interceptors.request.use(
   function (config) {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -51,13 +51,13 @@ api.interceptors.response.use(
         const data = res.data as { token?: string };
         const newToken = data.token;
         if (newToken) {
-          localStorage.setItem('token', newToken);
+          localStorage.setItem('access_token', newToken);
           originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
            return api(originalRequest);
           }
       } catch (refreshError) {
         // Nếu refresh thất bại, xóa token và chuyển về trang login  
-        localStorage.removeItem('token');
+        localStorage.removeItem('access_token');
         // TEMPORARY: Không redirect về login cho product pages
         if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/product/')) {
           window.location.href = '/login';

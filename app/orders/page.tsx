@@ -17,7 +17,25 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState<number | null>(null);
 
   useEffect(() => {
+    // Initialize tab from URL (?tab=...)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = params.get('tab');
+      if (urlTab && (urlTab === 'all' || STATUS_LABELS.some(s => s.key === urlTab))) {
+        setTab(urlTab);
+      }
+    } catch {}
     fetchOrders();
+  }, [tab]);
+
+  // Keep URL in sync when tab changes
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.set('tab', tab);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    } catch {}
   }, [tab]);
 
   const fetchOrders = async () => {

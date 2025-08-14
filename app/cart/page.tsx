@@ -3,6 +3,8 @@ import { useCart } from '../hooks/useCart'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
+import api from '../lib/axios'
+import VoucherSection from '../components/VoucherSection'
 
 function fixImgSrc(src: string | undefined | null): string {
   if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';
@@ -20,10 +22,7 @@ export default function CartPage() {
   const [selected, setSelected] = useState<{slug: string, variant_id?: number}[]>([]);
   const [showAll, setShowAll] = useState(false);
   
-  // State cho voucher
-  const [vouchers, setVouchers] = useState<any[]>([]);
-  const [loadingVouchers, setLoadingVouchers] = useState(true);
-  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+
 
   // Hàm xử lý chọn/bỏ chọn sản phẩm
   const handleSelect = (slug: string, variant_id?: number) => {
@@ -51,46 +50,8 @@ export default function CartPage() {
     else setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
   };
 
-  // Fetch vouchers từ API
-  useEffect(() => {
-    const fetchVouchers = async () => {
-      try {
-        setLoadingVouchers(true);
-        const response = await api.get('/voucher');
-        const activeVouchers = response.data.filter((voucher: any) => {
-          const now = new Date();
-          const startDate = new Date(voucher.start_date);
-          const endDate = new Date(voucher.end_date);
-          return !voucher.is_used && now >= startDate && now <= endDate && voucher.quantity > 0;
-        });
-        setVouchers(activeVouchers);
-      } catch (error) {
-        console.error('Error fetching vouchers:', error);
-        setVouchers([]);
-      } finally {
-        setLoadingVouchers(false);
-      }
-    };
-
-    fetchVouchers();
-  }, []);
-
-  // Hàm xử lý chọn voucher
-  const handleVoucherSelect = (voucher: any) => {
-    if (selectedVoucher?.id === voucher.id) {
-      setSelectedVoucher(null);
-    } else {
-      setSelectedVoucher(voucher);
-    }
-  };
-
-  // Tính toán giảm giá
-  const discount = selectedVoucher && total >= selectedVoucher.min_order_value 
-    ? Math.min(selectedVoucher.max_discount, total * 0.1) // Giảm tối đa 10% hoặc max_discount
-    : 0;
-
-  // Tổng tiền sau giảm giá
-  const finalTotal = total - discount;
+  // Tổng tiền sau giảm giá (tạm thời không có voucher)
+  const finalTotal = total;
 
   return (
     <main className="main-content">
@@ -157,7 +118,7 @@ export default function CartPage() {
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.slug, item.variant_id)}
+                          onClick={async () => await removeFromCart(item.slug, item.variant_id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa
@@ -224,104 +185,15 @@ export default function CartPage() {
                   <span>Tạm tính</span>
                   <span>{total.toLocaleString()}₫</span>
                 </div>
-                {selectedVoucher && (
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span className="text-success">Giảm giá ({selectedVoucher.code})</span>
-                    <span className="text-success">-{discount.toLocaleString()}₫</span>
-                  </div>
-                )}
+
                 <hr className="my-2" />
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <span className="fw-bold">Tổng tiền</span>
                   <span className="fw-bold text-danger fs-5">{finalTotal.toLocaleString()}₫</span>
                 </div>
                 
-                {/* Voucher Section */}
-                <div className="mb-3">
-                  <h6 className="fw-bold mb-2">Mã giảm giá</h6>
-                  {loadingVouchers ? (
-                    <div className="text-center py-3">
-                      <div className="spinner-border spinner-border-sm text-success" role="status">
-                        <span className="visually-hidden">Đang tải...</span>
-                      </div>
-                      <div className="small text-muted mt-1">Đang tải mã giảm giá...</div>
-                    </div>
-                  ) : vouchers.length > 0 ? (
-                    <div className="voucher-container" style={{
-                      display: 'flex',
-                      overflowX: 'auto',
-                      gap: '10px',
-                      paddingBottom: '5px',
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: '#22c55e #f0fdf4'
-                    }}>
-                      {vouchers.map((voucher) => (
-                        <div 
-                          key={voucher.id}
-                          className="voucher-item" 
-                          style={{
-                            minWidth: '200px',
-                            padding: '12px',
-                            backgroundColor: selectedVoucher?.id === voucher.id ? '#dcfce7' : '#f0fdf4',
-                            border: selectedVoucher?.id === voucher.id ? '1.5px solid #22c55e' : '1.5px solid #bbf7d0',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            flexShrink: 0
-                          }}
-                          onClick={() => handleVoucherSelect(voucher)}
-                        >
-                          <div className="d-flex align-items-center justify-content-between">
-                            <div>
-                              <div className="fw-bold text-success">{voucher.code}</div>
-                              <div className="small text-muted">
-                                Giảm {voucher.max_discount.toLocaleString()}₫
-                                {voucher.min_order_value > 0 && ` (Đơn tối thiểu ${voucher.min_order_value.toLocaleString()}₫)`}
-                              </div>
-                            </div>
-                            <div className="text-success">
-                              {selectedVoucher?.id === voucher.id ? (
-                                <i className="fa-solid fa-check-circle"></i>
-                              ) : (
-                                <i className="fa-solid fa-tag"></i>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-3">
-                      <div className="text-muted">
-                        <i className="fa-solid fa-tag me-2"></i>
-                        Hiện tại không có mã giảm giá nào
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Custom scrollbar styles */}
-                  <style jsx>{`
-                    .voucher-container::-webkit-scrollbar {
-                      height: 6px;
-                    }
-                    .voucher-container::-webkit-scrollbar-track {
-                      background: #f0fdf4;
-                      border-radius: 3px;
-                    }
-                    .voucher-container::-webkit-scrollbar-thumb {
-                      background: #22c55e;
-                      border-radius: 3px;
-                    }
-                    .voucher-container::-webkit-scrollbar-thumb:hover {
-                      background: #16a34a;
-                    }
-                    .voucher-item:hover {
-                      transform: translateY(-2px);
-                      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
-                      border-color: #22c55e;
-                    }
-                  `}</style>
-                </div>
+                                {/* Voucher Section */}
+                <VoucherSection />
                 
                 {/* Disable nút thanh toán nếu không chọn sản phẩm nào */}
                 <button
@@ -341,12 +213,7 @@ export default function CartPage() {
                     const selectedItems = cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id));
                     localStorage.setItem('cart_selected', JSON.stringify(selectedItems));
                     
-                    // Lưu voucher đã chọn vào localStorage
-                    if (selectedVoucher) {
-                      localStorage.setItem('selectedVoucher', JSON.stringify(selectedVoucher));
-                    } else {
-                      localStorage.removeItem('selectedVoucher');
-                    }
+
                     
                     window.location.href = '/checkout';
                   }}

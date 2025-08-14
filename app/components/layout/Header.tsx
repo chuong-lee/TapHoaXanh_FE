@@ -89,39 +89,33 @@ const Header = () => {
                   height={48}
                   style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)', objectFit: 'cover', background: '#fff', marginRight: 10, verticalAlign: 'middle'}}
                 />
-                <span className="fw-bold fs-4" style={{letterSpacing: 1, color: '#fff'}}>Tạp Hóa Xanh</span>
+                                 <span className="fw-bold fs-4" style={{letterSpacing: 1, color: scrolled ? '#22c55e' : '#fff'}}>Tạp Hóa Xanh</span>
               </Link>
             </div>
             {/* Menu */}
-            <div className="d-none d-lg-flex align-items-center justify-content-center flex-nowrap" style={{flex: 1, gap: 36, marginLeft: '120px'}}>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/">
+            <div className="d-none d-lg-flex align-items-center justify-content-center flex-grow-1" style={{gap: 36}}>
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/" style={{color: scrolled ? '#22c55e' : 'white'}}>
                 Trang Chủ
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/product" style={{color: scrolled ? '#22c55e' : 'white'}}>
                 Sản Phẩm
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/news">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/news" style={{color: scrolled ? '#22c55e' : 'white'}}>
                 Bài Viết
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact">
+              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/contact" style={{color: scrolled ? '#22c55e' : 'white'}}>
                 Liên Hệ
               </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/about-us">
-                Về Chúng Tôi
-              </Link>
-              <Link className="nav-link fw-semibold d-flex align-items-center gap-1" href="/about">
-                Chính Sách
-              </Link>
-              {/* <button 
+              <button 
                 className="nav-link fw-semibold d-flex align-items-center gap-1 border-0 bg-transparent"
                 onClick={() => handleProtectedRoute('/orders')}
                 style={{color: scrolled ? '#22c55e' : 'white'}}
               >
                 Đơn hàng
-              </button> */}
+              </button>
             </div>
             {/* Icon */}
-            <div className="header-icons d-flex align-items-center gap-4" style={{minWidth: 100, justifyContent: 'flex-end', marginLeft: '30px'}}>
+            <div className="header-icons d-flex align-items-center gap-4 ms-auto">
               <button 
                 className="nav-link fw-semibold d-flex align-items-center p-0 position-relative border-0 bg-transparent"
                 onClick={() => handleProtectedRoute('/cart')}
@@ -159,7 +153,7 @@ const Header = () => {
                 <li className="nav-item dropdown">
                   <a 
                     className="nav-link me-lg-2 dropdown-toggle" 
-                    href="myaccount.html" 
+                    href="#" 
                     role="button" 
                     data-bs-toggle="dropdown" 
                     aria-expanded="false"
@@ -178,11 +172,8 @@ const Header = () => {
                   </ul>
                 </li>
               ) : (
-                <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="7" r="4" stroke={scrolled ? "#22c55e" : "white"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                <Link className="nav-link fw-semibold d-flex align-items-center p-0" href="/login" title="Đăng Nhập" style={{color: scrolled ? "#22c55e" : "white"}}>
+                  <span>Đăng nhập</span>
                 </Link>
               )}
             </div>

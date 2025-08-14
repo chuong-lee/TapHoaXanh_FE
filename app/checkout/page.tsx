@@ -574,7 +574,7 @@ function CheckoutPage() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        window.location.href = '/profile?tab=orders';
+        router.push('/orders?tab=pending');
       }, 1500);
     } catch (err: unknown) {
       console.error('🚨 Order error:', err);
