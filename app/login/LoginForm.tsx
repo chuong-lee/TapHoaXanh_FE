@@ -53,7 +53,6 @@ function LoginForm() {
       <div className="mb-3">
         <label className="form-label">Email</label>
         <input
-          // value="phongndps37996@gmail.com"
           type="email"
           className="form-control"
           ref={emailRef}
@@ -63,7 +62,6 @@ function LoginForm() {
       <div className="mb-3">
         <label className="form-label">Mật khẩu</label>
         <input
-          // value="123456789"
           type="password"
           className="form-control"
           ref={passwordRef}
