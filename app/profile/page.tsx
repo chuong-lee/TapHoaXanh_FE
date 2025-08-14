@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useRef, useEffect, useReducer } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '../context/AuthContext';
 import { profileService } from '../lib/profileService';
-import { Tabs, Tab } from 'react-bootstrap';
+import { Tabs, Tab, Form } from 'react-bootstrap';
 import LogoutButton from '../components/logout';
+import Avatar from '../components/Avatar';
 
 export default function ProfilePage() {
   const { profile, setProfile, refreshProfile } = useAuth();
   const [form, setForm] = useState({ name: profile?.name || '', phone: profile?.phone || '', email: profile?.email || '', image: profile?.image || '' });
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
-  const [updateError, setUpdateError] = useState<string | null>(null);
+  const updateLoadingRef = useRef(false);
+  const updateSuccessRef = useRef<string | null>(null);
+  const updateErrorRef = useRef<string | null>(null);
 
   // Password change state
   const [passwordForm, setPasswordForm] = useState({
@@ -21,11 +21,20 @@ export default function ProfilePage() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const passwordLoadingRef = useRef(false);
+  const passwordSuccessRef = useRef<string | null>(null);
+  const passwordErrorRef = useRef<string | null>(null);
 
-  React.useEffect(() => {
+  // Avatar upload state - sử dụng useRef để tối ưu
+  const avatarFileRef = useRef<File | null>(null);
+  const avatarLoadingRef = useRef(false);
+  const avatarSuccessRef = useRef<string | null>(null);
+  const avatarErrorRef = useRef<string | null>(null);
+
+  // Force update function để trigger re-render khi cần
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+
+  useEffect(() => {
     if (profile) {
       setForm({ name: profile.name, phone: profile.phone, email: profile.email, image: profile.image });
     }
@@ -38,17 +47,17 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUpdateLoading(true);
-    setUpdateSuccess(null);
-    setUpdateError(null);
+    updateLoadingRef.current = true;
+    updateSuccessRef.current = null;
+    updateErrorRef.current = null;
     try {
       const updated = await profileService.updateProfile(form);
       setProfile(updated);
-      setUpdateSuccess('Profile updated successfully!');
+      updateSuccessRef.current = 'Thông tin đã được cập nhật!';
     } catch {
-      setUpdateError('Failed to update profile');
+      updateErrorRef.current = 'Cập nhật thông tin thất bại!';
     } finally {
-      setUpdateLoading(false);
+      updateLoadingRef.current = false;
     }
   };
 
@@ -59,12 +68,12 @@ export default function ProfilePage() {
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPasswordLoading(true);
-    setPasswordSuccess(null);
-    setPasswordError(null);
+    passwordLoadingRef.current = true;
+    passwordSuccessRef.current = null;
+    passwordErrorRef.current = null;
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError('New password and confirm password do not match');
-      setPasswordLoading(false);
+      passwordErrorRef.current = 'Mật khẩu mới và mật khẩu xác nhận không khớp!';
+      passwordLoadingRef.current = false;
       return;
     }
     try {
@@ -73,15 +82,70 @@ export default function ProfilePage() {
         newPassword: passwordForm.newPassword,
         confirmPassword: passwordForm.confirmPassword,
       });
-      setPasswordSuccess('Password updated successfully!');
+      passwordSuccessRef.current = 'Mật khẩu đã được cập nhật!';
       setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
       refreshProfile();
     } catch {
-      setPasswordError('Failed to update password');
+      passwordErrorRef.current = 'Cập nhật mật khẩu thất bại!';
     } finally {
-      setPasswordLoading(false);
+      passwordLoadingRef.current = false;
     }
   };
+
+  // Handle avatar file selection - tự động upload ngay
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      avatarFileRef.current = file;
+      avatarErrorRef.current = null;
+      avatarSuccessRef.current = null;
+      
+      // Tự động upload ngay lập tức
+      await handleAvatarUpload();
+    }
+  };
+
+  // Handle avatar upload
+  const handleAvatarUpload = async () => {
+    if (!avatarFileRef.current) return;
+    
+    avatarLoadingRef.current = true;
+    avatarErrorRef.current = null;
+    avatarSuccessRef.current = null;
+    
+    try {
+      const result = await profileService.uploadAvatar(avatarFileRef.current);
+      
+      // Cập nhật profile với avatar mới
+      if (profile) {
+        const updatedProfile = { 
+          name: profile.name, 
+          phone: profile.phone, 
+          email: profile.email, 
+          image: result.imageUrl 
+        };
+        setProfile(updatedProfile);
+        setForm(prev => ({ ...prev, image: result.imageUrl }));
+      }
+      
+      avatarSuccessRef.current = result.message;
+      avatarFileRef.current = null;
+      
+      // Reset input file
+      const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+      
+    } catch {
+      avatarErrorRef.current = 'Upload avatar thất bại. Vui lòng thử lại.';
+    } finally {
+      avatarLoadingRef.current = false;
+      forceUpdate();
+    }
+  };
+
+  useEffect(() => {
+    refreshProfile()
+  }, [])
 
   if (!profile) return <div className="container py-5">Loading...</div>;
 
@@ -90,8 +154,8 @@ export default function ProfilePage() {
       <div className="my-account">
         <div className="container">
           <h1 className="page-title">Thông tin người dùng</h1>
-          <div className="breadcrumb">
-            <Link href="/">Home</Link>
+          <div className="breadcrumb mt-3">
+            <Link href="/">Trang chủ </Link>
             <span>/</span>
             <span>Thông tin người dùng</span>
           </div>
@@ -102,28 +166,49 @@ export default function ProfilePage() {
                   <div className="profile-section">
                     <div className="profile-header d-flex align-items-center mb-4">
                       <div className="profile-image position-relative">
-                        <Image className="rounded-circle" src={form.image || '/client/images/profile.jpg'} alt="Profile Image" width={100} height={100} />
+                        <Avatar image={form.image} name={form.name} size={100} />
                         <div className="edit-icon"><i className="fas fa-edit"></i></div>
                       </div>
+                                              <div className="avatar-upload-section ms-4">
+                          <div className="mb-3">
+                            <label htmlFor="avatar-input" className="form-label">Thay đổi avatar</label>
+                            <input
+                              type="file"
+                              id="avatar-input"
+                              className="form-control"
+                              accept="image/*"
+                              onChange={handleAvatarChange}
+                            />
+                          </div>
+                          {avatarLoadingRef.current && (
+                            <div className="text-info mt-2">Đang upload avatar...</div>
+                          )}
+                          {avatarSuccessRef.current && (
+                            <div className="text-success mt-2">{avatarSuccessRef.current}</div>
+                          )}
+                          {avatarErrorRef.current && (
+                            <div className="text-danger mt-2">{avatarErrorRef.current}</div>
+                          )}
+                        </div>
                     </div>
                     <form className="profile-form" id="profile-form" onSubmit={handleSubmit}>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="name">Name*</label>
+                        <label className="form-label" htmlFor="name">Tên người dùng</label>
                         <input className="form-control" id="name" type="text" value={form.name} onChange={handleChange} required />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="email">Email*</label>
-                        <input className="form-control" id="email" type="email" value={form.email} onChange={handleChange} required />
+                        <label className="form-label" htmlFor="email">Địa chỉ email<span className="text-danger">*</span></label>
+                        <Form.Control type="email" id="email" value={form.email} onChange={handleChange} disabled />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="phone">Phone*</label>
+                        <label className="form-label" htmlFor="phone">Số điện thoại</label>
                         <input className="form-control" id="phone" type="tel" value={form.phone} onChange={handleChange} required />
                       </div>
                       <div className="mt-4">
-                        <button className="btn btn-warning" type="submit" disabled={updateLoading}>{updateLoading ? 'Updating...' : 'Update Changes'}</button>
+                        <button className="btn btn-warning" type="submit" disabled={updateLoadingRef.current}>{updateLoadingRef.current ? 'Updating...' : 'Thay đổi thông tin'}</button>
                       </div>
-                      {updateSuccess && <div className="text-success mt-2">{updateSuccess}</div>}
-                      {updateError && <div className="text-danger mt-2">{updateError}</div>}
+                      {updateSuccessRef.current && <div className="text-success mt-2">{updateSuccessRef.current}</div>}
+                      {updateErrorRef.current && <div className="text-danger mt-2">{updateErrorRef.current}</div>}
                     </form>
                   </div>
                 </Tab>
@@ -211,20 +296,22 @@ export default function ProfilePage() {
                   <h2>Orders</h2>
                   <div className="table-container">
                     <table className="order-table">
-                      <thead></thead>
-                      <tr>
-                        <th>Order ID | #SDGT1254FD</th>
-                        <th>Total Payment</th>
-                        <th>Payment Method</th>
-                        <th>Estimated Delivery Date</th>
-                      </tr>
-                      <tbody></tbody>
-                      <tr>
-                        <td>#SDGT1254FD</td>
-                        <td>$74.00</td>
-                        <td>Paypal</td>
-                        <td>29 July 2024</td>
-                      </tr>
+                      <thead>
+                        <tr>
+                          <th>Order ID | #SDGT1254FD</th>
+                          <th>Total Payment</th>
+                          <th>Payment Method</th>
+                          <th>Estimated Delivery Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>#SDGT1254FD</td>
+                          <td>$74.00</td>
+                          <td>Paypal</td>
+                          <td>29 July 2024</td>
+                        </tr>
+                      </tbody>
                     </table>
                     <div className="order-status">
                       <span className="status">Accepted</span>
@@ -237,8 +324,8 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </Tab>
-                {/* <Tab eventKey="payments" title="Payment Methods">
-                  <div className="payment-methods">
+                <Tab eventKey="payments" title="Phương thức thanh toán">
+                  {/* <div className="payment-methods">
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="paypal" defaultChecked />
                       <label className="label-name" htmlFor="paypal"><Image className="img-icon" src="/client/images/paypal.png" alt="Paypal" width={24} height={24} />Paypal</label>
@@ -284,10 +371,10 @@ export default function ProfilePage() {
                       </div>
                       <button className="add-card-btn">Add Card</button>
                     </div>
-                  </div>
-                </Tab> */}
+                  </div> */}
+                </Tab>
                 <Tab eventKey="password" title="Đổi mật khẩu">
-                  <div className="change-password-form card p-4 shadow-sm" style={{maxWidth: 400, margin: '0 auto'}}>
+                  <div className="change-password-form card p-4 shadow-sm" style={{ maxWidth: 400, margin: '0 auto' }}>
                     <h4 className="change-password-title mb-4 text-center">Đổi mật khẩu</h4>
                     <form onSubmit={handlePasswordSubmit}>
                       <div className="form-group mb-3">
@@ -302,9 +389,9 @@ export default function ProfilePage() {
                         <label htmlFor="confirmPassword" className="form-label">Xác nhận mật khẩu mới</label>
                         <input id="confirmPassword" className="form-control" type="password" placeholder="Nhập lại mật khẩu mới" required value={passwordForm.confirmPassword} onChange={handlePasswordChange} />
                       </div>
-                      <button className="btn btn-success w-100 change-password-btn" type="submit" disabled={passwordLoading}>{passwordLoading ? 'Đang cập nhật...' : 'Đổi mật khẩu'}</button>
-                      {passwordSuccess && <div className="text-success mt-3 text-center">{passwordSuccess}</div>}
-                      {passwordError && <div className="text-danger mt-3 text-center">{passwordError}</div>}
+                      <button className="btn btn-success w-100 change-password-btn" type="submit" disabled={passwordLoadingRef.current}>{passwordLoadingRef.current ? 'Đang cập nhật...' : 'Đổi mật khẩu'}</button>
+                      {passwordSuccessRef.current && <div className="text-success mt-3 text-center">{passwordSuccessRef.current}</div>}
+                      {passwordErrorRef.current && <div className="text-danger mt-3 text-center">{passwordErrorRef.current}</div>}
                     </form>
                   </div>
                 </Tab>

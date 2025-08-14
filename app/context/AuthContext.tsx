@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { profileService, ProfileDto } from '../lib/profileService';
 
@@ -13,8 +14,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const pathname = usePathname()
+  const router = useRouter()
   const [profile, setProfile] = useState<ProfileDto | null>(null);
-
   const refreshProfile = async () => {
     try {
       const data = await profileService.getProfile();
@@ -24,9 +26,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  useEffect(() => {
-    refreshProfile();
+  useEffect(() => { 
+    if (localStorage.getItem('access_token')) {
+     refreshProfile()
+    };
   }, []);
+
+  useEffect(() => {
+    if (profile) {
+      if (pathname === '/login' || pathname === '/register') {
+        router.push('/');
+      }
+    }
+  }, [pathname, profile, router]);
 
   return (
     <AuthContext.Provider value={{ profile, setProfile, refreshProfile }}>
@@ -37,6 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  if (!ctx) throw new Error('useAuth phải được sử dụng trong AuthProvider');
   return ctx;
 };
