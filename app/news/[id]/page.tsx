@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type News = {
   id: number
@@ -12,6 +13,34 @@ type News = {
   readTime: string
   description: string
   category: string
+  content?: string
+}
+
+// Hàm helper để xử lý URL hình ảnh
+const processImageUrl = (imageData: unknown): string => {
+  if (!imageData) return '/images/hinh1.jpg'
+  
+  // Nếu là array, lấy phần tử đầu tiên
+  if (Array.isArray(imageData)) {
+    return imageData.length > 0 ? imageData[0] : '/images/hinh1.jpg'
+  }
+  
+  // Nếu là string
+  if (typeof imageData === 'string') {
+    // Kiểm tra nếu là JSON array trong string
+    try {
+      const parsed = JSON.parse(imageData)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0]
+      }
+    } catch {
+      // Nếu không parse được, sử dụng string gốc
+      return imageData
+    }
+    return imageData
+  }
+  
+  return '/images/hinh1.jpg'
 }
 
 export default function NewsDetailPage() {
@@ -20,25 +49,49 @@ export default function NewsDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:5000/news/${id}`)
-      .then(res => res.json())
-      .then(item => {
-        setNews({
-          id: item.id,
-          title: item.name,
-          image: item.images,
-          date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
-          views: Math.floor(Math.random() * 1000) + 100,
-          readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
-          description: item.description,
-          category: getRandomCategory(),
-        })
+    // Thử endpoint posts trước, nếu không có thì thử news
+    const fetchNewsDetail = async () => {
+      try {
+        console.log('Fetching news detail for ID:', id)
+        
+        // Gọi local API posts
+        let response = await fetch(`/api/posts/${id}`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const apiResponse = await response.json()
+        console.log('API response:', apiResponse)
+        
+        // Lấy data từ response
+        const newsItem = apiResponse.data
+        
+        // Xử lý dữ liệu từ API
+        const newsData = {
+          id: newsItem.id,
+          title: newsItem.title || 'Tiêu đề bài viết',
+          image: newsItem.image || '/images/hinh1.jpg',
+          date: newsItem.createdAt ? new Date(newsItem.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
+          views: newsItem.views || Math.floor(Math.random() * 1000) + 100,
+          readTime: newsItem.readTime || '5 phút',
+          description: newsItem.description || 'Nội dung bài viết đang được cập nhật...',
+          category: newsItem.category || getRandomCategory(),
+          content: newsItem.content || newsItem.description || 'Nội dung chi tiết đang được cập nhật...'
+        }
+        
+        console.log('Processed news data:', newsData)
+        setNews(newsData)
         setIsLoading(false)
-      })
-      .catch(error => {
-        console.error('Lỗi khi tải bài viết:', error)
+      } catch (error) {
+        console.error('Lỗi khi tải chi tiết bài viết:', error)
         setIsLoading(false)
-      })
+      }
+    }
+    
+    if (id) {
+      fetchNewsDetail()
+    }
   }, [id])
 
   const getRandomCategory = () => {
@@ -136,17 +189,22 @@ export default function NewsDetailPage() {
               </div>
 
               {/* Featured image */}
-              <img 
-                src={news.image} 
-                alt={news.title} 
-                style={{
-                  width: '100%',
-                  height: 400,
-                  objectFit: 'cover',
-                  borderRadius: 16,
-                  marginBottom: 32
-                }} 
-              />
+              <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: 32 }}>
+                <Image 
+                  src={news.image} 
+                  alt={news.title} 
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                    borderRadius: 16
+                  }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/images/hinh1.jpg';
+                  }}
+                />
+              </div>
 
               {/* Description */}
               <div style={{
@@ -159,28 +217,53 @@ export default function NewsDetailPage() {
               </div>
 
               {/* Content */}
-              <div style={{
-                fontSize: 16,
-                lineHeight: 1.7,
-                color: '#444'
-              }}>
-                <p style={{marginBottom: 20}}>
-                  Tạp Hóa Xanh tự hào mang đến cho bạn những thông tin hữu ích về sản phẩm, 
-                  dịch vụ và các chương trình khuyến mãi đặc biệt. Chúng tôi cam kết cung cấp 
-                  những sản phẩm chất lượng cao với giá cả hợp lý nhất.
-                </p>
+              <div 
+                style={{
+                  fontSize: 16,
+                  lineHeight: 1.7,
+                  color: '#444'
+                }}
+                className="article-content"
+                dangerouslySetInnerHTML={{ __html: news.content || news.description }}
+              />
+              
+              <style jsx>{`
+                .article-content h2 {
+                  color: #22c55e;
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  margin: 24px 0 16px 0;
+                  line-height: 1.4;
+                }
                 
-                <p style={{marginBottom: 20}}>
-                  Với đội ngũ nhân viên tận tâm và hệ thống phân phối hiện đại, 
-                  chúng tôi đảm bảo mọi nhu cầu mua sắm của bạn đều được đáp ứng 
-                  một cách nhanh chóng và thuận tiện nhất.
-                </p>
-
-                <p style={{marginBottom: 20}}>
-                  Hãy theo dõi trang tin tức của chúng tôi để cập nhật những thông tin 
-                  mới nhất về sản phẩm, khuyến mãi và các sự kiện đặc biệt từ Tạp Hóa Xanh.
-                </p>
-              </div>
+                .article-content h3 {
+                  color: #333;
+                  font-size: 1.25rem;
+                  font-weight: 600;
+                  margin: 20px 0 12px 0;
+                  line-height: 1.4;
+                }
+                
+                .article-content p {
+                  margin-bottom: 16px;
+                  text-align: justify;
+                }
+                
+                .article-content ul, .article-content ol {
+                  margin: 16px 0;
+                  padding-left: 24px;
+                }
+                
+                .article-content li {
+                  margin-bottom: 8px;
+                  line-height: 1.6;
+                }
+                
+                .article-content strong {
+                  color: #22c55e;
+                  font-weight: 600;
+                }
+              `}</style>
 
               {/* Tags */}
               <div style={{marginTop: 32, paddingTop: 24, borderTop: '1px solid #e0fbe2'}}>
@@ -327,29 +410,54 @@ function RelatedPosts({ currentId }: { currentId: number }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:5000/news')
-      .then(res => res.json())
-      .then(data => {
-        const mapped = data
-          .filter((item: any) => item.id !== currentId)
-          .map((item: any) => ({
-            id: item.id,
-            title: item.name,
-            image: item.images,
-            date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
-            views: Math.floor(Math.random() * 1000) + 100,
-            readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
-            description: item.description,
-            category: getRandomCategory(),
+    const fetchRelatedPosts = async () => {
+      try {
+        console.log('Fetching related posts...')
+        
+        // Gọi local API posts
+        let response = await fetch('/api/posts')
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const apiResponse = await response.json()
+        console.log('Related posts API response:', apiResponse)
+        
+        const relatedData = apiResponse.data || []
+        
+        const mapped = relatedData
+          .filter((postItem: { id: number }) => postItem.id !== currentId)
+          .map((postItem: {
+            id: number
+            title?: string
+            image?: string
+            createdAt?: string
+            description?: string
+            content?: string
+            category?: string
+            views?: number
+            readTime?: string
+          }) => ({
+            id: postItem.id,
+            title: postItem.title || 'Tiêu đề bài viết',
+            image: postItem.image || '/images/hinh1.jpg',
+            date: postItem.createdAt ? new Date(postItem.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
+            views: postItem.views || Math.floor(Math.random() * 1000) + 100,
+            readTime: postItem.readTime || '5 phút',
+            description: postItem.description || postItem.content || 'Mô tả bài viết...',
+            category: postItem.category || getRandomCategory(),
           }))
           .slice(0, 3)
         setRelated(mapped)
         setIsLoading(false)
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Lỗi khi tải bài viết liên quan:', error)
         setIsLoading(false)
-      })
+      }
+    }
+
+    fetchRelatedPosts()
   }, [currentId])
 
   const getRandomCategory = () => {
@@ -406,16 +514,22 @@ function RelatedPosts({ currentId }: { currentId: number }) {
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <img 
-              src={item.image} 
-              alt={item.title} 
-              style={{
-                width: 80, 
-                height: 60, 
-                objectFit: 'cover', 
-                borderRadius: 8
-              }} 
-            />
+            <div style={{ position: 'relative', width: '80px', height: '60px', flexShrink: 0 }}>
+              <Image 
+                src={item.image} 
+                alt={item.title} 
+                fill
+                style={{
+                  objectFit: 'cover',
+                  borderRadius: 8
+                }}
+                sizes="80px"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/images/hinh1.jpg';
+                }}
+              />
+            </div>
             <div style={{flex: 1}}>
               <div style={{
                 fontWeight: 600, 

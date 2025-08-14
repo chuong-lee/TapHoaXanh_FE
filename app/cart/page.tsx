@@ -1,15 +1,8 @@
 'use client'
-import { useCart } from '@/hooks/useCart'
+import { useCart } from '../hooks/useCart'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
-import api from '@/lib/axios'
-
-interface Voucher {
-  code: string;
-  max_discount: number;
-  min_order_value: number;
-}
 
 function fixImgSrc(src: string | undefined | null): string {
   if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';

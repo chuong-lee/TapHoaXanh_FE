@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type News = {
   id: number
@@ -13,30 +14,104 @@ type News = {
   category: string
 }
 
+interface ApiPost {
+  id: number
+  title?: string
+  name?: string
+  image?: string
+  images?: string
+  description?: string
+  content?: string
+  category?: string | { id: number; name: string; slug?: string; parent_id?: number }
+  createdAt?: string
+  created_at?: string
+  views?: number
+  readTime?: string
+}
+
 export default function PostPage() {
   const [news, setNews] = useState<News[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  const fixImageSrc = (src: string) => {
+    if (!src || src === 'null' || src === 'undefined') return '/images/placeholder.png';
+    if (src.startsWith('http')) return src;
+    if (src.startsWith('/')) return src;
+    if (src.startsWith('client/images/')) return '/' + src;
+    if (src.startsWith('images/')) return '/' + src;
+    return '/images/' + src;
+  }
+
   useEffect(() => {
-    fetch('http://localhost:5000/news')
-      .then(res => res.json())
+    // Gọi API posts từ local API routes
+    fetch('/api/posts')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`API Error: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        console.log('API Response:', data);
+        
+        let postsArray = []
+        
+        // Xử lý response đơn giản
+        if (Array.isArray(data)) {
+          postsArray = data
+        } else if (data && data.data && Array.isArray(data.data)) {
+          postsArray = data.data
+        } else if (data && data.posts && Array.isArray(data.posts)) {
+          postsArray = data.posts
+        } else if (data && data.news && Array.isArray(data.news)) {
+          postsArray = data.news
+        }
+        
+        console.log('Posts found:', postsArray.length);
+        
+        // Debug: Kiểm tra structure của item đầu tiên
+        if (postsArray.length > 0) {
+          console.log('Sample post structure:', postsArray[0]);
+        }
+        
+        if (postsArray.length === 0) {
+          console.log('Không có bài viết nào từ API');
+          setNews([]);
+          setIsLoading(false);
+          return;
+        }
+        
         // Map lại dữ liệu cho đúng với type News ở FE
-        const mapped = data.map((item: any) => ({
-          id: item.id,
-          title: item.name, // name -> title
-          image: item.images, // images -> image
-          date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '', // format ngày Việt Nam
-          views: Math.floor(Math.random() * 1000) + 100, // Random views cho demo
-          readTime: Math.floor(Math.random() * 10) + 3 + ' phút', // Random thời gian đọc
-          description: item.description,
-          category: getRandomCategory(), // Random category
-        }));
+        const mapped = postsArray.map((item: ApiPost) => {
+          // Debug logging cho mỗi item
+          console.log('Processing item:', { 
+            id: item.id, 
+            title: item.title, 
+            name: item.name, 
+            category: item.category 
+          });
+          
+          return {
+            id: item.id,
+            title: item.title || item.name || 'Tiêu đề bài viết', // title hoặc name
+            image: item.image || item.images || '/images/placeholder.png', // image hoặc images
+            date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : 
+                  item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') :
+                  new Date().toLocaleDateString('vi-VN'), // format ngày Việt Nam
+            views: item.views || Math.floor(Math.random() * 1000) + 100, // views hoặc random
+            readTime: item.readTime || (Math.floor(Math.random() * 10) + 3 + ' phút'), // readTime hoặc random
+            description: item.description || item.content || 'Nội dung bài viết...',
+            category: typeof item.category === 'string' ? item.category : 
+                      (typeof item.category === 'object' && item.category?.name ? item.category.name : 
+                      getRandomCategory()), // xử lý category object
+          }
+        });
         setNews(mapped);
         setIsLoading(false);
       })
       .catch(error => {
         console.error('Lỗi khi tải tin tức:', error);
+        setNews([]);
         setIsLoading(false);
       });
   }, []);
@@ -73,92 +148,126 @@ export default function PostPage() {
         <div style={{display: 'flex', gap: 32}}>
           {/* Main content */}
           <div style={{flex: 3}}>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24}}>
-              {news.map(item => (
-                <Link href={`/news/${item.id}`} key={item.id} style={{textDecoration: 'none', color: 'inherit'}}>
-                  <div style={{
-                    background: '#fff',
-                    borderRadius: 16,
-                    boxShadow: '0 2px 12px rgba(34,197,94,0.10)',
-                    border: '1.5px solid #e0fbe2',
-                    padding: 20,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column'
+            {news.length === 0 ? (
+              <div style={{
+                background: '#fff',
+                borderRadius: 16,
+                boxShadow: '0 2px 12px rgba(34,197,94,0.10)',
+                border: '1.5px solid #e0fbe2',
+                padding: 40,
+                textAlign: 'center'
+              }}>
+                <div style={{fontSize: '3rem', marginBottom: 16}}>📰</div>
+                <h4 style={{color: '#22c55e', marginBottom: 16}}>Không có bài viết nào</h4>
+                <p style={{color: '#666', marginBottom: 20}}>
+                  Hiện tại chưa có bài viết nào từ API. 
+                  Hãy kiểm tra kết nối API hoặc thêm dữ liệu vào backend.
+                </p>
+                <button 
+                  className="btn"
+                  style={{
+                    background: '#22c55e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '12px 24px',
+                    fontWeight: 600
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(34,197,94,0.18)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(34,197,94,0.10)';
-                  }}>
-                    <img 
-                      src={item.image} 
-                      alt={item.title} 
-                      style={{
-                        width: '100%', 
-                        height: 180, 
-                        objectFit: 'cover', 
-                        borderRadius: 12,
-                        marginBottom: 16
-                      }} 
-                    />
-                    <div style={{marginBottom: 12}}>
-                      <span style={{
-                        background: '#e0fbe2', 
-                        color: '#22c55e', 
-                        borderRadius: 8, 
-                        padding: '4px 12px', 
-                        fontSize: 12,
-                        fontWeight: 600
-                      }}>
-                        {item.category}
-                      </span>
-                    </div>
-                    <h5 style={{
-                      fontWeight: 700, 
-                      fontSize: '1.1rem',
-                      marginBottom: 8,
-                      lineHeight: 1.4,
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}>
-                      {item.title}
-                    </h5>
-                    <p style={{
-                      color: '#666', 
-                      fontSize: 14,
-                      marginBottom: 12,
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      lineHeight: 1.5
-                    }}>
-                      {item.description || 'Khám phá những thông tin thú vị về sản phẩm và dịch vụ của chúng tôi...'}
-                    </p>
+                  onClick={() => window.location.reload()}
+                >
+                  Thử lại
+                </button>
+              </div>
+            ) : (
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24}}>
+                {news.map(item => (
+                  <Link href={`/news/${item.id}`} key={item.id} style={{textDecoration: 'none', color: 'inherit'}}>
                     <div style={{
-                      color: '#888', 
-                      fontSize: 13,
-                      marginTop: 'auto',
+                      background: '#fff',
+                      borderRadius: 16,
+                      boxShadow: '0 2px 12px rgba(34,197,94,0.10)',
+                      border: '1.5px solid #e0fbe2',
+                      padding: 20,
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      height: '100%',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 12
+                      flexDirection: 'column'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(34,197,94,0.18)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 12px rgba(34,197,94,0.10)';
                     }}>
-                      <span>📅 {item.date}</span>
-                      <span>👁️ {item.views} lượt xem</span>
-                      <span>⏱️ {item.readTime}</span>
+                      <Image 
+                        src={fixImageSrc(item.image)} 
+                        alt={item.title} 
+                        width={400}
+                        height={180}
+                        style={{
+                          width: '100%', 
+                          height: 180, 
+                          objectFit: 'cover', 
+                          borderRadius: 12,
+                          marginBottom: 16
+                        }} 
+                      />
+                      <div style={{marginBottom: 12}}>
+                        <span style={{
+                          background: '#e0fbe2', 
+                          color: '#22c55e', 
+                          borderRadius: 8, 
+                          padding: '4px 12px', 
+                          fontSize: 12,
+                          fontWeight: 600
+                        }}>
+                          {item.category}
+                        </span>
+                      </div>
+                      <h5 style={{
+                        fontWeight: 700, 
+                        fontSize: '1.1rem',
+                        marginBottom: 8,
+                        lineHeight: 1.4,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}>
+                        {item.title}
+                      </h5>
+                      <p style={{
+                        color: '#666', 
+                        fontSize: 14,
+                        marginBottom: 12,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.5
+                      }}>
+                        {item.description || 'Khám phá những thông tin thú vị về sản phẩm và dịch vụ của chúng tôi...'}
+                      </p>
+                      <div style={{
+                        color: '#888', 
+                        fontSize: 13,
+                        marginTop: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12
+                      }}>
+                        <span>📅 {item.date}</span>
+                        <span>👁️ {item.views} lượt xem</span>
+                        <span>⏱️ {item.readTime}</span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}

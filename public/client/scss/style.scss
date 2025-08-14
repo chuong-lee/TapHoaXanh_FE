@@ -281,10 +281,10 @@ a {
 }
 
 body {
-  
   font-size: 12px;
   overflow-x: hidden;
-  background-color: white;
+  background-color: white !important;
+
 }
 
 //global class
@@ -2472,7 +2472,7 @@ section {
   }
 }
 
-// Footer styles
+
 .footer {
   background: #fff;
   font-family: 'Roboto', Arial, sans-serif;
