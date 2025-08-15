@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
+import OrderSuccessToast from '@/components/OrderSuccessToast'
 
 // Tạo mã QR ngân hàng thông qua API backend
 const generateBankQR = async (amount: number, orderId: string, bankCode: string) => {
@@ -163,6 +164,12 @@ function CheckoutPage() {
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successOrderData, setSuccessOrderData] = useState<{
+    orderId: string;
+    totalAmount: number;
+    productCount: number;
+    paymentMethod: string;
+  } | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
   const [selectedBank, setSelectedBank] = useState('970425'); // VietinBank mặc định
@@ -287,22 +294,29 @@ function CheckoutPage() {
       return;
     }
     setErrorFields([]);
+    
     try {
-      // Gửi đúng các trường backend yêu cầu
-      await api.post('/order', {
+      // Tạo đơn hàng với thông tin đầy đủ
+      const orderData = {
         price: total,
         quantity: cart.reduce((sum, item) => sum + item.quantity, 0),
         images: cart.map(item => item.images).join(','),
-        comment: form.notes || '',
-        orderItems: cart.map(item => ({
-          product: item.id,
+        comment: form.notes || null,
+        shipping_address: `${form.address}${form.address2 ? ', ' + form.address2 : ''}, ${form.zip}, ${form.state}, ${form.city}`,
+        shipping_phone: form.phone,
+        shipping_name: form.fullName,
+        order_items: cart.map(item => ({
+          product_id: item.id,
           quantity: item.quantity,
-          images: item.images,
-          unit_price: item.price
+          price: item.price
         }))
-      });
+      };
 
-      // Nếu thành công mới xóa giỏ hàng và chuyển trang
+      console.log('Sending order data:', orderData); // Debug log
+
+      const response = await api.post('/order', orderData);
+      
+      // Nếu thành công, xóa giỏ hàng và hiển thị thông báo
       const cartLocal = JSON.parse(localStorage.getItem('cart_local') || '[]');
       const cartSelected = JSON.parse(localStorage.getItem('cart_selected') || '[]');
       const updatedCart = cartLocal.filter((item: any) =>
@@ -311,48 +325,52 @@ function CheckoutPage() {
       localStorage.setItem('cart_local', JSON.stringify(updatedCart));
       localStorage.removeItem('cart_selected');
       localStorage.setItem('checkout_user_info', JSON.stringify(form));
+      
+      // Hiển thị thông báo thành công với toast
+      setSuccessOrderData({
+        orderId: response.data.id.toString(),
+        totalAmount: total,
+        productCount: cart.length,
+        paymentMethod: form.payment
+      });
       setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        window.location.href = '/orders';
-      }, 1500);
+      
     } catch (err: any) {
-      alert('Có lỗi khi đặt hàng: ' + (err?.response?.data?.message || err.message));
+      console.error('Order error:', err); // Debug log
+      
+      let errorMessage = 'Có lỗi khi đặt hàng';
+      
+      if (err?.response?.data?.message) {
+        errorMessage += ': ' + err.response.data.message;
+      } else if (err?.response?.data?.error) {
+        errorMessage += ': ' + err.response.data.error;
+      } else if (err?.message) {
+        errorMessage += ': ' + err.message;
+      }
+      
+      alert(errorMessage);
     }
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+    setSuccessOrderData(null);
+    // Chuyển hướng đến trang đơn hàng
+    window.location.href = '/orders';
   };
 
   return (
     <>
-      {showSuccess && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.15)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <div style={{
-            background: '#fff',
-            borderRadius: 16,
-            padding: '40px 48px',
-            boxShadow: '0 4px 32px rgba(0,0,0,0.12)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 16
-          }}>
-            <div style={{fontSize: 60, color: '#22c55e', marginBottom: 8}}>
-              <i className="fa-solid fa-circle-check"></i>
-            </div>
-            <div style={{fontSize: 22, fontWeight: 700, color: '#22c55e', textAlign: 'center'}}>Đã đặt hàng thành công</div>
-          </div>
-        </div>
+      {showSuccess && successOrderData && (
+        <OrderSuccessToast
+          orderId={successOrderData.orderId}
+          totalAmount={successOrderData.totalAmount}
+          productCount={successOrderData.productCount}
+          paymentMethod={successOrderData.paymentMethod}
+          onClose={handleCloseSuccess}
+        />
       )}
+      
       <main className="main-content">
         <div className="container py-4">
           <div className="row">
