@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Pagination from '@/components/Pagination'
+import Pagination from '@/components/ui/Pagination'
 import { useCart } from '@/hooks/useCart'
 
 interface ProductData {

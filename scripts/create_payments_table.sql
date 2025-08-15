@@ -1,38 +1,34 @@
--- Tạo bảng payments để quản lý trạng thái thanh toán
-CREATE TABLE IF NOT EXISTS payments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL,
-  status ENUM(
-    'payment_pending',
-    'payment_success', 
-    'payment_failed',
-    'payment_insufficient_funds',
-    'payment_processing',
-    'payment_refunded',
-    'payment_partial'
-  ) DEFAULT 'payment_pending',
-  method VARCHAR(100) NOT NULL,
-  amount DECIMAL(10,2) NOT NULL,
-  failure_reason TEXT,
-  transaction_id VARCHAR(255),
-  bank_account VARCHAR(50),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-  INDEX idx_order_id (order_id),
-  INDEX idx_status (status),
-  INDEX idx_created_at (created_at)
-);
+-- Tạo bảng payments để lưu thông tin thanh toán
+CREATE TABLE IF NOT EXISTS `payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transaction_id` varchar(100) NOT NULL,
+  `order_id` varchar(100) NOT NULL,
+  `sepay_transaction_id` varchar(100) DEFAULT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `description` text,
+  `customer_name` varchar(255) DEFAULT NULL,
+  `customer_email` varchar(255) DEFAULT NULL,
+  `customer_phone` varchar(20) DEFAULT NULL,
+  `status` enum('pending','success','failed','expired') NOT NULL DEFAULT 'pending',
+  `bank_account` varchar(50) DEFAULT NULL,
+  `bank_name` varchar(100) DEFAULT NULL,
+  `qr_code_url` text DEFAULT NULL,
+  `transaction_date` datetime DEFAULT NULL,
+  `error_message` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `transaction_id` (`transaction_id`),
+  KEY `order_id` (`order_id`),
+  KEY `status` (`status`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Thêm một số dữ liệu mẫu
-INSERT INTO payments (order_id, status, method, amount, failure_reason, transaction_id, bank_account) VALUES
-(1, 'payment_success', 'Thẻ tín dụng', 150000.00, NULL, 'TXN001', NULL),
-(2, 'payment_pending', 'Ví điện tử', 250000.00, NULL, 'TXN002', NULL),
-(3, 'payment_failed', 'Chuyển khoản ngân hàng', 500000.00, 'Lỗi kết nối ngân hàng', 'TXN003', '1234567890'),
-(4, 'payment_insufficient_funds', 'Thẻ ATM', 1000000.00, 'Số dư không đủ. Hiện tại: 500,000₫, Cần: 1,000,000₫', 'TXN004', '0987654321'),
-(5, 'payment_processing', 'Momo', 75000.00, NULL, 'TXN005', NULL),
-(6, 'payment_refunded', 'ZaloPay', 120000.00, NULL, 'TXN006', NULL);
+-- Thêm cột payment_date vào bảng order nếu chưa có
+ALTER TABLE `order` 
+ADD COLUMN IF NOT EXISTS `payment_date` datetime DEFAULT NULL AFTER `payment_status`;
 
--- Cập nhật trạng thái đơn hàng dựa trên trạng thái thanh toán
-UPDATE orders SET status = 'confirmed' WHERE id IN (1, 6);
-UPDATE orders SET status = 'pending' WHERE id IN (2, 3, 4, 5); 
+-- Tạo index cho performance
+CREATE INDEX IF NOT EXISTS `idx_payments_status` ON `payments` (`status`);
+CREATE INDEX IF NOT EXISTS `idx_payments_order_id` ON `payments` (`order_id`);
+CREATE INDEX IF NOT EXISTS `idx_payments_created_at` ON `payments` (`created_at`); 

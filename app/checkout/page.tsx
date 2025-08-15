@@ -186,6 +186,15 @@ function CheckoutPage() {
   const [qrLoading, setQrLoading] = useState(false);
   const [selectedBank, setSelectedBank] = useState('970425'); // VietinBank mặc định
 
+  // SePay payment states
+  const [sepayPaymentData, setSepayPaymentData] = useState<any>(null);
+  const [sepayLoading, setSepayLoading] = useState(false);
+  const [sepayError, setSepayError] = useState<string | null>(null);
+  const [showSepayQR, setShowSepayQR] = useState(false);
+
+  // Thêm state cho QR payment
+  const [showQRPayment, setShowQRPayment] = useState(false);
+
   useEffect(() => {
     const selected = localStorage.getItem("cart_selected");
     if (!selected || JSON.parse(selected).length === 0) {
@@ -416,7 +425,89 @@ function CheckoutPage() {
     });
   };
 
-  const handleOrder = async (e: React.FormEvent) => {
+  // Create SePay payment
+  const createSepayPayment = async () => {
+    setSepayLoading(true);
+    setSepayError(null);
+
+    try {
+      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const response = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId,
+          amount: total,
+          description: `Thanh toán đơn hàng ${orderId}`,
+          customerName: form.fullName,
+          customerEmail: form.email,
+          customerPhone: form.phone
+        })
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to create payment');
+      }
+
+      setSepayPaymentData(result.data);
+      setShowSepayQR(true);
+
+      // Start polling for payment status
+      pollSepayPaymentStatus(result.data.transaction_id);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setSepayError(errorMessage);
+    } finally {
+      setSepayLoading(false);
+    }
+  };
+
+  // Poll SePay payment status
+  const pollSepayPaymentStatus = async (transactionId: string) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/payment/status/${transactionId}`);
+        const result = await response.json();
+
+        if (result.success) {
+          const status = result.data.status;
+
+          if (status === 'success') {
+            clearInterval(pollInterval);
+            // Payment successful - proceed with order creation
+            await handleOrderWithPayment(transactionId);
+          } else if (status === 'failed' || status === 'expired') {
+            clearInterval(pollInterval);
+            setSepayError(`Payment ${status}`);
+          }
+        }
+      } catch (err) {
+        console.error('Error polling payment status:', err);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    // Stop polling after 15 minutes
+    setTimeout(() => {
+      clearInterval(pollInterval);
+      if (sepayPaymentData?.status === 'pending') {
+        setSepayError('Payment expired');
+      }
+    }, 15 * 60 * 1000);
+  };
+
+  // Create order with payment
+  const handleOrderWithPayment = async (transactionId: string) => {
+    // This will be called after successful payment
+    await handleOrder(new Event('submit') as any, transactionId);
+  };
+
+  const handleOrder = async (e: React.FormEvent, paymentTransactionId?: string) => {
     e.preventDefault();
     const missing = requiredFields.filter(f => !form[f.key as keyof typeof form]);
     if (missing.length > 0) {
@@ -483,7 +574,7 @@ function CheckoutPage() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        window.location.href = '/profile?tab=orders';
+        router.push('/orders?tab=pending');
       }, 1500);
     } catch (err: unknown) {
       console.error('🚨 Order error:', err);
@@ -885,8 +976,15 @@ function CheckoutPage() {
                         <strong>Thông tin nhận hàng đã đầy đủ!</strong> Bây giờ bạn có thể chọn phương thức thanh toán.
                       </div>
                       <div className="form-check">
+                        <input type="radio" className="form-check-input" checked={form.payment === 'sepay'} onChange={() => setForm(f => ({...f, payment: 'sepay'}))} />
+                        <label className="form-check-label"><b>Thanh toán qua SePay (QR Code)</b></label>
+                        <div className="small text-muted ms-4">
+                          Quét mã QR để thanh toán nhanh chóng và an toàn qua các ngân hàng Việt Nam.
+                        </div>
+                      </div>
+                      <div className="form-check">
                         <input type="radio" className="form-check-input" checked={form.payment === 'bank'} onChange={() => setForm(f => ({...f, payment: 'bank'}))} />
-                        <label className="form-check-label"><b>Chuyển khoản ngân hàng</b></label>
+                        <label className="form-check-label"><b>Chuyển khoản ngân hàng thủ công</b></label>
                         <div className="small text-muted ms-4">
                           Vui lòng chuyển khoản theo hướng dẫn. Đơn hàng sẽ được xử lý sau khi nhận được tiền.
                         </div>
@@ -927,22 +1025,97 @@ function CheckoutPage() {
                     Bạn chưa nhập: {errorFields.join(', ')}
                   </div>
                 )}
-                <button
-                  className="btn btn-primary w-100 fw-bold"
-                  style={{
-                    background: (form.agree && isShippingInfoComplete() && form.payment) ? '#22c55e' : '#bdbdbd',
-                    border: 0,
-                    borderRadius: 8,
-                    fontSize: 18,
-                    opacity: (form.agree && isShippingInfoComplete() && form.payment) ? 1 : 0.7,
-                    cursor: (form.agree && isShippingInfoComplete() && form.payment) ? 'pointer' : 'not-allowed'
-                  }}
-                  disabled={!(form.agree && isShippingInfoComplete() && form.payment)}
-                  onClick={handleOrder}
-                >
-                  {!isShippingInfoComplete() ? 'Vui lòng nhập đầy đủ thông tin' : 
-                   !form.payment ? 'Vui lòng chọn phương thức thanh toán' : 'Đặt hàng'}
-                </button>
+                {form.payment === 'sepay' && showSepayQR && sepayPaymentData ? (
+                  // SePay QR Code Display
+                  <div className="sepay-qr-section">
+                    <div className="card">
+                      <div className="card-body text-center">
+                        <h6 className="mb-3">
+                          <i className="fa fa-qrcode me-2"></i>
+                          Quét mã QR để thanh toán
+                        </h6>
+                        
+                        {sepayPaymentData.qr_code_url && (
+                          <div className="qr-code-container mb-3">
+                            <img
+                              src={sepayPaymentData.qr_code_url}
+                              alt="QR Code"
+                              style={{ width: '200px', height: '200px' }}
+                              className="img-fluid"
+                            />
+                          </div>
+                        )}
+
+                        <div className="payment-details mb-3">
+                          <div className="row">
+                            <div className="col-6">
+                              <p><strong>Ngân hàng:</strong> {sepayPaymentData.bank_name}</p>
+                              <p><strong>Số tài khoản:</strong> {sepayPaymentData.bank_account}</p>
+                            </div>
+                            <div className="col-6">
+                              <p><strong>Số tiền:</strong> {total.toLocaleString('vi-VN')}đ</p>
+                              <p><strong>Nội dung:</strong> {sepayPaymentData.transaction_id}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {sepayError && (
+                          <div className="alert alert-danger" role="alert">
+                            <i className="fa fa-exclamation-triangle me-2"></i>
+                            {sepayError}
+                          </div>
+                        )}
+
+                        <div className="payment-instructions">
+                          <h6>Hướng dẫn thanh toán:</h6>
+                          <ol className="text-start small">
+                            <li>Mở ứng dụng ngân hàng trên điện thoại</li>
+                            <li>Chọn tính năng quét mã QR</li>
+                            <li>Quét mã QR bên trên</li>
+                            <li>Kiểm tra thông tin và xác nhận thanh toán</li>
+                            <li>Chờ hệ thống cập nhật trạng thái</li>
+                          </ol>
+                        </div>
+
+                        <button
+                          className="btn btn-outline-secondary mt-3"
+                          onClick={() => {
+                            setShowSepayQR(false);
+                            setSepayPaymentData(null);
+                            setSepayError(null);
+                          }}
+                        >
+                          <i className="fa fa-arrow-left me-2"></i>
+                          Quay lại
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Normal order button
+                  <button
+                    className="btn btn-primary w-100 fw-bold"
+                    style={{
+                      background: (form.agree && isShippingInfoComplete() && form.payment) ? '#22c55e' : '#bdbdbd',
+                      border: 0,
+                      borderRadius: 8,
+                      fontSize: 18,
+                      opacity: (form.agree && isShippingInfoComplete() && form.payment) ? 1 : 0.7,
+                      cursor: (form.agree && isShippingInfoComplete() && form.payment) ? 'pointer' : 'not-allowed'
+                    }}
+                    disabled={!(form.agree && isShippingInfoComplete() && form.payment) || sepayLoading}
+                    onClick={form.payment === 'sepay' ? createSepayPayment : handleOrder}
+                  >
+                    {sepayLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Đang tạo thanh toán...
+                      </>
+                    ) : !isShippingInfoComplete() ? 'Vui lòng nhập đầy đủ thông tin' : 
+                       !form.payment ? 'Vui lòng chọn phương thức thanh toán' : 
+                       form.payment === 'sepay' ? 'Tạo mã QR thanh toán' : 'Đặt hàng'}
+                  </button>
+                )}
               </div>
             </div>
           </div>

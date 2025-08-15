@@ -1,10 +1,10 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import './globals.css';
-import Footer from './components/Footer';
-import Header from './components/Header';
+import Footer from './components/layout/Footer';
+import Header from './components/layout/Header';
 import { AuthProvider } from './context/AuthContext';
-import ErrorBoundary from './components/ErrorBoundary';
-import PWAComponents from './components/PWAComponents';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import PWAComponents from './components/pwa/PWAComponents';
 import QueryProvider from './providers/QueryProvider';
 
 export const metadata = {

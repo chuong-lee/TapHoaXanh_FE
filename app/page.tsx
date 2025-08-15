@@ -1,11 +1,10 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import Marquee from "./components/Marquee";
+import Marquee from "./components/layout/Marquee";
 import Image from "next/image";
 import { Product } from "./lib/productService";
-import ProductCard from "./components/ProductCard";
-import LoadingSkeleton from "./components/LoadingSkeleton";
-import Link from 'next/link'
+import ProductCard from "./components/product/ProductCard";
+import LoadingSkeleton from "./components/ui/LoadingSkeleton";
 
 const bannerList = [
   {},

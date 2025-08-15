@@ -68,9 +68,29 @@ export function useCart() {
     });
   }
 
-  const removeFromCart = (slug: string, variant_id?: number) => {
-    const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
-    saveToLocal(updatedCart);
+  const removeFromCart = async (slug: string, variant_id?: number) => {
+    try {
+      // Tìm cart item để lấy ID
+      const cartItem = cart.find((item) => item.slug === slug && item.variant_id === variant_id);
+      
+             if (cartItem && cartItem.id) {
+         // Sử dụng API DELETE /cart-item/:id để xóa cart item
+         await api.delete(`/cart-item/${cartItem.id}`);
+        
+        // Cập nhật local state
+        const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+        saveToLocal(updatedCart);
+      } else {
+        // Fallback: xóa chỉ ở local nếu không có ID
+        const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+        saveToLocal(updatedCart);
+      }
+    } catch (error) {
+      console.error('Lỗi xóa sản phẩm khỏi giỏ hàng:', error);
+      // Fallback: xóa chỉ ở local nếu API lỗi
+      const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+      saveToLocal(updatedCart);
+    }
   };
 
   const updateQuantity = (slug: string, variant_id: number | undefined, quantity: number) => {

@@ -3,6 +3,8 @@ import { useCart } from '../hooks/useCart'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
+import api from '../lib/axios'
+import VoucherSection from '../components/VoucherSection'
 
 function fixImgSrc(src: string | undefined | null): string {
   if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';
@@ -19,6 +21,8 @@ export default function CartPage() {
   // State lưu danh sách slug sản phẩm được chọn
   const [selected, setSelected] = useState<{slug: string, variant_id?: number}[]>([]);
   const [showAll, setShowAll] = useState(false);
+  
+
 
   // Hàm xử lý chọn/bỏ chọn sản phẩm
   const handleSelect = (slug: string, variant_id?: number) => {
@@ -45,6 +49,9 @@ export default function CartPage() {
     if (allSelected) setSelected([]);
     else setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
   };
+
+  // Tổng tiền sau giảm giá (tạm thời không có voucher)
+  const finalTotal = total;
 
   return (
     <main className="main-content">
@@ -98,7 +105,6 @@ export default function CartPage() {
                             {item.name}
                             {item.variant_name && <span className="text-muted"> ({item.variant_name})</span>}
                           </h6>
-                          <p className="card-text text-muted small">(Hộp 500g)</p>
                           <p className="card-text fw-bold">{(item.price * (1-item.discount/100)).toLocaleString()}₫</p>
                         </div>
                       </div>
@@ -112,7 +118,7 @@ export default function CartPage() {
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.slug, item.variant_id)}
+                          onClick={async () => await removeFromCart(item.slug, item.variant_id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa
@@ -148,12 +154,7 @@ export default function CartPage() {
               </>
             )}
 
-            {/* Đã bỏ phần ghi chú đơn hàng ở đây */}
-            {/* <div className="mt-4">
-              <label htmlFor="order-notes" className="form-label fw-bold">Ghi chú đơn hàng</label>
-              <textarea className="form-control" id="order-notes" rows={4}></textarea>
-            </div>
-            <button className="btn btn-success mt-3" style={{backgroundColor: '#005246'}}>LƯU THÔNG TIN</button> */}
+
           </div>
 
           {/* Right Column: Order Summary */}
@@ -166,6 +167,7 @@ export default function CartPage() {
                   <thead>
                     <tr>
                       <th>Sản phẩm</th>
+                      <th className="text-center">SL</th>
                       <th className="text-end">Giá</th>
                     </tr>
                   </thead>
@@ -173,7 +175,8 @@ export default function CartPage() {
                     {cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)).map(item => (
                       <tr key={item.id}>
                         <td>{item.name}</td>
-                        <td className="text-end">{item.price.toLocaleString('vi-VN')}₫</td>
+                        <td className="text-center">{item.quantity}</td>
+                        <td className="text-end">{(item.price * item.quantity).toLocaleString('vi-VN')}₫</td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,11 +185,16 @@ export default function CartPage() {
                   <span>Tạm tính</span>
                   <span>{total.toLocaleString()}₫</span>
                 </div>
-                <hr/>
+
+                <hr className="my-2" />
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <span className="fw-bold">Tổng tiền</span>
-                  <span className="fw-bold text-danger fs-5">{total.toLocaleString()}₫</span>
+                  <span className="fw-bold text-danger fs-5">{finalTotal.toLocaleString()}₫</span>
                 </div>
+                
+                                {/* Voucher Section */}
+                <VoucherSection />
+                
                 {/* Disable nút thanh toán nếu không chọn sản phẩm nào */}
                 <button
                   className={`btn w-100 mt-2 fw-bold${selected.length === 0 ? ' disabled' : ''}`}
@@ -204,6 +212,9 @@ export default function CartPage() {
                     // Lưu danh sách sản phẩm đã chọn vào localStorage
                     const selectedItems = cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id));
                     localStorage.setItem('cart_selected', JSON.stringify(selectedItems));
+                    
+
+                    
                     window.location.href = '/checkout';
                   }}
                 >
@@ -211,12 +222,7 @@ export default function CartPage() {
                 </button>
               </div>
             </div>
-            <div className="card border-0" style={{backgroundColor: '#e6f6f2'}}>
-              <div className="card-body">
-                <h6 className="card-title fw-bold">Chính sách mua hàng</h6>
-                <p className="card-text small">Mua trên 100.000đ để có thể áp dụng mã giảm giá từ shop</p>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>
