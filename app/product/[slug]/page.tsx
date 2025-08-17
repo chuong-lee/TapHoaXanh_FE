@@ -25,7 +25,7 @@ type Product = {
 }
 
 function fixImgSrc(src: string | null | undefined): string {
-  if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';
+  if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.jpg';
   src = src.toString().trim();
   if (src.startsWith('http')) return src;
   src = src.replace(/^\.\//, '');
@@ -278,12 +278,12 @@ export default function ProductDetailPage() {
                   <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
                 </div>
                 <div className="mt-2 d-flex gap-2">
-                  <a href="#"><img src="/images/social-fb.png" alt="fb" width={28} /></a>
-                  <a href="#"><img src="/images/social-ig.png" alt="ig" width={28} /></a>
-                  <a href="#"><img src="/images/social-x.png" alt="x" width={28} /></a>
-                  <a href="#"><img src="/images/social-yt.png" alt="yt" width={28} /></a>
-                  <a href="#"><img src="/images/social-tg.png" alt="tg" width={28} /></a>
-                  <a href="#"><img src="/images/social-in.png" alt="in" width={28} /></a>
+                  <a href="#"><img src="/images/social-fb.jpg" alt="fb" width={28} /></a>
+                  <a href="#"><img src="/images/social-ig.jpg" alt="ig" width={28} /></a>
+                  <a href="#"><img src="/images/social-x.jpg" alt="x" width={28} /></a>
+                  <a href="#"><img src="/images/social-yt.jpg" alt="yt" width={28} /></a>
+                  <a href="#"><img src="/images/social-tg.jpg" alt="tg" width={28} /></a>
+                  <a href="#"><img src="/images/social-in.jpg" alt="in" width={28} /></a>
                 </div>
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function ProductDetailPage() {
                   <a href="#" className="text-decoration-none text-muted">So sánh</a>
                 </div>
                 <hr />
-                <div className="mb-2"><img src="/images/safe-checkout.png" alt="Thanh toán an toàn" style={{ height: 24 }} /></div>
+                <div className="mb-2"><img src="/images/safe-checkout.jpg" alt="Thanh toán an toàn" style={{ height: 24 }} /></div>
                 <div className="mb-2 fw-bold">Đặt hàng nhanh 24/7<br /><span className="fw-normal">(025) 3886 25 16</span></div>
                 <div className="mb-2"><i className="bi bi-truck"></i> Giao từ <a href="#" className="text-decoration-none">Việt Nam</a></div>
               </div>
@@ -474,7 +474,7 @@ export default function ProductDetailPage() {
                   </span>
                 <div className="product-image">
                   <Image
-                    src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.png') : '/images/placeholder.png'))}
+                    src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.jpg') : '/images/placeholder.jpg'))}
                     alt={item.name}
                     width={140}
                     height={140}

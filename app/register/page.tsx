@@ -13,7 +13,7 @@ export default function RegisterPage() {
         }}
       >
         <div className="text-center mb-4">
-          <img src="/client/images/logo.png" alt="Tạp Hóa Xanh" width={64} height={64} style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)'}} />
+          <img src="/client/images/logo.jpg" alt="Tạp Hóa Xanh" width={64} height={64} style={{borderRadius: '50%', boxShadow: '0 2px 8px rgba(34,197,94,0.10)'}} />
           <h2 className="fw-bold mt-3 mb-2" style={{color: '#22c55e', fontSize: '2.1rem'}}>Đăng ký</h2>
           <div className="text-muted mb-2" style={{fontSize: 16}}>Tạo tài khoản mới tại Tạp Hóa Xanh</div>
         </div>

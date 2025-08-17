@@ -57,7 +57,7 @@ export default function VoucherPage() {
               {/* Hình ảnh bên trái */}
               <div style={{flex: '0 0 80px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                 <img
-                  src={v.image || '/images/voucher-default.png'}
+                  src={v.image || '/images/voucher-default.jpg'}
                   alt="Hình ảnh voucher"
                   style={{
                     width: 64,

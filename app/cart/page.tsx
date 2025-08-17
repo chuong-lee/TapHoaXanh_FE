@@ -12,7 +12,7 @@ interface Voucher {
 }
 
 function fixImgSrc(src: string | undefined | null): string {
-  if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';
+  if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.jpg';
   if (src.startsWith('http')) return src;
   if (src.startsWith('/')) return src;
   if (src.startsWith('client/images/')) return '/' + src;

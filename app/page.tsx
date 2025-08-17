@@ -9,7 +9,7 @@ import Pagination from '@/components/Pagination'
 import Marquee from './components/Marquee';
 
 function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.png';
+  if (!img) return '/images/placeholder.jpg';
   if (img.startsWith('http')) return img;
   if (img.startsWith('/')) return img;
   if (img.startsWith('client/images/')) return '/' + img;
@@ -154,7 +154,7 @@ export default function HomePage() {
                 </div>
                 <div className="col-lg-5 text-center d-flex justify-content-end align-items-end" style={{height: '100%'}}>
                   <Image
-                    src="/client/images/banner.png"
+                    src="/client/images/banner.jpg"
                     alt="Tạp Hóa Xanh"
                     width={1000}
                     height={800}
@@ -342,7 +342,7 @@ export default function HomePage() {
                 <div
                   className="double-banner-card left-banner d-flex flex-column justify-content-center align-items-start p-5"
                   style={{
-                    backgroundImage: 'url(/client/images/water.png)',
+                    backgroundImage: 'url(/client/images/water.jpg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     borderRadius: 32,
@@ -380,7 +380,7 @@ export default function HomePage() {
                 <div
                   className="double-banner-card right-banner d-flex flex-column justify-content-center align-items-start p-5"
                   style={{
-                    background: "#ffd43b url('/client/images/coffe.png') no-repeat right bottom / contain",
+                    background: "#ffd43b url('/client/images/coffe.jpg') no-repeat right bottom / contain",
                     borderRadius: 32,
                     minHeight: 340,
                     position: 'relative',
@@ -413,7 +413,7 @@ export default function HomePage() {
                 {/* Banner ngoài cùng bên trái */}
                 <div className="featured-product-card banner-in-grid">
                   <img
-                    src="/client/images/banne-milk.png"
+                    src="/client/images/banne-milk.jpg"
                     alt="Banner"
                     className="banner-img-in-grid"
                   />
@@ -518,7 +518,7 @@ export default function HomePage() {
               </div>
               <div className="col-md-5 text-center">
                 <img
-                  src="/images/girl-red-hoodie.png"
+                  src="/images/girl-red-hoodie.jpg"
                   alt="Cô gái áo đỏ"
                   style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
                 />

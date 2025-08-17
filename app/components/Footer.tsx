@@ -48,7 +48,7 @@ const Footer = () => (
       </div>
       <div className="d-flex justify-content-between align-items-center" style={{fontSize: 14, color: "#888"}}>
         <span>© Bản quyền thuộc về DalatGap Store</span>
-        <img src="/images/bocongthuong.png" alt="Bộ Công Thương" style={{height: 40}} />
+        <img src="/images/bocongthuong.jpg" alt="Bộ Công Thương" style={{height: 40}} />
       </div>
     </div>
   </footer>
