@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import api from '@/lib/axios'
+import api from './lib/axios'
 import Pagination from '@/components/Pagination'
 import Marquee from './components/Marquee';
 
@@ -25,13 +25,25 @@ interface Category {
 
 interface Product {
   id: number
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string | null
   name: string
   price: number
-  slug: string
-  images: string
   discount: number
+  images: string
+  slug: string
+  barcode: string
+  expiry_date: string
+  origin: string
+  weight_unit: string
   description: string
-  category?: string
+  quantity: number
+  brandId?: number
+  purchase?: number
+  categoryId?: number
+  category_childId?: number
+  category?: string // Giữ lại để tương thích với UI hiện tại
 }
 
 export default function HomePage() {
@@ -46,7 +58,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get('/products')
+        const res = await api.get('/api/products') // Đổi lại thành /api/product
         const data: unknown = res.data
         let productList: Product[] = []
         if (Array.isArray(data)) {
@@ -64,6 +76,7 @@ export default function HomePage() {
         setAllProducts(productList)
         setProducts(productList)
       } catch (err: unknown) {
+        console.error('❌ Lỗi khi tải sản phẩm:', err)
         setAllProducts([])
         setProducts([])
       } finally {
@@ -75,9 +88,10 @@ export default function HomePage() {
     // Lấy categories từ API
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/categories');
-        setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
+        const res = await api.get('/api/categories'); // Sử dụng API route
+        setCategories(res.data as Category[]);
       } catch (err) {
+        console.error('❌ Lỗi khi tải categories:', err)
         setCategories([]);
       }
     };

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export async function GET() {
   try {
     // Gọi backend server
-    const res = await fetch('http://localhost:4000/products')
+    const res = await fetch('http://localhost:5000/products')
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`)
     }

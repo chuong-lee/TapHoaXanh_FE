@@ -72,9 +72,7 @@ module.exports = nextConfig;
 =======
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  // Xóa experimental.appDir vì đã được enable mặc định trong Next.js 13+
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -90,6 +88,10 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: false,
+  },
+  // Thêm cấu hình images
+  images: {
+    domains: ["dummyimage.com"],
   },
 };
 
