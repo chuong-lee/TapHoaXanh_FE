@@ -11,22 +11,18 @@ interface ProductRow {
   images: string
   discount: string
   description: string
-  stock: number // <-- Nếu cột trong DB là `quantity`, đổi thành quantity: number
-  rating: string
-  featured: number
-  created_at: string // <-- Nếu cột trong DB là `createdAt`, đổi thành createdAt: string
-  updated_at: string // <-- Nếu cột trong DB là `updatedAt`, đổi thành updatedAt: string
+  stock: number
+  created_at: string
+  updated_at: string
   category: string
-  category_id: number // <-- Nếu cột trong DB là `categoryId`, đổi thành categoryId: number
-  // Thêm các trường khác nếu cần, ví dụ:
+  category_id: number
   barcode?: string
   expiry_date?: string
   origin?: string
   weight_unit?: string
   brandId?: number
-  purchase?: string
+  purchase?: number
   category_childId?: number
-  comment?: string
   brand_name?: string
 }
 
@@ -67,14 +63,9 @@ export async function GET(request: NextRequest) {
       whereClause += ' AND p.name LIKE ?'
       params.push(`%${search}%`)
     }
-    
-    // Featured filter removed - column doesn't exist in current schema
-    // if (featured === 'true') {
-    //   whereClause += ' AND p.featured = 1'
-    // }
 
-    // Execute main query using connection pool (adjusted for actual database schema)
-const rows = await executeQuery<ProductRow[]>(`
+    // Execute main query - chỉ select các cột có trong bảng
+    const rows = await executeQuery<ProductRow[]>(`
       SELECT 
         p.id,
         p.name,
@@ -94,8 +85,6 @@ const rows = await executeQuery<ProductRow[]>(`
         p.brandId,
         p.purchase,
         p.category_childId,
-        p.rating,
-        p.comment,
         c.name as category,
         p.categoryId as category_id,
         b.name as brand_name
@@ -117,13 +106,43 @@ const rows = await executeQuery<ProductRow[]>(`
     
     const total = countRows[0].total
     
+    // Function để xử lý URL hình ảnh
+    function processImageUrl(imagePath: string | null): string {
+      if (!imagePath) {
+        return '/client/images/placeholder.png'
+      }
+      
+      // Nếu là URL đầy đủ
+      if (imagePath.startsWith('http')) {
+        return imagePath
+      }
+      
+      // Nếu là đường dẫn tương đối
+      if (imagePath.startsWith('/')) {
+        return imagePath
+      }
+      
+      // Nếu là tên file trong thư mục products
+      if (imagePath.includes('.')) {
+        return `/images/products/${imagePath}`
+      }
+      
+      // Nếu là dummy image
+      if (imagePath.includes('dummyimage.com')) {
+        return imagePath
+      }
+      
+      // Default
+      return '/client/images/placeholder.png'
+    }
+
     // Format product data
     const product = rows.map(row => ({
       id: row.id,
       name: row.name,
       price: parseFloat(row.price),
       slug: row.slug,
-      images: row.images || '/client/images/placeholder.png',
+      images: processImageUrl(row.images),
       discount: parseFloat(row.discount || '0'),
       description: row.description,
       category: {
@@ -137,7 +156,7 @@ const rows = await executeQuery<ProductRow[]>(`
       },
       brandId: row.brandId,
       stock: row.stock,
-      rating: parseFloat(row.rating || '4.5'),
+      rating: 4.5,
       created_at: row.created_at,
       updated_at: row.updated_at,
       barcode: row.barcode,
@@ -145,8 +164,7 @@ const rows = await executeQuery<ProductRow[]>(`
       origin: row.origin,
       weight_unit: row.weight_unit,
       purchase: row.purchase,
-      category_childId: row.category_childId,
-      comment: row.comment
+      category_childId: row.category_childId
     }))
     
     return NextResponse.json({
