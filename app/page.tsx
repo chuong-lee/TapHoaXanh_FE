@@ -1,599 +1,532 @@
-'use client';
-import React, { useState, useEffect } from "react";
-import Marquee from "./components/layout/Marquee";
-import Image from "next/image";
-import { Product } from "./lib/productService";
-import ProductCard from "./components/product/ProductCard";
-import LoadingSkeleton from "./components/ui/LoadingSkeleton";
+'use client'
 
-const bannerList = [
-  {},
-  {
-    image: "/client/images/flash-banner.jpg",
-    title: "Mang thiên nhiên",
-    subtitle: "vào ngôi nhà của bạn",
-    link: "#"
-  }
-];
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import api from '@/lib/axios'
+import Pagination from '@/components/Pagination'
+import Marquee from './components/Marquee';
 
-function fixImgSrc(src: string) {
-  if (!src) return "/client/images/product.png";
-  if (src.startsWith("http")) return src;
-  if (src.startsWith("/")) return src;
-  if (src.startsWith("client/images/")) return "/" + src;
-  return "/client/images/" + src;
+function fixImgSrc(img: string) {
+  if (!img) return '/images/placeholder.jpg';
+  if (img.startsWith('http')) return img;
+  if (img.startsWith('/')) return img;
+  if (img.startsWith('client/images/')) return '/' + img;
+  return '/images/products/' + img;
 }
 
-function getCategoryImage(cat: {id: number, name: string}, idx: number) {
-  // Trả về ảnh mẫu cho từng danh mục với nhiều options hơn
-  const imgs = [
-    "/client/images/pr-1.png",
-    "/client/images/pr-2.png",
-    "/client/images/pr-3.png",
-    "/client/images/pr-4.png",
-    "/client/images/pr-5.png",
-    "/client/images/water.png",
-    "/client/images/coffe.png",
-    "/client/images/product.png",
-    "/client/images/banner.png"
-  ];
-  return imgs[idx % imgs.length];
+interface Category {
+  name: string
+  color: string
+  icon: string
+  count: number
 }
 
-// Temporary mock data for testing
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "Bánh quy hạt chia",
-    price: 97489,
-    slug: "banh-quy-hat-chia",
-    images: "/client/images/product.png",
-    discount: 0,
-    description: "Bánh quy hạt chia thơm ngon, bổ dưỡng",
-    category: "Đồ uống",
-    category_id: 1,
-    stock: 65,
-    rating: 4.5,
-    created_at: "2025-06-29T15:58:18.000Z"
-  },
-  {
-    id: 2,
-    name: "Nước cam tươi",
-    price: 25000,
-    slug: "nuoc-cam-tuoi",
-    images: "/client/images/product-1.png",
-    discount: 10,
-    description: "Nước cam tươi nguyên chất",
-    category: "Đồ uống",
-    category_id: 1,
-    stock: 30,
-    rating: 4.8,
-    created_at: "2025-06-29T15:58:18.000Z"
-  }
-];
+interface Product {
+  id: number
+  name: string
+  price: number
+  slug: string
+  images: string
+  discount: number
+  description: string
+  category?: string
+}
 
-const mockCategories = [
-  { id: 1, name: "Gia vị & nguyên liệu nấu ăn", count: 2 },
-  { id: 2, name: "Nông sản thực phẩm", count: 14 },
-  { id: 3, name: "Thực phẩm chế biến", count: 6 },
-  { id: 4, name: "Đồ uống", count: 13 }
-];
-
-export default function Home() {
-  // Start with mock data, then update with real API data
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [categories, setCategories] = useState<any[]>(mockCategories);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(mockProducts);
-  const [bestSellingProducts, setBestSellingProducts] = useState<Product[]>(mockProducts);
-  const [loading, setLoading] = useState(false); // Start with false to show content immediately
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [featuredLoading, setFeaturedLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function HomePage() {
+  const router = useRouter()
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 20
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    console.log('🔥 Starting API calls...');
-    
-    // Timeout fallback to stop loading and use mock data after 3 seconds
-    const timeoutId = setTimeout(() => {
-      console.log('🔥 Timeout reached, using fallback data');
-      if (products.length === 0) {
-        // Generate more mock products for 6 rows
-        const extendedMockProducts = Array.from({length: 60}, (_, i) => ({
-          ...mockProducts[i % 2],
-          id: i + 1,
-          name: i % 2 === 0 ? `Bánh quy hạt chia ${i + 1}` : `Nước cam tươi ${i + 1}`,
-          slug: i % 2 === 0 ? `banh-quy-hat-chia-${i + 1}` : `nuoc-cam-tuoi-${i + 1}`,
-        }));
-        setProducts(extendedMockProducts);
-        setFeaturedProducts(extendedMockProducts.slice(0, 8));
-        setBestSellingProducts(extendedMockProducts.slice(0, 8));
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/products')
+        const data: unknown = res.data
+        let productList: Product[] = []
+        if (Array.isArray(data)) {
+          productList = data as Product[]
+        } else if (
+          typeof data === 'object' &&
+          data !== null &&
+          Array.isArray((data as { products?: unknown }).products)
+        ) {
+          productList = (data as { products: Product[] }).products
+        } else {
+          console.error('❌ Dữ liệu sản phẩm không hợp lệ:', data)
+        }
+        console.log('Products loaded:', productList)
+        setAllProducts(productList)
+        setProducts(productList)
+      } catch (err: unknown) {
+        setAllProducts([])
+        setProducts([])
+      } finally {
+        setLoading(false)
       }
-      setCategories(mockCategories);
-      setLoading(false);
-      setCategoriesLoading(false);
-      setFeaturedLoading(false);
-    }, 3000);
-    
-         // Fetch products
-     console.log('🔥 Fetching products...');
-     fetch('/api/products?limit=60')
-      .then(res => {
-        console.log('🔥 Products response status:', res.status);
-        return res.json();
-      })
-             .then(data => {
-         console.log('🔥 Products data received:', data);
-         if (data.success) {
-           console.log('🔥 Setting products:', data.data.length, 'items');
-           setProducts(data.data || []);
-           clearTimeout(timeoutId); // Clear timeout on success
-         }
-         setLoading(false);
-       })
-      .catch(err => {
-        console.error('🔥 Products fetch error:', err);
-        setError(err.message);
-        setLoading(false);
-      });
+    }
+    fetchData()
 
-    // Fetch categories
-    fetch('/api/category?withCount=true')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setCategories(data.data || []);
-        }
-        setCategoriesLoading(false);
-      })
-      .catch(err => {
-        console.error('Categories error:', err);
-        setCategoriesLoading(false);
-      });
+    // Lấy categories từ API
+    const fetchCategories = async () => {
+      try {
+        const res = await api.get('/categories');
+        setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
+      } catch (err) {
+        setCategories([]);
+      }
+    };
+    fetchCategories();
+  }, [])
 
-    // Fetch featured products
-    fetch('/api/products/featured?limit=8')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setFeaturedProducts(data.data || []);
-        }
-        setFeaturedLoading(false);
-      })
-      .catch(err => {
-        console.error('Featured products error:', err);
-        setFeaturedLoading(false);
-      });
-
-         // Fetch best selling products
-     fetch('/api/products/best-selling?limit=8')
-       .then(res => res.json())
-       .then(data => {
-         if (data.success) {
-           setBestSellingProducts(data.data || []);
-         }
-       })
-       .catch(err => {
-         console.error('Best selling products error:', err);
-       });
-
-    // Cleanup timeout on unmount
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-
-  // Error handling hiển thị
-  if (error) {
-    return (
-      <div className="container mt-5">
-        <div className="alert alert-danger" role="alert">
-          <h4 className="alert-heading">Lỗi tải dữ liệu!</h4>
-          <p>{error}</p>
-          <button 
-            className="btn btn-outline-danger" 
-            onClick={() => window.location.reload()}
-          >
-            Thử lại
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentProducts = products.slice(startIndex, endIndex)
 
   const handleAddToCart = (product: Product) => {
-    // Navigate to product detail page
-    window.location.href = `/product/${product.slug || product.id}`;
+    // Bỏ kiểm tra đăng nhập, cho phép thao tác tự do
+    router.push(`/product/${product.slug}`);
+  };
+
+  const handleViewDetail = (product: Product) => {
+    // Bỏ kiểm tra đăng nhập, cho phép thao tác tự do
+    router.push(`/product/${product.slug}`);
   };
 
   return (
-    <div>
+    <>
       <Marquee />
-      <section>
-        <div className="home">
-          <div className="hero-subscribe-section">
-            <div className="container">
-              <div className="row align-items-center hero-subscribe-section-lg">
-                <div className="col-lg-7 col-md-12 mb-4 mb-lg-0">
-                  <div className="text-label mb-2"><span className="text-danger fw-bold">100%</span> Rau củ hữu cơ</div>
-                  <h1 className="hero-title mb-3">Cách tốt nhất để<br />tiết kiệm cho ví của bạn.</h1>
-                  <p className="text-muted mb-4">Mua sắm thông minh với Tạp Hoá Xanh - nơi cung cấp thực phẩm tươi ngon, chất lượng cao với giá cả phải chăng nhất thị trường.</p>
-                  <form className="d-flex align-items-center gap-2 hero-subscribe-form">
-                    <div className="input-group rounded-pill bg-white shadow-sm overflow-hidden"><span className="input-group-text bg-white border-0"><i className="fa fa-envelope text-muted" /></span>
-                      <input className="form-control border-0" type="email" placeholder="Địa chỉ email của bạn" />
-                    </div>
-                    <button className="btn btn-success rounded-pill px-4">Đăng ký</button>
-                  </form>
-                </div>
-                <div className="col-lg-5 col-md-12 text-center position-relative">
-                  <div className="hero-tags d-flex justify-content-center gap-2 mb-4 flex-wrap">
-                    <Link href="/categories" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
-                      <i className="fa fa-times-circle text-muted me-1" />Mua sắm
-                    </Link>
-                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float text-decoration-none">
-                      <i className="fa fa-times-circle text-muted me-1" />Công thức
-                    </Link>
-                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
-                      <i className="fa fa-times-circle text-muted me-1" />Bếp núc
-                    </Link>
-                    <Link href="/news" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-muted border hvr-float text-decoration-none">
-                      <i className="fa fa-times-circle text-muted me-1" />Tin tức
-                    </Link>
-                    <Link href="/categories" className="btn hero-tag badge px-3 py-2 fs-6 rounded-pill shadow-sm hvr-float bg-white text-success border border-success hvr-float text-decoration-none">
-                      <i className="fa fa-times-circle text-muted me-1" />Thực phẩm
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="hero-subscribe"><img className="hero-lettuce" src="client/images/banner.png" /></div><img className="hero-decor1 floating" src="client/images/decor4.png" alt="decor" /><img className="hero-decor2 floating" src="client/images/decor2.png" alt="decor" /><img className="hero-decor3 floating" src="client/images/decor3.png" alt="decor" /><img className="hero-decor4 floating" src="client/images/decor1.png" alt="decor" />
-          </div>
-          <div className="container">
-            <div className="section-featured-categories">
-              <div className="featured-categories-header">
-                <h2 className="featured-categories-title">Danh mục sản phẩm  </h2>
-                <div className="featured-categories-tabs"><span className="tab-item active">Bánh &amp; Sữa</span><span className="tab-item">Cà phê &amp; Trà</span><span className="tab-item">Thức ăn thú cưng</span><span className="tab-item">Rau củ</span></div>
-                <div className="featured-categories-nav">
-                  <button className="nav-btn left"><i className="icon-arrow-left" /></button>
-                  <button className="nav-btn right"><i className="icon-arrow-right" /></button>
-                </div>
-              </div>
-              <div className="featured-categories-list">
-                {categoriesLoading ? (
-                  <LoadingSkeleton />
-                ) : categories && categories.length > 0 ? (
-                  categories.map((cat, idx) => {
-                    const bgColors = ['bg-yellow', 'bg-orange', 'bg-green', 'bg-pink', 'bg-purple'];
-                    const bgClass = bgColors[idx % bgColors.length];
-                    return (
-                      <div className={`featured-category-item ${bgClass}`} key={cat.id}>
-                    <Image src={getCategoryImage(cat, idx)} alt={cat.name} width={80} height={80} />
-                    <div className="category-name">{cat.name}</div>
-                        <div className="category-count">{cat.count ? `${cat.count} sản phẩm` : 'Đang cập nhật...'}</div>
-                  </div>
-                    );
-                  })
-                ) : (
-                  <div className="text-center">Không có danh mục nào</div>
-                )}
-              </div>
-            </div>
-            <div className="flash-sale-row my-1">
-              <div className="container">
-                <div className="row g-4 align-items-stretch">
-                  {/* Banner trái động từ API hoặc fallback */}
-                  <div className="col-lg-3 col-md-12 mb-4 mb-lg-0">
-                    <div className="flash-sale-banner bg-dark text-white rounded-4 p-4 h-100 d-flex flex-column justify-content-center align-items-start">
-                      <Image
-                        className="mb-4 rounded-3"
-                        src={bannerList && bannerList[1] && bannerList[1].image ? fixImgSrc(bannerList[1].image) : '/client/images/flash-banner.jpg'}
-                        alt={bannerList && bannerList[1] && bannerList[1].title ? bannerList[1].title : 'Banner'}
-                        width={260}
-                        height={180}
-                        style={{width: '100%', maxWidth: 260, height: 'auto', objectFit: 'cover'}}
-                      />
-                      <h2 className="fw-bold mb-3">{bannerList && bannerList[1] && bannerList[1].title ? bannerList[1].title : 'Mang thiên nhiên'}<br />{bannerList && bannerList[1] && bannerList[1].subtitle ? bannerList[1].subtitle : 'vào ngôi nhà của bạn'}</h2>
-                      <a className="btn btn-danger rounded-pill px-4 py-2 mt-3" href={bannerList && bannerList[1] && bannerList[1].link ? bannerList[1].link : '#'}>Mua ngay →</a>
-                    </div>
-                  </div>
-                  {/* Slider phải động từ API */}
-                  <div className="col-lg-9">
-                    <div className="flash-sale-slider position-relative">
-                      {/* Nút điều hướng trái/phải */}
-                      <button className="slick-prev custom-arrow" type="button"><i className="fa fa-chevron-left" /></button>
-                      <button className="slick-next custom-arrow" type="button"><i className="fa fa-chevron-right" /></button>
-                      {/* Danh sách sản phẩm featured */}
-                      <div className="flash-sale-track">
-                        {featuredLoading ? (
-                          <div className="row">
-                            {[1,2,3,4].map(i => (
-                              <div key={i} className="col-md-3">
-                                <LoadingSkeleton />
-                              </div>
-                            ))}
-                          </div>
-                        ) : featuredProducts && featuredProducts.length > 0 ? (
-                          <div className="row">
-                            {featuredProducts.slice(0, 4).map((product) => (
-                              <div key={product.id} className="col-md-3">
-                                <ProductCard 
-                                  product={product}
-                                  onAddToCart={handleAddToCart}
-                                  showBadge={true}
-                                  badgeText="Nổi bật"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-4">
-                            <p>Không có sản phẩm nổi bật nào</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="products w-100 my-1">
-              <div className="d-flex justify-content-lg-between align-items-center align-items-center flex-wrap justify-content-center">
-                <h2>Sản phẩm phổ biến</h2>
-              </div>
-              <div className="product-list">
-                <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
-                  {loading ? (
-                    // Loading skeleton
-                    [1,2,3,4,5,6,7,8,9,10].map(i => (
-                      <div className="col" key={i}>
-                        <LoadingSkeleton />
-                      </div>
-                    ))
-                  ) : products && products.length > 0 ? (
-                    products.slice(0, 10).map((product) => (
-                    <div className="col" key={product.id}>
-                        <ProductCard 
-                          product={product}
-                          onAddToCart={handleAddToCart}
-                          showBadge={true}
-                          badgeText="Phổ biến"
-                        />
-                      </div>
-                    ))
-                  ) : !loading ? (
-                    <div className="col-12 text-center py-5">
-                      <p>Không có sản phẩm nào để hiển thị (Products: {products.length})</p>
-                      <button 
-                        className="btn btn-primary"
-                        onClick={() => window.location.reload()}
-                      >
-                        Tải lại
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-            <div className="promo-banners my-2">
-              <div className="promo-grid">
-                <div className="row"> 
-                  <div className="col-lg-6">
-                    <div className="promo-banner bg-blue">
-                      <div className="promo-content">
-                        <div className="promo-badge">Giảm giá 20%</div>
-                        <div className="promo-title my-3">Rau củ tươi ngon<br />hoàn toàn sạch</div><a className="promo-btn" href="#">Mua ngay</a>
-                      </div>
-                      <div className="promo-image"><img className="img-pr" src="./client/images/water.png" alt="Water Bottle" /></div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6">
-                    <div className="promo-banner bg-yellow">
-                      <div className="promo-conten-b">
-                        <div className="promo-badge">Giảm giá 25%</div>
-                        <div className="promo-title my-3">Trái cây tươi<br />chất lượng cao</div><a className="promo-btn" href="#">Mua ngay</a>
-                      </div>
-                      <div className="promo-image"><img className="img-pr" src="./client/images/coffe.png" alt="Coffee Beans" /></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="section-best-sells">
-              
-              <div className="row g-3 my-2">
-                {/* Banner chỉ hiển thị trên desktop */}
-                <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
-                  <div className="promo-banner">
-                    <Image className="img-fluid rounded" src="/client/images/banner-1.png" alt="Banner" width={180} height={418} style={{height:418, width:'100%', objectFit:'cover'}} />
-                  </div>
-                </div>
-                {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
-                <div className="col-12 d-block d-lg-none mb-2">
-                    <h5 className="fw-bold text-success">Sản phẩm bán chạy</h5>
-                </div>    
-                  <div className="col-12 col-lg-10">
-                    <div className="row">
-                          {loading ? (
-                            [1,2,3,4].map(i => (
-                              <div className="col-12 col-md-6 col-lg-3 padd" key={i}>
-                                <LoadingSkeleton />
-                              </div>
-                            ))
-                          ) : bestSellingProducts && bestSellingProducts.length > 0 ? (
-                            bestSellingProducts.slice(0, 4).map((product) => (
-                        <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={product.id}>
-                                <ProductCard 
-                                  product={product}
-                                  onAddToCart={handleAddToCart}
-                                  showBadge={true}
-                                  badgeText="Bán chạy"
-                                  layout="default"
-                                />
-                              </div>
-                            ))
-                          ) : (
-                            <div className="col-12 text-center">
-                              <p>Không có sản phẩm bán chạy nào</p>
-                            </div>
-                          )}
-                          </div>
-                        </div>
-                
-                                </div>
-
-          {/* Row 4: Sản phẩm cao cấp */}
-          <div className="section-premium my-4">
-            <div className="row g-3 my-2">
-              {/* Banner chỉ hiển thị trên desktop */}
-              <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
-                <div className="promo-banner">
-                  <Image className="img-fluid rounded" src="/client/images/banner-1.png" alt="Banner Cao Cấp" width={180} height={418} style={{height:418, width:'100%', objectFit:'cover'}} />
-                                </div>
-                              </div>
-              {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
-              <div className="col-12 d-block d-lg-none mb-2">
-                  <h5 className="fw-bold text-success">Sản phẩm cao cấp</h5>
-              </div>    
-                <div className="col-12 col-lg-10">
-                  <div className="row">
-                        {loading ? (
-                          [1,2,3,4].map(i => (
-                            <div className="col-12 col-md-6 col-lg-3 padd" key={i}>
-                              <LoadingSkeleton />
-                            </div>
-                          ))
-                        ) : products && products.length > 30 ? (
-                          products.slice(30, 34).map((product) => (
-                          <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={product.id}>
-                              <ProductCard 
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                showBadge={true}
-                                badgeText="Cao cấp"
-                                layout="default"
-                              />
-                            </div>
-                          ))
-                        ) : (
-                          <div className="col-12 text-center">
-                            <p>Không có sản phẩm cao cấp nào</p>
-                          </div>
-                        )}
-                        </div>
-                  </div>
-            </div>
-          </div>
-
-          {/* Row 5: Sản phẩm hữu cơ */}
-          <div className="section-organic my-4">
-            <div className="row g-3 my-2">
-              {/* Banner chỉ hiển thị trên desktop */}
-              <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
-                <div className="promo-banner">
-                  <Image className="img-fluid rounded" src="/client/images/banner-1.png" alt="Banner Hữu Cơ" width={180} height={418} style={{height:418, width:'100%', objectFit:'cover'}} />
-                </div>
-              </div>
-              {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
-              <div className="col-12 d-block d-lg-none mb-2">
-                  <h5 className="fw-bold text-success">Sản phẩm hữu cơ</h5>
-              </div>    
-                <div className="col-12 col-lg-10">
-                  <div className="row">
-                        {loading ? (
-                          [1,2,3,4].map(i => (
-                            <div className="col-12 col-md-6 col-lg-3 padd" key={i}>
-                              <LoadingSkeleton />
-                            </div>
-                          ))
-                        ) : products && products.length > 40 ? (
-                          products.slice(40, 44).map((product) => (
-                          <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={product.id}>
-                              <ProductCard 
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                showBadge={true}
-                                badgeText="Hữu cơ"
-                                layout="default"
-                              />
-                            </div>
-                          ))
-                        ) : (
-                          <div className="col-12 text-center">
-                            <p>Không có sản phẩm hữu cơ nào</p>
-                          </div>
-                        )}
-                        </div>
-                  </div>
-            </div>
-          </div>
-
-          {/* Row 6: Sản phẩm đặc biệt */}
-          <div className="section-special my-4">
-            <div className="row g-3 my-2">
-              {/* Banner chỉ hiển thị trên desktop */}
-              <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
-                <div className="promo-banner">
-                  <Image className="img-fluid rounded" src="/client/images/banner-1.png" alt="Banner Đặc Biệt" width={180} height={418} style={{height:418, width:'100%', objectFit:'cover'}} />
-                </div>
-              </div>
-              {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
-              <div className="col-12 d-block d-lg-none mb-2">
-                  <h5 className="fw-bold text-success">Sản phẩm đặc biệt</h5>
-              </div>    
-                <div className="col-12 col-lg-10">
-                  <div className="row">
-                        {loading ? (
-                          [1,2,3,4].map(i => (
-                            <div className="col-12 col-md-6 col-lg-3 padd" key={i}>
-                              <LoadingSkeleton />
-                            </div>
-                          ))
-                        ) : products && products.length > 50 ? (
-                          products.slice(50, 54).map((product) => (
-                          <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={product.id}>
-                              <ProductCard 
-                                product={product}
-                                onAddToCart={handleAddToCart}
-                                showBadge={true}
-                                badgeText="Đặc biệt"
-                                layout="default"
-                              />
-                            </div>
-                          ))
-                        ) : (
-                          <div className="col-12 text-center">
-                            <p>Không có sản phẩm đặc biệt nào</p>
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-          </div>
-
-
-          <div className="newsletter-banner">
+      <main className="main-content" style={{ paddingTop: 0 }}>
+        <div className="home-page min-vh-100 bg-light">
+          {/* Banner/Hero Section */}
+          <section className="hero-section-green mb-4" style={{background: '#f3f4f6', borderRadius: '0 0 32px 32px', marginTop: 0, paddingTop: 0, paddingBottom: 40}}>
             <div className="container">
               <div className="row align-items-center">
-                <div className="col-lg-7 col-md-12">
-                  <div className="newsletter-content">
-                    <h1 className="title">Ở nhà &amp; nhận nhu cầu hàng ngày<br />từ cửa hàng của chúng tôi</h1>
-                    <p className="subtitle">Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span></p>
-                    <form className="newsletter-form">
-                      <div className="input-group"><span className="input-icon"><i className="fa fa-envelope" /></span>
-                        <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
-                        <button className="btn-subscribe" type="submit">Đăng ký</button>
-                      </div>
-                    </form>
+                <div className="col-lg-7 mb-4 mb-lg-0">
+                  <div className="mb-2">
+                    <span className="badge bg-danger bg-opacity-10 text-danger px-3 py-2 fw-bold" style={{fontSize: '1rem'}}>100% Rau củ hữu cơ</span>
                   </div>
+                  <h1 className="fw-bold display-4 mb-3" style={{lineHeight: 1.1, fontSize: '2.8rem'}}>
+                    Cách tốt nhất để<br />làm đầy ví của bạn.
+                  </h1>
+                  <p className="lead text-secondary mb-4" style={{fontSize: '1.05rem'}}>
+                    Chào mừng bạn đến với Tạp Hóa Xanh! Nơi cung cấp thực phẩm sạch, an toàn và chất lượng cho gia đình bạn.
+                  </p>
+                  <form className="d-flex mb-3" style={{maxWidth: 420}}>
+                    <div className="position-relative flex-grow-1">
+                      <span className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3" style={{color: '#888'}}>
+                        <i className="fa-solid fa-envelope"></i>
+                      </span>
+                      <input
+                        type="email"
+                        className="form-control ps-5"
+                        placeholder="Nhập email của bạn"
+                        style={{
+                          borderRadius: 24,
+                          height: 44,
+                          border: 'none',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                        }}
+                      />
+                    </div>
+                    <button
+                      className="btn fw-bold ms-2"
+                      type="submit"
+                      style={{
+                        borderRadius: 24,
+                        height: 44,
+                        minWidth: 120,
+                        fontWeight: 600,
+                        fontSize: 17,
+                        background: '#22c55e',
+                        color: '#fff',
+                        boxShadow: '0 2px 8px rgba(34,197,94,0.08)'
+                      }}
+                    >
+                      Đăng ký
+                    </button>
+                  </form>
                 </div>
-                <div className="col-lg-5 col-md-12">
-                  <div className="newsletter-image position-relative"><img className="girl-img floating" src="client/images/girl.png" alt="Girl" draggable="false" /></div>
-                </div>
+                <div className="col-lg-5 text-center d-flex justify-content-end align-items-end" style={{height: '100%'}}>
+                  <Image
+                    src="/client/images/banner.jpg"
+                    alt="Tạp Hóa Xanh"
+                    width={1000}
+                    height={800}
+                    style={{
+                      objectFit: 'contain',
+                      background: 'none',
+                      width: '100%',      // luôn chiếm hết chiều ngang cột
+                      height: 'auto',     // tự động chiều cao
+                      maxWidth: 'none',   // không giới hạn
+                      maxHeight: 'none'   // không giới hạn
+                    }}
+                  />
                 </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Featured Categories */}
+          <section className="container mb-5">
+            <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Danh mục nổi bật</h2>
+            <div className="categories-scroll d-flex flex-nowrap gap-3">
+              {categories.map((cat, idx) => (
+                <div
+                  className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
+                  key={cat.name}
+                  style={{
+                    background: cat.color,
+                    borderRadius: 16,
+                    minWidth: 170,
+                    minHeight: 120,
+                    flex: '0 0 170px'
+                  }}
+                >
+                  <Image src={cat.icon} alt={cat.name} width={40} height={40} style={{objectFit: 'contain'}} />
+                  <div className="fw-bold mt-2" style={{fontSize: 15}}>{cat.name}</div>
+                  <div className="text-secondary small">{cat.count} sản phẩm</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Banner + Featured Products Section */}
+          <section className="container mb-5">
+            <div className="featured-banner-products d-flex align-items-stretch" style={{gap: '12px'}}>
+              {/* Banner bên trái */}
+              <div className="featured-banner bg-dark text-white rounded-4 p-4 d-flex flex-column justify-content-between h-100" style={{minWidth: 260, maxWidth: 320}}>
+                <div>
+                  <span className="badge bg-success mb-2">Khuyến mãi</span>
+                  <h3 className="fw-bold mb-3" style={{fontSize: '2rem'}}>Mang thiên nhiên<br/>vào ngôi nhà bạn</h3>
+                </div>
+                <button className="btn btn-danger fw-bold px-4 py-2 mt-3 align-self-start" style={{borderRadius: 24, fontSize: 18}}>Mua ngay</button>
+              </div>
+              {/* Sản phẩm nổi bật bên phải */}
+              <div className="featured-product-list d-flex flex-row align-items-stretch">
+                {products.slice(0, 4).map((product, idx) => (
+                  <div
+                    key={product.id}
+                    className="featured-product-card card border-0 shadow-sm position-relative p-3"
+                  >
+                    {/* Thêm ảnh sản phẩm ở đây */}
+                    <div className="featured-product-image d-flex align-items-center justify-content-center mb-2">
+                      <Image
+                        src={fixImgSrc(product.images)}
+                        alt={product.name}
+                        width={120}
+                        height={120}
+                        style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
+                      />
+                    </div>
+                    {/* Nhãn giảm giá */}
+                    {idx === 0 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 35%</span>}
+                    {idx === 1 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Giảm giá</span>}
+                    {idx === 2 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Bán chạy</span>}
+                    {idx === 3 && <span className="badge position-absolute top-0 start-0 m-2" style={{fontSize:13, borderRadius:8, background:'#fb923c', color:'#fff', fontWeight:600}}>Tiết kiệm 15%</span>}
+                    {/* Brand + icon sao */}
+                    <div className="d-flex align-items-center mb-1">
+                      <span className="text-secondary small me-2">Hodo Foods</span>
+                      <span className="text-warning" style={{fontSize: 16}}>&#9733;</span>
+                    </div>
+                    {/* Tên sản phẩm */}
+                    <h6 className="fw-bold text-dark mb-2" style={{fontSize: '1.08rem'}}>{product.name}</h6>
+                    {/* Giá */}
+                    <div className="mb-2">
+                      <span className="fw-bold text-success me-2" style={{fontSize: 18}}>{product.price.toLocaleString()}₫</span>
+                      <span className="text-muted text-decoration-line-through small">{(product.price + product.discount).toLocaleString()}₫</span>
+                    </div>
+                    {/* Thanh tiến trình bán */}
+                    <div className="mb-2">
+                      <div className="progress" style={{height: 4, borderRadius: 8}}>
+                        <div className="progress-bar bg-danger" role="progressbar" style={{width: `${90/120*100}%`}} aria-valuenow={90} aria-valuemin={0} aria-valuemax={120}></div>
+                      </div>
+                      <div className="small text-muted mt-1">Đã bán: 90/120</div>
+                    </div>
+                    {/* Nút Add To Cart */}
+                    <button 
+                      className="btn btn-danger w-100 fw-bold mt-auto" 
+                      style={{borderRadius: 24, fontSize: 18, padding: '10px 0'}}
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      <i className="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Popular Products */}
+          <section className="container mb-5">
+            <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Sản phẩm phổ biến</h2>
+            {loading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-success" role="status">
+                  <span className="visually-hidden">Đang tải...</span>
+                </div>
+                <p className="mt-3 text-muted">Đang tải sản phẩm...</p>
+              </div>
+            ) : (
+              <div className="product-list-grid">
+                {currentProducts.map((product, idx) => (
+                  <div className="custom-product-card d-flex flex-column h-100 position-relative" key={product.id}>
+                    {product.discount > 0 && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          zIndex: 2,
+                          background: '#fb923c',
+                          color: '#fff',
+                          borderRadius: 8,
+                          padding: '2px 10px',
+                          fontWeight: 700,
+                          fontSize: 13,
+                          minWidth: 0,
+                          textAlign: 'center',
+                          lineHeight: '18px',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                          letterSpacing: 0.5
+                        }}
+                      >
+                        -{Math.round((product.discount / (product.price + product.discount)) * 100)}%
+                      </span>
+                    )}
+                    <div className="product-image">
+                      <Image
+                        src={fixImgSrc(product.images)}
+                        alt={product.name}
+                        width={140}
+                        height={140}
+                        style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
+                      />
+                    </div>
+                    <div className="product-info">
+                      <div className="product-type">Đồ ăn vặt</div>
+                      <div className="product-name">{product.name}</div>
+                      <div className="product-brand" style={{color: '#e11d48'}}>Bởi NestFood</div>
+                      <div className="product-price">
+                        <span className="price-main" style={{color: '#e11d48'}}>{product.price.toLocaleString()}₫</span>
+                        <span className="price-old">{(product.price + product.discount).toLocaleString()}₫</span>
+                      </div>
+                      <div className="product-rating">
+                        <span className="star">★</span> <span>4.0</span>
+                      </div>
+                    </div>
+                    <div style={{ height: 18 }}></div>
+                    <Link
+                      href="#"
+                      className="btn btn-success"
+                      onClick={e => {
+                        e.preventDefault();
+                        handleViewDetail(product);
+                      }}
+                    >
+                      Xem chi tiết <i className="fa fa-eye"></i>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+          <section className="container mb-5">
+            <div className="row g-4 home-below-banners">
+              <div className="col-md-6">
+                <div
+                  className="double-banner-card left-banner d-flex flex-column justify-content-center align-items-start p-5"
+                  style={{
+                    backgroundImage: 'url(/client/images/water.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderRadius: 32,
+                    minHeight: 340,
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span className="banner-sale">Giảm ngay 20%</span>
+                  <h2 style={{
+                    fontWeight: 800,
+                    fontSize: '2.3rem',
+                    color: '#222',
+                    marginBottom: 24,
+                    lineHeight: 1.1,
+                    wordBreak: 'break-word'
+                  }}>
+                    Rau củ tươi sạch<br />100% tự nhiên
+                  </h2>
+                  <button style={{
+                    background:'#ffc300',
+                    color:'#222',
+                    fontWeight:700,
+                    border:'none',
+                    borderRadius:10,
+                    padding:'12px 32px',
+                    fontSize:20,
+                    boxShadow:'0 2px 8px rgba(220,53,69,0.08)'
+                  }}>
+                    Mua ngay
+                  </button>
+                </div>
+              </div>
+              <div className="col-md-6">
+                <div
+                  className="double-banner-card right-banner d-flex flex-column justify-content-center align-items-start p-5"
+                  style={{
+                    background: "#ffd43b url('/client/images/coffe.jpg') no-repeat right bottom / contain",
+                    borderRadius: 32,
+                    minHeight: 340,
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span style={{background:'#dc3545',color:'#fff',fontWeight:700,fontSize:22,padding:'8px 28px',borderRadius:12,marginBottom:24,display:'inline-block'}}>Giảm ngay 25%</span>
+                  <h2 style={{
+                    fontSize: '2.3rem',
+                    color: '#222',
+                    marginBottom: 24,
+                    lineHeight: 1.15,
+                    fontFamily: 'system-ui, Arial, Helvetica, sans-serif',
+                    fontWeight: 700,
+                    wordBreak: 'break-word'
+                  }}>
+                    <span style={{ display: 'block', fontWeight: 800 }}>Rau củ tươi sạch</span>
+                    <span style={{ display: 'block', fontWeight: 400 }}>100% tự nhiên</span>
+                  </h2>
+                  <button style={{background:'#ffd43b',color:'#222',fontWeight:700,border:'none',borderRadius:10,padding:'12px 32px',fontSize:20,boxShadow:'0 2px 8px rgba(220,53,69,0.08)'}}>Mua ngay</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* PHẦN SẢN PHẨM NẰM Ở ĐÂY */}
+          {[0, 1, 2, 3].map(rowIdx => (
+            <section className="container mb-5" key={rowIdx}>
+              <div className="featured-product-list">
+                {/* Banner ngoài cùng bên trái */}
+                <div className="featured-product-card banner-in-grid">
+                  <img
+                    src="/client/images/banne-milk.jpg"
+                    alt="Banner"
+                    className="banner-img-in-grid"
+                  />
+                </div>
+                {/* Các sản phẩm còn lại */}
+                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product, idx) => (
+                  <div className="featured-product-card" key={product.id}>
+                    <div className="featured-product-image">
+                      <img
+                        src={fixImgSrc(product.images)}
+                        alt={product.name}
+                        style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
+                      />
+                    </div>
+                    <div className="brand-row">
+                      <span>Hodo Foods</span>
+                      <span className="star">&#9733;</span>
+                    </div>
+                    <div className="product-title">{product.name}</div>
+                    <div className="price-row">
+                      <span className="price-main">{product.price.toLocaleString()}₫</span>
+                      <span className="price-old">{(product.price + product.discount).toLocaleString()}₫</span>
+                    </div>
+                    <div className="progress" style={{height: 4, borderRadius: 8}}>
+                      <div className="progress-bar" style={{width: `${90/120*100}%`}}></div>
+                    </div>
+                    <div className="sold-row">Đã bán: 90/120</div>
+                    <Link href={product.slug ? `/product/${product.slug}` : '#'} passHref legacyBehavior>
+                      <a
+                        className="btn-featured-addcart"
+                        style={{
+                          background: '#22c55e',
+                          color: '#fff',
+                          borderRadius: 999,
+                          fontWeight: 600,
+                          fontSize: 16,
+                          padding: '10px 0',
+                          minHeight: 36,
+                          width: '92%',
+                          marginLeft: 'auto',
+                          marginRight: 'auto',
+                          marginTop: 'auto',
+                          marginBottom: 20,
+                          cursor: product.slug ? 'pointer' : 'not-allowed',
+                          pointerEvents: product.slug ? 'auto' : 'none',
+                          display: 'inline-block',
+                          textAlign: 'center'
+                        }}
+                      >
+                        Xem chi tiết <i className="fa fa-eye"></i>
+                      </a>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+          {/* SECTION ĐĂNG KÝ NHẬN TIN */}
+          <section className="container mb-5">
+            <div className="row align-items-center p-4" style={{background: '#eaf8f3', borderRadius: 18, minHeight: 320}}>
+              <div className="col-md-7 mb-4 mb-md-0">
+                <h2 className="fw-bold mb-3" style={{fontSize: '2.5rem', lineHeight: 1.15}}>
+                  Ở nhà & nhận mọi nhu cầu<br />hàng ngày từ cửa hàng của chúng tôi
+                </h2>
+                <div className="mb-3 text-secondary" style={{fontSize: '1.1rem'}}>
+                  Bắt đầu mua sắm cùng <span style={{color: '#e11d48', fontWeight: 700}}>TapHoaXanh</span>
+                </div>
+                <form className="d-flex" style={{maxWidth: 400}}>
+                  <div className="position-relative flex-grow-1">
+                    <span className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3" style={{color: '#888'}}>
+                      <i className="fa-solid fa-envelope"></i>
+                    </span>
+                    <input
+                      type="email"
+                      className="form-control ps-5"
+                      placeholder="Nhập email của bạn"
+                      style={{
+                        borderRadius: 24,
+                        height: 48,
+                        border: 'none',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                      }}
+                    />
+                  </div>
+                  <button
+                    className="btn fw-bold ms-2"
+                    type="submit"
+                    style={{
+                      borderRadius: 24,
+                      height: 48,
+                      minWidth: 120,
+                      fontWeight: 600,
+                      fontSize: 17,
+                      background: '#ffd43b',
+                      color: '#222',
+                      boxShadow: '0 2px 8px rgba(220,53,69,0.08)'
+                    }}
+                  >
+                    Đăng ký
+                  </button>
+                </form>
+              </div>
+              <div className="col-md-5 text-center">
+                <img
+                  src="/images/girl-red-hoodie.jpg"
+                  alt="Cô gái áo đỏ"
+                  style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
+                />
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
-    </div>
-  );
+      </main>
+    </>
+  )
 }

@@ -328,23 +328,23 @@ export default function ProfilePage() {
                   {/* <div className="payment-methods">
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="paypal" defaultChecked />
-                      <label className="label-name" htmlFor="paypal"><Image className="img-icon" src="/client/images/paypal.png" alt="Paypal" width={24} height={24} />Paypal</label>
+                      <label className="label-name" htmlFor="paypal"><Image className="img-icon" src="/client/images/paypal.jpg" alt="Paypal" width={24} height={24} />Paypal</label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="visa" />
-                      <label className="label-name" htmlFor="visa"><Image className="img-icon" src="/client/images/visa.png" alt="Visa" width={24} height={24} />**** **** **** 8047</label>
+                      <label className="label-name" htmlFor="visa"><Image className="img-icon" src="/client/images/visa.jpg" alt="Visa" width={24} height={24} />**** **** **** 8047</label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="googlepay" />
-                      <label className="label-name" htmlFor="googlepay"><Image className="img-icon" src="/client/images/gg.png" alt="Google Pay" width={24} height={24} />Google Pay</label>
+                      <label className="label-name" htmlFor="googlepay"><Image className="img-icon" src="/client/images/gg.jpg" alt="Google Pay" width={24} height={24} />Google Pay</label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="cod" />
-                      <label className="label-name" htmlFor="cod"><Image className="img-icon" src="/client/images/cash.png" alt="Cash On Delivery" width={24} height={24} />Cash On Delivery</label>
+                      <label className="label-name" htmlFor="cod"><Image className="img-icon" src="/client/images/cash.jpg" alt="Cash On Delivery" width={24} height={24} />Cash On Delivery</label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="newcard" />
-                      <label className="label-name" htmlFor="newcard"><Image className="img-icon" src="/client/images/cre.png" alt="Add New Credit/Debit Card" width={24} height={24} />Add New Credit/Debit Card</label>
+                      <label className="label-name" htmlFor="newcard"><Image className="img-icon" src="/client/images/cre.jpg" alt="Add New Credit/Debit Card" width={24} height={24} />Add New Credit/Debit Card</label>
                     </div>
                     <div className="card-details">
                       <div className="form-group">

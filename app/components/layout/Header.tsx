@@ -83,7 +83,7 @@ const Header = () => {
             <div className="d-flex align-items-center gap-2" style={{minWidth: 220}}>
               <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{gap: 10}}>
                 <img
-                  src="/client/images/logo.png"
+                  src="/client/images/logo.jpg"
                   alt="Tạp Hóa Xanh Logo"
                   width={48}
                   height={48}
