@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 
 const STATUS_LABELS = [
@@ -9,6 +10,30 @@ const STATUS_LABELS = [
   { key: "delivered", label: "Đã giao hàng", color: "success" },
   { key: "cancelled", label: "Đã hủy", color: "danger" },
 ];
+
+interface Order {
+  id: number;
+  price: number;
+  quantity: number;
+  status: string;
+  shipping_address: string;
+  shipping_phone: string;
+  shipping_name: string;
+  created_at: string;
+  confirmed_at: string;
+  shipped_at: string;
+  delivered_at: string;
+  comment: string;
+  orderItem?: Array<{
+    id: number;
+    quantity: number;
+    price: number;
+    product: {
+      name: string;
+      images: string;
+    };
+  }>;
+}
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -46,6 +71,7 @@ export default function AdminOrdersPage() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    } finally {
       setLoading(false);
     }
   };

@@ -182,6 +182,12 @@ function CheckoutPage() {
     max_discount: number;
   } | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successOrderData, setSuccessOrderData] = useState<{
+    orderId: string;
+    totalAmount: number;
+    productCount: number;
+    paymentMethod: string;
+  } | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
   const [selectedBank, setSelectedBank] = useState('970425'); // VietinBank mặc định
@@ -515,6 +521,7 @@ function CheckoutPage() {
       return;
     }
     setErrorFields([]);
+    
     try {
       // Gửi đúng các trường backend yêu cầu
       const orderData = {
@@ -528,8 +535,7 @@ function CheckoutPage() {
         items: cart.map(item => ({
           product: item.id,
           quantity: item.quantity,
-          images: item.images,
-          unit_price: item.price
+          price: item.price
         }))
       };
       
@@ -571,6 +577,14 @@ function CheckoutPage() {
       localStorage.setItem('cart_local', JSON.stringify(updatedCart));
       localStorage.removeItem('cart_selected');
       localStorage.setItem('checkout_user_info', JSON.stringify(form));
+      
+      // Hiển thị thông báo thành công với toast
+      setSuccessOrderData({
+        orderId: response.data.id.toString(),
+        totalAmount: total,
+        productCount: cart.length,
+        paymentMethod: form.payment
+      });
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
@@ -593,38 +607,25 @@ function CheckoutPage() {
     }
   };
 
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+    setSuccessOrderData(null);
+    // Chuyển hướng đến trang đơn hàng
+    window.location.href = '/orders';
+  };
+
   return (
     <>
-      {showSuccess && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.15)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <div style={{
-            background: '#fff',
-            borderRadius: 16,
-            padding: '40px 48px',
-            boxShadow: '0 4px 32px rgba(0,0,0,0.12)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 16
-          }}>
-            <div style={{fontSize: 60, color: '#22c55e', marginBottom: 8}}>
-              <i className="fa-solid fa-circle-check"></i>
-            </div>
-            <div style={{fontSize: 22, fontWeight: 700, color: '#22c55e', textAlign: 'center'}}>Đã đặt hàng thành công</div>
-          </div>
-        </div>
+      {showSuccess && successOrderData && (
+        <OrderSuccessToast
+          orderId={successOrderData.orderId}
+          totalAmount={successOrderData.totalAmount}
+          productCount={successOrderData.productCount}
+          paymentMethod={successOrderData.paymentMethod}
+          onClose={handleCloseSuccess}
+        />
       )}
+      
       <main className="main-content">
         <div className="container py-4">
           <div className="row">
