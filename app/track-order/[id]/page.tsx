@@ -167,6 +167,21 @@ export default function TrackOrderPage() {
 
   return (
     <div className="container py-4">
+      {/* Breadcrumb Section */}
+      <div className="breadcrumb-section">
+        <div className="container">
+          <h3 className="text-center">Theo Dõi Đơn Hàng</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item">
+                <Link href="/">Trang Chủ</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Theo Dõi Đơn Hàng</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+
       <div className="tracking-container" style={{
         maxWidth: '900px',
         margin: '0 auto'

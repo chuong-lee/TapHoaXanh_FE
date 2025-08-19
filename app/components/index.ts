@@ -1,7 +1,7 @@
 // Layout Components
 export { default as Header } from './layout/Header'
 export { default as Footer } from './layout/Footer'
-export { default as Marquee } from './layout/Marquee'
+// Marquee export removed
 
 // UI Components
 export { default as Avatar } from './ui/Avatar'
@@ -9,6 +9,8 @@ export { default as LoadingSkeleton } from './ui/LoadingSkeleton'
 export { default as Pagination } from './ui/Pagination'
 export { default as ErrorBoundary } from './ui/ErrorBoundary'
 export { default as FeaturesDemo } from './ui/FeaturesDemo'
+export { default as Button } from './ui/Button'
+export { Card, CardHeader, CardBody, CardFooter } from './ui/Card'
 
 // Product Components
 export { default as ProductCard } from './product/ProductCard'
@@ -35,4 +37,4 @@ export { default as LogoutButton } from './user/logout'
 export { default as PWAComponents } from './pwa/PWAComponents'
 
 // Legacy exports for backward compatibility
-export { default as CategoryList } from '../../components/CategoryList'
+export { CategoryList } from '../../components/CategoryList'

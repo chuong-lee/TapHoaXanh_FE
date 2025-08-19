@@ -109,61 +109,81 @@ export default function PaymentPage() {
 
   return (
     <div className="container mt-5">
-      <div className="row">
-        <div className="col-lg-8">
-          <PaymentGateway
-            orderId={orderData.id}
-            amount={orderData.total_amount}
-            description={`Thanh toán đơn hàng ${orderData.id}`}
-            customerName={orderData.customer_name}
-            customerEmail={orderData.customer_email}
-            customerPhone={orderData.customer_phone}
-            onPaymentSuccess={handlePaymentSuccess}
-            onPaymentError={handlePaymentError}
-          />
+      {/* Breadcrumb Section */}
+      <div className="breadcrumb-section">
+        <div className="container">
+          <h3 className="text-center">Thanh Toán</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item">
+                <Link href="/">Trang Chủ</Link>
+              </li>
+              <li className="breadcrumb-item">
+                <Link href="/cart">Giỏ Hàng</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Thanh Toán</li>
+            </ol>
+          </nav>
         </div>
-        
-        <div className="col-lg-4">
-          <div className="card">
-            <div className="card-header">
-              <h5 className="card-title mb-0">
-                <i className="fa fa-shopping-cart me-2"></i>
-                Chi tiết đơn hàng
-              </h5>
-            </div>
-            <div className="card-body">
-              <div className="order-summary">
-                <h6>Mã đơn hàng: {orderData.id}</h6>
-                <hr />
-                
-                <div className="order-items">
-                  {orderData.items.map((item, index) => (
-                    <div key={index} className="d-flex justify-content-between mb-2">
-                      <span>{item.product_name} x{item.quantity}</span>
-                      <span>{(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
-                    </div>
-                  ))}
-                </div>
-                
-                <hr />
-                <div className="d-flex justify-content-between">
-                  <strong>Tổng cộng:</strong>
-                  <strong>{orderData.total_amount.toLocaleString('vi-VN')}đ</strong>
-                </div>
+      </div>
+
+      <main className="main-content">
+        <div className="row">
+          <div className="col-lg-8">
+            <PaymentGateway
+              orderId={orderData.id}
+              amount={orderData.total_amount}
+              description={`Thanh toán đơn hàng ${orderData.id}`}
+              customerName={orderData.customer_name}
+              customerEmail={orderData.customer_email}
+              customerPhone={orderData.customer_phone}
+              onPaymentSuccess={handlePaymentSuccess}
+              onPaymentError={handlePaymentError}
+            />
+          </div>
+          
+          <div className="col-lg-4">
+            <div className="card">
+              <div className="card-header">
+                <h5 className="card-title mb-0">
+                  <i className="fa fa-shopping-cart me-2"></i>
+                  Chi tiết đơn hàng
+                </h5>
               </div>
-              
-              <hr />
-              
-              <div className="customer-info">
-                <h6>Thông tin khách hàng</h6>
-                <p><strong>Tên:</strong> {orderData.customer_name}</p>
-                <p><strong>Email:</strong> {orderData.customer_email}</p>
-                <p><strong>Điện thoại:</strong> {orderData.customer_phone}</p>
+              <div className="card-body">
+                <div className="order-summary">
+                  <h6>Mã đơn hàng: {orderData.id}</h6>
+                  <hr />
+                  
+                  <div className="order-items">
+                    {orderData.items.map((item, index) => (
+                      <div key={index} className="d-flex justify-content-between mb-2">
+                        <span>{item.product_name} x{item.quantity}</span>
+                        <span>{(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <hr />
+                  <div className="d-flex justify-content-between">
+                    <strong>Tổng cộng:</strong>
+                    <strong>{orderData.total_amount.toLocaleString('vi-VN')}đ</strong>
+                  </div>
+                </div>
+                
+                <hr />
+                
+                <div className="customer-info">
+                  <h6>Thông tin khách hàng</h6>
+                  <p><strong>Tên:</strong> {orderData.customer_name}</p>
+                  <p><strong>Email:</strong> {orderData.customer_email}</p>
+                  <p><strong>Điện thoại:</strong> {orderData.customer_phone}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { executeQuery } from '@/lib/db';
 
 // GET - Lấy trạng thái thanh toán của đơn hàng
 export async function GET(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Lấy thông tin đơn hàng và trạng thái thanh toán
-    const [orderRows] = await db.execute(
+    const orderRows = await executeQuery(
       `SELECT o.*, p.status as payment_status, p.method as payment_method, p.amount, p.created_at as payment_date
        FROM orders o 
        LEFT JOIN payments p ON o.id = p.order_id 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Kiểm tra đơn hàng tồn tại
-    const [orderRows] = await db.execute(
+    const orderRows = await executeQuery(
       'SELECT * FROM orders WHERE id = ?',
       [orderId]
     );
@@ -81,14 +81,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Cập nhật hoặc tạo mới payment record
-    const [existingPayment] = await db.execute(
+    const existingPayment = await executeQuery(
       'SELECT * FROM payments WHERE order_id = ?',
       [orderId]
     );
 
     if ((existingPayment as any[]).length > 0) {
       // Cập nhật payment hiện có
-      await db.execute(
+      await executeQuery(
         `UPDATE payments 
          SET status = ?, method = ?, amount = ?, failure_reason = ?, updated_at = NOW()
          WHERE order_id = ?`,
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       );
     } else {
       // Tạo payment record mới
-      await db.execute(
+      await executeQuery(
         `INSERT INTO payments (order_id, status, method, amount, failure_reason, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
         [orderId, paymentStatus, paymentMethod, amount, failureReason]

@@ -1,5 +1,4 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import './globals.css';
+import './styles.scss';
 import Footer from './components/layout/Footer';
 import Header from './components/layout/Header';
 import { AuthProvider } from './context/AuthContext';
@@ -9,7 +8,7 @@ import QueryProvider from './providers/QueryProvider';
 
 export const metadata = {
   title: {
-    default: 'Tạp Hóa Xanh - Mua sắm tiện lợi, chất lượng đảm bảo',
+    default: 'T.H.X',
     template: '%s | Tạp Hóa Xanh'
   },
   description: 'Tạp Hóa Xanh - Ứng dụng mua sắm tạp hóa trực tuyến với đầy đủ các mặt hàng thiết yếu, giao hàng nhanh chóng và giá cả hợp lý.',
@@ -78,15 +77,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
           crossOrigin="anonymous"
         />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" href="/api/products/homepage" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/api/categories" as="fetch" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//localhost" />
+        
+        {/* Preload critical images */}
+        <link rel="preload" href="/client/images/logo.svg" as="image" />
+        <link rel="preload" href="/client/images/vegetables-basket.png" as="image" />
       </head>
       <body>
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
               <Header />
-              <main>
+              
                 {children}
-              </main>
+              
               <Footer />
               <PWAComponents />
             </AuthProvider>

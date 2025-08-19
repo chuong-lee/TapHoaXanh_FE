@@ -1,0 +1,72 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.card {
+  @include card-base;
+  padding: $spacing-lg;
+  
+  &.hover {
+    @include card-hover;
+  }
+  
+  &.compact {
+    padding: $spacing-md;
+  }
+  
+  &.large {
+    padding: $spacing-xl;
+  }
+}
+
+.header {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  
+  .title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+  
+  .subtitle {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: $spacing-xs 0 0 0;
+  }
+}
+
+.body {
+  color: $text-primary;
+  line-height: $line-height-normal;
+}
+
+.footer {
+  @include flex-between;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-light;
+}
+
+// Card variants
+.primary {
+  border-left: 4px solid $primary-color;
+}
+
+.secondary {
+  border-left: 4px solid $secondary-color;
+}
+
+.success {
+  border-left: 4px solid $success-color;
+}
+
+.warning {
+  border-left: 4px solid $warning-color;
+}
+
+.danger {
+  border-left: 4px solid $danger-color;
+}

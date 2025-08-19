@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../context/AuthContext'
 import locationService, { MappedProvince, MappedDistrict, MappedWard } from '../../lib/locationService'
+import { useVouchers, Voucher } from '@/hooks/useVouchers'
+import VoucherDropdown from '@/components/ui/VoucherDropdown'
+import VNPayQRInline from '@/components/ui/VNPayQRInline'
+import VietQRPayment from '@/components/ui/VietQRPayment';
 
 // Tạo mã QR ngân hàng thông qua API backend
 const generateBankQR = async (amount: number, orderId: string, bankCode: string) => {
@@ -171,16 +176,11 @@ function CheckoutPage() {
 
 
 
-  const [selectedProductVoucher, setSelectedProductVoucher] = useState<string | null>(null)
-  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState<string | null>(null)
+  // Voucher states removed - now using useVouchers hook
   const router = useRouter();
   const [errorFields, setErrorFields] = useState<string[]>([]);
-  const [selectedVoucher, setSelectedVoucher] = useState<{
-    id?: number;
-    code: string;
-    min_order_value: number;
-    max_discount: number;
-  } | null>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const { vouchers, loading: vouchersLoading, error: vouchersError } = useVouchers();
   const [showSuccess, setShowSuccess] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
@@ -193,7 +193,8 @@ function CheckoutPage() {
   const [showSepayQR, setShowSepayQR] = useState(false);
 
   // Thêm state cho QR payment
-  const [showQRPayment, setShowQRPayment] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState<string>('');
+  const [selectedWallet, setSelectedWallet] = useState<string>('vnpay');
 
   useEffect(() => {
     const selected = localStorage.getItem("cart_selected");
@@ -219,14 +220,7 @@ function CheckoutPage() {
     }
   }, []);
 
-  useEffect(() => {
-    // Lấy mã voucher đã chọn từ localStorage
-    const productCode = localStorage.getItem('selectedProductVoucher')
-    const shippingCode = localStorage.getItem('selectedShippingVoucher')
-    setSelectedProductVoucher(productCode)
-    setSelectedShippingVoucher(shippingCode)
-    // Có thể fetch thêm thông tin voucher nếu cần
-  }, [])
+  // Voucher loading is now handled by useVouchers hook
 
   useEffect(() => {
     const voucherStr = localStorage.getItem('selectedVoucher');
@@ -335,10 +329,15 @@ function CheckoutPage() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   let discount = 0;
   if (selectedVoucher && subtotal >= selectedVoucher.min_order_value) {
-    discount = Math.min(selectedVoucher.max_discount, subtotal);
+    if (selectedVoucher.type === 'percentage') {
+      discount = (subtotal * selectedVoucher.max_discount) / 100;
+    } else {
+      discount = selectedVoucher.max_discount;
+    }
   }
   const shipping = subtotal > 300000 ? 0 : 15000;
-  const total = subtotal - discount + shipping;
+  // Đảm bảo total không âm
+  const total = Math.max(0, subtotal - discount + shipping);
 
   // Tạo mã QR khi chọn phương thức thanh toán QR
   useEffect(() => {
@@ -593,6 +592,28 @@ function CheckoutPage() {
     }
   };
 
+  // Cập nhật danh sách phương thức thanh toán
+  const paymentMethods = [
+    {
+      id: 'cod',
+      name: 'Thanh toán khi nhận hàng (COD)',
+      icon: 'fas fa-money-bill-wave',
+      color: 'primary'
+    },
+    {
+      id: 'bank_transfer',
+      name: 'Chuyển khoản Vietcombank',
+      icon: 'fas fa-university',
+      color: 'success'
+    },
+    {
+      id: 'vnpay',
+      name: 'Thanh toán qua VNPay',
+      icon: 'fab fa-vnpay',
+      color: 'info'
+    }
+  ];
+
   return (
     <>
       {showSuccess && (
@@ -626,6 +647,24 @@ function CheckoutPage() {
         </div>
       )}
       <main className="main-content">
+        {/* Breadcrumb Section */}
+        <div className="breadcrumb-section">
+          <div className="container">
+            <h3 className="text-center">Thanh Toán</h3>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link href="/">Trang Chủ</Link>
+                </li>
+                <li className="breadcrumb-item">
+                  <Link href="/cart">Giỏ Hàng</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">Thanh Toán</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
         <div className="container py-4">
           <div className="row">
             {/* Cột trái: Mặc định hiển thị thông tin nhận hàng, chỉ thay đổi khi chọn phương thức thanh toán */}
@@ -654,7 +693,7 @@ function CheckoutPage() {
                         onChange={(e) => setSelectedBank(e.target.value)}
                         style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}}
                       >
-                        <option value="970425">VietinBank (PHAM TUAN KIET)</option>
+                        <option value="970425">VietinBank</option>
                         <option value="970436">Vietcombank</option>
                         <option value="970403">BIDV</option>
                         <option value="970415">Agribank</option>
@@ -762,6 +801,13 @@ function CheckoutPage() {
               ) : form.payment === 'ewallet' ? (
                 // Hiển thị form thông tin ví điện tử
                 <div>
+                  {(() => {
+                    if (!currentOrderId) {
+                      const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                      setCurrentOrderId(orderId);
+                    }
+                    return null;
+                  })()}
                   <div className="alert mb-4" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
                     <h5 className="fw-bold">Thông tin ví điện tử</h5>
                     <p className="mb-0">Vui lòng chọn ví điện tử và điền thông tin thanh toán</p>
@@ -770,11 +816,15 @@ function CheckoutPage() {
                     <div className="row g-3">
                       <div className="col-12">
                         <label>Chọn ví điện tử *</label>
-                        <select className="form-control" defaultValue="" style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}}>
-                          <option value="">Chọn ví điện tử</option>
+                        <select 
+                          className="form-control" 
+                          value={selectedWallet}
+                          onChange={(e) => setSelectedWallet(e.target.value)}
+                          style={{borderColor: '#bbf7d0', backgroundColor: '#f0fdf4'}}
+                        >
+                          <option value="vnpay">VNPay</option>
                           <option value="momo">MoMo</option>
                           <option value="zalopay">ZaloPay</option>
-                          <option value="vnpay">VNPay</option>
                           <option value="airpay">AirPay</option>
                         </select>
                       </div>
@@ -789,6 +839,32 @@ function CheckoutPage() {
                       <div className="col-12">
                         <div className="alert" style={{backgroundColor: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534'}}>
                           <strong>Hướng dẫn:</strong> Sau khi xác nhận, bạn sẽ được chuyển đến trang thanh toán của ví điện tử đã chọn.
+                        </div>
+                      </div>
+                      
+                      {/* QR Code Payment Section */}
+                      <div className="col-12">
+                        <div className="border rounded p-3" style={{backgroundColor: '#f8f9fa'}}>
+                          <h6 className="mb-3">
+                            <i className="fas fa-qrcode text-primary me-2"></i>
+                            Thanh toán qua mã QR
+                          </h6>
+                          {currentOrderId && selectedWallet === 'vnpay' ? (
+                            <VNPayQRInline
+                              orderId={currentOrderId}
+                              amount={total}
+                              customerEmail={form.email}
+                              customerPhone={form.phone}
+                            />
+                          ) : selectedWallet === 'vnpay' ? (
+                            <div className="text-center py-3">
+                              <p className="text-muted">Đang tạo mã QR...</p>
+                            </div>
+                          ) : (
+                            <div className="text-center py-3">
+                              <p className="text-muted">QR code chỉ khả dụng cho VNPay</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -908,9 +984,9 @@ function CheckoutPage() {
               <div className="bg-white p-3 rounded-3 mb-4" style={{border: '1.5px solid #f3f3f3'}}>
                 <h5 className="fw-bold mb-3">Đơn hàng của bạn</h5>
                 {/* Thông báo điều kiện voucher */}
-                {selectedVoucher && subtotal < selectedVoucher.min_order_value && (
+                {selectedVoucher && subtotal < selectedVoucher.min_order_amount && (
                   <div className="alert alert-warning mt-2">
-                    Bạn không đủ điều kiện để dùng voucher này (Đơn tối thiểu: {selectedVoucher.min_order_value.toLocaleString('vi-VN')}₫)
+                    Bạn không đủ điều kiện để dùng voucher này (Đơn tối thiểu: {selectedVoucher.min_order_amount.toLocaleString('vi-VN')}₫)
                   </div>
                 )}
                 <table className="table mb-3">
@@ -941,28 +1017,19 @@ function CheckoutPage() {
                     </tr>
                     <tr>
                       <td><b>Tổng cộng</b></td>
-                      <td className="text-end"><b style={{color:'#22c55e', fontSize:18}}>{total.toLocaleString('vi-VN')}₫</b></td>
+                      <td className="text-end"><b style={{color:'#22c55e', fontSize:18}}>{total <= 0 ? '0₫' : total.toLocaleString('vi-VN') + '₫'}</b></td>
                     </tr>
                   </tbody>
                 </table>
                 <div className="mb-3">
                   <label className="fw-bold mb-2">Mã giảm giá</label>
-                  <div className="d-flex align-items-center mb-3">
-                    <button type="button" className="btn btn-outline-primary me-2" onClick={() => router.push('/voucher')}>
-                      Chọn mã giảm giá
-                    </button>
-                    <div>
-                      {selectedProductVoucher && (
-                        <div className="badge bg-success me-1">Sản phẩm: {selectedProductVoucher}</div>
-                      )}
-                      {selectedShippingVoucher && (
-                        <div className="badge bg-info">Vận chuyển: {selectedShippingVoucher}</div>
-                      )}
-                      {!(selectedProductVoucher || selectedShippingVoucher) && (
-                        <span className="text-muted">Chưa chọn mã giảm giá</span>
-                      )}
-                    </div>
-                  </div>
+                  <VoucherDropdown
+                    vouchers={vouchers}
+                    loading={vouchersLoading}
+                    selectedVoucher={selectedVoucher}
+                    onSelectVoucher={setSelectedVoucher}
+                    subtotal={subtotal}
+                  />
                   
                   {!isShippingInfoComplete() ? (
                     <div className="alert alert-warning">
@@ -975,27 +1042,27 @@ function CheckoutPage() {
                         <i className="fa-solid fa-check-circle me-2"></i>
                         <strong>Thông tin nhận hàng đã đầy đủ!</strong> Bây giờ bạn có thể chọn phương thức thanh toán.
                       </div>
-                      <div className="form-check">
-                        <input type="radio" className="form-check-input" checked={form.payment === 'sepay'} onChange={() => setForm(f => ({...f, payment: 'sepay'}))} />
-                        <label className="form-check-label"><b>Thanh toán qua SePay (QR Code)</b></label>
-                        <div className="small text-muted ms-4">
-                          Quét mã QR để thanh toán nhanh chóng và an toàn qua các ngân hàng Việt Nam.
-                        </div>
-                      </div>
-                      <div className="form-check">
-                        <input type="radio" className="form-check-input" checked={form.payment === 'bank'} onChange={() => setForm(f => ({...f, payment: 'bank'}))} />
-                        <label className="form-check-label"><b>Chuyển khoản ngân hàng thủ công</b></label>
-                        <div className="small text-muted ms-4">
-                          Vui lòng chuyển khoản theo hướng dẫn. Đơn hàng sẽ được xử lý sau khi nhận được tiền.
-                        </div>
-                      </div>
+                      
+                      
                       <div className="form-check mt-2">
-                        <input type="radio" className="form-check-input" checked={form.payment === 'ewallet'} onChange={() => setForm(f => ({...f, payment: 'ewallet'}))} />
+                        <input 
+                          type="radio" 
+                          className="form-check-input" 
+                          checked={form.payment === 'ewallet'} 
+                          onChange={() => {
+                            setForm(f => ({...f, payment: 'ewallet'}));
+                            const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                            setCurrentOrderId(orderId);
+                          }} 
+                        />
                         <label className="form-check-label"><b>Ví điện tử (MoMo, ZaloPay, VNPay)</b></label>
                         <div className="small text-muted ms-4">
                           Thanh toán nhanh chóng và an toàn qua ví điện tử. Bạn sẽ được chuyển đến trang thanh toán.
                         </div>
                       </div>
+
+
+
                       <div className="form-check mt-2">
                         <input type="radio" className="form-check-input" checked={form.payment === 'qr'} onChange={() => setForm(f => ({...f, payment: 'qr'}))} />
                         <label className="form-check-label"><b>Thanh toán qua mã QR</b></label>
@@ -1003,6 +1070,7 @@ function CheckoutPage() {
                           Quét mã QR bằng ứng dụng ngân hàng hoặc ví điện tử để thanh toán nhanh chóng.
                         </div>
                       </div>
+                      
                       <div className="form-check mt-2">
                         <input type="radio" className="form-check-input" checked={form.payment === 'cod'} onChange={() => setForm(f => ({...f, payment: 'cod'}))} />
                         <label className="form-check-label">Thanh toán khi nhận hàng</label>
@@ -1121,6 +1189,8 @@ function CheckoutPage() {
           </div>
         </div>
       </main>
+
+
     </>
   )
 }

@@ -1,0 +1,241 @@
+// =============================================================================
+// SCSS Mixins - Tạp Hóa Xanh
+// =============================================================================
+
+// Import variables
+@import './variables';
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// Button mixins
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $btn-padding-y $btn-padding-x;
+  font-size: $btn-font-size;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+  border-radius: $btn-border-radius;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: $btn-transition;
+  text-decoration: none;
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-variant($background, $border, $color) {
+  background-color: $background;
+  border-color: $border;
+  color: $color;
+  
+  &:hover {
+    background-color: darken($background, 10%);
+    border-color: darken($border, 10%);
+  }
+  
+  &:active {
+    background-color: darken($background, 15%);
+    border-color: darken($border, 15%);
+  }
+}
+
+// Card mixins
+@mixin card-base {
+  background: $bg-light;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow;
+  transition: $transition-normal;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+}
+
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-xl;
+  }
+}
+
+// Text truncation
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-truncate-multiline($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Responsive mixins
+@mixin mobile {
+  @media (max-width: $breakpoint-sm - 1px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-sm) and (max-width: $breakpoint-lg - 1px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-sm - 1px) { @content; }
+  } @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == xxl {
+    @media (min-width: $breakpoint-xxl) { @content; }
+  }
+}
+
+// Animation mixins
+@mixin fade-in($duration: 0.3s) {
+  animation: fadeIn $duration ease-in-out;
+}
+
+@mixin slide-up($duration: 0.3s) {
+  animation: slideUp $duration ease-out;
+}
+
+@mixin pulse {
+  animation: pulse 2s infinite;
+}
+
+// Form mixins
+@mixin input-base {
+  display: block;
+  width: 100%;
+  padding: $input-padding-y $input-padding-x;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  color: $text-primary;
+  background-color: $bg-light;
+  border: 1px solid $input-border-color;
+  border-radius: $input-border-radius;
+  transition: $transition-fast;
+  
+  &:focus {
+    border-color: $input-focus-border-color;
+    box-shadow: $input-focus-box-shadow;
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: $text-muted;
+  }
+}
+
+// Grid mixins
+@mixin grid($columns: 1, $gap: $spacing-md) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+@mixin grid-responsive($mobile: 1, $tablet: 2, $desktop: 3, $gap: $spacing-md) {
+  @include grid($mobile, $gap);
+  
+  @include responsive(sm) {
+    grid-template-columns: repeat($tablet, 1fr);
+  }
+  
+  @include responsive(lg) {
+    grid-template-columns: repeat($desktop, 1fr);
+  }
+}
+
+// Product card mixins
+@mixin product-card {
+  @include card-base;
+  @include card-hover;
+  padding: $product-card-padding;
+  
+  .product-image {
+    height: $product-image-height;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+    margin-bottom: $spacing-md;
+    
+    @include mobile {
+      height: $product-image-height-mobile;
+    }
+  }
+  
+  .product-info {
+    .product-name {
+      @include text-truncate-multiline(2);
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      margin-bottom: $spacing-sm;
+      color: $text-primary;
+    }
+    
+    .product-price {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: $secondary-color;
+      margin-bottom: $spacing-sm;
+    }
+    
+    .product-description {
+      @include text-truncate-multiline(2);
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Breadcrumb styles are now handled by breadcrumb.scss

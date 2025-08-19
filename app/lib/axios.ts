@@ -39,7 +39,7 @@ api.interceptors.response.use(
     // Check if error response is HTML
     if (error.response && typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE')) {
       console.error('Received HTML error response:', error.response.data.substring(0, 200));
-      error.message = `API Error ${error.response.status}: Server returned HTML instead of JSON`;
+      throw new Error(`API Error ${error.response.status}: Server returned HTML instead of JSON`);
     }
     
     // Nếu lỗi là 401 và chưa từng retry

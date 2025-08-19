@@ -32,6 +32,10 @@ interface CountRow {
 
 // GET /api/products - Get all products with filters
 export async function GET(request: NextRequest) {
+  // Add caching headers
+  const response = NextResponse.next();
+  response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+  
   try {
     
     // Parse query parameters
@@ -64,7 +68,7 @@ export async function GET(request: NextRequest) {
       params.push(`%${search}%`)
     }
 
-    // Execute main query - chỉ select các cột có trong bảng
+    // Execute main query - chỉ select các cột cần thiết để tối ưu performance
     const rows = await executeQuery<ProductRow[]>(`
       SELECT 
         p.id,
@@ -75,24 +79,12 @@ export async function GET(request: NextRequest) {
         p.discount,
         p.description,
         p.quantity as stock,
-        p.createdAt as created_at,
-        p.updatedAt as updated_at,
-        p.deletedAt,
-        p.barcode,
-        p.expiry_date,
-        p.origin,
-        p.weight_unit,
-        p.brandId,
-        p.purchase,
-        p.category_childId,
-        c.name as category,
         p.categoryId as category_id,
-        b.name as brand_name
+        c.name as category
       FROM product p
       LEFT JOIN category c ON p.categoryId = c.id
-      LEFT JOIN brand b ON p.brandId = b.id
       ${whereClause}
-      ORDER BY p.createdAt DESC
+      ORDER BY p.id DESC
       LIMIT ? OFFSET ?
     `, [...params, limit, offset])
 
@@ -109,7 +101,7 @@ export async function GET(request: NextRequest) {
     // Function để xử lý URL hình ảnh
     function processImageUrl(imagePath: string | null): string {
       if (!imagePath) {
-        return '/client/images/placeholder.png'
+        return '/client/images/product.png'
       }
       
       // Nếu là URL đầy đủ
@@ -122,18 +114,8 @@ export async function GET(request: NextRequest) {
         return imagePath
       }
       
-      // Nếu là tên file trong thư mục products
-      if (imagePath.includes('.')) {
-        return `/images/products/${imagePath}`
-      }
-      
-      // Nếu là dummy image
-      if (imagePath.includes('dummyimage.com')) {
-        return imagePath
-      }
-      
-      // Default
-      return '/client/images/placeholder.png'
+      // Sử dụng placeholder cho tất cả sản phẩm
+      return '/client/images/product.png'
     }
 
     // Format product data

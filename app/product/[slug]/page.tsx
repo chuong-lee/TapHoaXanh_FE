@@ -162,6 +162,51 @@ export default function ProductDetailPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false)
   const [reviewMessage, setReviewMessage] = useState('')
 
+  // Thêm state để hiển thị thông báo thêm vào giỏ hàng
+  const [addToCartMessage, setAddToCartMessage] = useState('')
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+
+  // Thêm hàm xử lý thêm vào giỏ hàng với thông báo
+  const handleAddToCart = async (product: Product, variant?: ProductVariant) => {
+    try {
+      setIsAddingToCart(true)
+      setAddToCartMessage('')
+      
+      const finalPrice = variant 
+        ? (variant.price_modifier === 0 ? product.price : product.price + variant.price_modifier) - product.discount
+        : product.price - product.discount
+      
+      const cartItem = {
+        ...product,
+        variant_id: variant?.id,
+        variant_name: variant?.variant_name,
+        price: finalPrice,
+        stock: variant?.stock || product.quantity || 0,
+        images: Array.isArray(product.images) ? product.images.join(',') : product.images,
+      }
+      
+      addToCart(cartItem, quantity)
+      
+      setAddToCartMessage('✅ Đã thêm vào giỏ hàng thành công!')
+      
+      // Tự động ẩn thông báo sau 3 giây
+      setTimeout(() => {
+        setAddToCartMessage('')
+      }, 3000)
+      
+    } catch (error) {
+      console.error('Lỗi khi thêm vào giỏ hàng:', error)
+      setAddToCartMessage('❌ Có lỗi xảy ra khi thêm vào giỏ hàng')
+      
+      // Tự động ẩn thông báo lỗi sau 3 giây
+      setTimeout(() => {
+        setAddToCartMessage('')
+      }, 3000)
+    } finally {
+      setIsAddingToCart(false)
+    }
+  }
+
   // Function để kiểm tra scroll position
   const checkScrollButtons = () => {
     const slider = document.getElementById('related-products-slider');
@@ -256,21 +301,32 @@ export default function ProductDetailPage() {
     }
   }
 
-  // Lấy chi tiết sản phẩm - ĐƠNGIẢN VÀ CHẮC CHẮN
- useEffect(() => {
-  const fetchProduct = async () => {
-    try {
-      setLoading(true)
+  // Lấy chi tiết sản phẩm - SỬA LỖI URL ENCODING
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true)
         console.log('🔍 Tìm sản phẩm với slug:', slug)
 
-        // Gọi API endpoint mới - đơn giản và chắc chắn
-        const response = await fetch(`/api/products/detail/${slug}`)
-        const result = await response.json()
+        // Encode slug để tránh lỗi URL
+        const encodedSlug = encodeURIComponent(slug)
+        console.log('🔍 Encoded slug:', encodedSlug)
+
+        // Gọi API endpoint với slug đã encode
+        const response = await fetch(`/api/products/detail/${encodedSlug}`)
         
+        if (!response.ok) {
+          console.error('❌ API response not ok:', response.status, response.statusText)
+          setProduct(null)
+          setLoading(false)
+          return
+        }
+        
+        const result = await response.json()
         console.log('📦 API Response:', result)
         
         if (!result.success || !result.data) {
-          console.error('❌ Không tìm thấy sản phẩm')
+          console.error('❌ Không tìm thấy sản phẩm:', result.message)
           setProduct(null)
           setLoading(false)
           return
@@ -306,15 +362,15 @@ export default function ProductDetailPage() {
         
       } catch (error) {
         console.error('🚨 Lỗi fetch sản phẩm:', error)
-      setProduct(null)
-      setLoading(false)
+        setProduct(null)
+        setLoading(false)
+      }
     }
-  }
 
     if (slug) {
-  fetchProduct()
+      fetchProduct()
     }
-}, [slug])
+  }, [slug])
 
 
   // Lấy biến thể và related products theo cùng category
@@ -421,73 +477,34 @@ export default function ProductDetailPage() {
   const totalPrice = getSelectedPrice() * quantity;
 
   return (
-    <div className="container main-content py-4" style={{ paddingTop: 110 }}>
-      <style jsx>{`
-        .related-products-slider::-webkit-scrollbar {
-          height: 6px;
-        }
-        .related-products-slider::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .related-products-slider::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 10px;
-        }
-        .related-products-slider::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-        .slider-controls button {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          font-size: 18px;
-          font-weight: bold;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .badge-hot {
-          position: absolute;
-          top: 10px;
-          left: 10px;
-          background: #ff4757;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: bold;
-          z-index: 2;
-        }
-        .option-btn {
-          border: 2px solid #ddd;
-          color: #222;
-          background: #fff;
-          transition: border 0.2s, color 0.2s, background 0.2s;
-        }
-        .option-btn:hover {
-          border: 2px solid #4CAF50 !important;
-          color: #4CAF50 !important;
-          background: #fff !important;
-        }
-        .option-btn.active, .option-btn.selected {
-          border: 2px solid #4CAF50 !important;
-          color: #4CAF50 !important;
-          background: #fff !important;
-        }
-        .product-thumb {
-          transition: border 0.2s, box-shadow 0.2s;
-          cursor: pointer;
-        }
-        .product-thumb:hover {
-          border: 2px solid #4CAF50 !important;
-          box-shadow: 0 0 0 2px #d1e7dd;
-        }
-        .product-thumb.selected {
-          border: 2.5px solid #4CAF50 !important;
-          box-shadow: 0 0 0 2px #b6f0c2;
-        }
-      `}</style>
+    <>
+      {/* Breadcrumb Section */}
+      <div className="breadcrumb-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-12">
+              <nav aria-label="breadcrumb">
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
+                    <a href="/" className="text-decoration-none">
+                      <i className="fas fa-home me-1"></i>
+                      Trang chủ
+                    </a>
+                  </li>
+                  <li className="breadcrumb-item">
+                    <a href="/product" className="text-decoration-none">Sản phẩm</a>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    {product?.name || 'Chi tiết sản phẩm'}
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container main-content py-4" style={{ paddingTop: 110 }}>
       <div className="row">
         {/* Left: Product Images */}
         <div className="col-md-5">
@@ -632,6 +649,13 @@ export default function ProductDetailPage() {
                     <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
                   </div>
                 )}
+                {/* Hiển thị thông báo thêm vào giỏ hàng */}
+                {addToCartMessage && (
+                  <div className={`alert ${addToCartMessage.includes('✅') ? 'alert-success' : 'alert-danger'} mb-3`}>
+                    {addToCartMessage}
+                  </div>
+                )}
+                
                 {variants.length > 0 ? (
                   <>
                     <button
@@ -645,30 +669,18 @@ export default function ProductDetailPage() {
                       onClick={() => {
                         if (!selectedVariant) return;
                         const variant = variants.find(v => v.id === selectedVariant);
-                        const priceModifier = variant?.price_modifier || 0;
-
-                        // Nếu priceModifier = 0, giá gốc là product.price
-                        // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
-                        const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
-
-                        // Giá sau giảm
-                        const finalPrice = basePrice - product.discount;
-
-                        // Phần trăm giảm giá (nếu muốn hiển thị badge)
-                        const percent = Math.round((product.discount / basePrice) * 100);
-                        addToCart({
-                          ...product,
-                          variant_id: variant?.id,
-                          variant_name: variant?.variant_name,
-                          price: finalPrice,
-                          stock: variant?.stock || 0,
-                          images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-                        }, quantity);
-                        router.push('/cart');
+                        handleAddToCart(product, variant);
                       }}
-                      disabled={!selectedVariant}
+                      disabled={!selectedVariant || isAddingToCart}
                     >
-                      Thêm vào giỏ hàng
+                      {isAddingToCart ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Đang thêm...
+                        </>
+                      ) : (
+                        'Thêm vào giỏ hàng'
+                      )}
                     </button>
                     <button
                       className="btn w-100 mb-3 fw-bold"
@@ -693,18 +705,17 @@ export default function ProductDetailPage() {
                         borderRadius: 8,
                         fontWeight: 600
                       }}
-                      onClick={() => {
-                        const finalPrice = product.price - product.discount;
-                        addToCart({
-                          ...product,
-                          price: finalPrice,
-                          stock: product.quantity || 0,
-                          images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-                        }, quantity);
-                        router.push('/cart');
-                      }}
+                      onClick={() => handleAddToCart(product)}
+                      disabled={isAddingToCart}
                     >
-                      Thêm vào giỏ hàng
+                      {isAddingToCart ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Đang thêm...
+                        </>
+                      ) : (
+                        'Thêm vào giỏ hàng'
+                      )}
                     </button>
                     <button
                       className="btn w-100 mb-3 fw-bold"
@@ -922,27 +933,32 @@ export default function ProductDetailPage() {
                 <i className="fas fa-comments me-2"></i>ĐÁNH GIÁ & NHẬN XÉT
               </h5>
               {product && product.reviews ? (
-            <div className="row">
-              {/* Tổng quan đánh giá */}
-              <div className="col-md-5">
+                <div className="row">
+                  {/* Tổng quan đánh giá */}
+                  <div className="col-md-5">
                     <div className="card border-info">
                       <div className="card-header bg-info text-white">
                         <h6 className="mb-0">Tổng quan đánh giá</h6>
-                  </div>
+                      </div>
                       <div className="card-body text-center">
                         <div className="rating-display mb-3">
-                          <span className="display-3 fw-bold text-warning">{product.reviews.rating.toFixed(1)}</span>
+                          <span className="display-3 fw-bold text-warning">
+                            {product.avg_rating ? product.avg_rating.toFixed(1) : '0.0'}
+                          </span>
                           <div className="rating-stars mt-2">
                             {[1,2,3,4,5].map(star => (
-                              <i key={star} className={`fas fa-star fs-5 ${star <= Math.round(product.reviews.rating) ? 'text-warning' : 'text-muted'}`}></i>
+                              <i key={star} className={`fas fa-star fs-5 ${star <= Math.round(product.avg_rating || 0) ? 'text-warning' : 'text-muted'}`}></i>
                             ))}
-                </div>
+                          </div>
                           <p className="text-muted mt-2">Đánh giá trung bình</p>
-                </div>
+                          <p className="text-muted">
+                            {product.total_reviews || 0} đánh giá
+                          </p>
+                        </div>
                         
                         <div className="rating-breakdown text-start">
                           {[5,4,3,2,1].map(stars => {
-                            const percentage = stars === Math.round(product.reviews.rating) ? 80 : Math.random() * 30 + 5;
+                            const percentage = stars === Math.round(product.avg_rating || 0) ? 80 : Math.random() * 30 + 5;
                             return (
                               <div key={stars} className="mb-2">
                                 <span className="me-2">{stars}★</span>
@@ -951,7 +967,7 @@ export default function ProductDetailPage() {
                                     className="progress-bar bg-warning" 
                                     style={{width: `${percentage}%`}}
                                   ></div>
-              </div>
+                                </div>
                                 <span className="ms-2 small">{Math.round(percentage)}%</span>
                               </div>
                             );
@@ -968,37 +984,47 @@ export default function ProductDetailPage() {
                   </div>
                   
                   {/* Chi tiết đánh giá */}
-              <div className="col-md-7">
+                  <div className="col-md-7">
                     <div className="review-detail">
                       <h6 className="fw-bold">Nhận xét chi tiết từ khách hàng:</h6>
                       
-                      {/* Đánh giá từ database */}
-                      <div className="border rounded p-3 mb-3 bg-light">
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <div>
-                            <b className="text-primary">
-                              <i className="fas fa-user-circle me-2"></i>Khách hàng đã mua
-                            </b>
-                            <span className="text-muted ms-2">
-                              {product.reviews.updated_at ? new Date(product.reviews.updated_at).toLocaleDateString('vi-VN') : 'N/A'}
-                            </span>
-                </div>
-                          <div className="rating-stars">
-                            {[1,2,3,4,5].map(star => (
-                              <i key={star} className={`fas fa-star ${star <= Math.round(product.reviews.rating) ? 'text-warning' : 'text-muted'}`}></i>
-                            ))}
-                            <span className="ms-2 fw-bold">{product.reviews.rating.toFixed(1)}</span>
-                </div>
-                </div>
-                        <div className="review-content">
-                          <p className="mb-0 fst-italic">"{product.reviews.comment}"</p>
-              </div>
-                        <div className="mt-2">
-                          <span className="badge bg-success">Đã xác thực mua hàng</span>
-            </div>
-        </div>
+                      {/* Hiển thị danh sách đánh giá từ database */}
+                      {product.reviews && product.reviews.length > 0 ? (
+                        product.reviews.map((review: any, index: number) => (
+                          <div key={review.id || index} className="border rounded p-3 mb-3 bg-light">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                              <div>
+                                <b className="text-primary">
+                                  <i className="fas fa-user-circle me-2"></i>
+                                  {review.customer_name || 'Khách hàng'}
+                                </b>
+                                <span className="text-muted ms-2">
+                                  {review.createdAt ? new Date(review.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+                                </span>
+                              </div>
+                              <div className="rating-stars">
+                                {[1,2,3,4,5].map(star => (
+                                  <i key={star} className={`fas fa-star ${star <= review.rating ? 'text-warning' : 'text-muted'}`}></i>
+                                ))}
+                                <span className="ms-2 fw-bold">{review.rating.toFixed(1)}</span>
+                              </div>
+                            </div>
+                            <div className="review-content">
+                              <p className="mb-0 fst-italic">"{review.comment}"</p>
+                            </div>
+                            <div className="mt-2">
+                              <span className="badge bg-success">Đã xác thực mua hàng</span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-4">
+                          <i className="fas fa-comment-slash text-muted fs-1"></i>
+                          <p className="text-muted mt-2">Chưa có đánh giá nào cho sản phẩm này</p>
+                        </div>
+                      )}
                       
-                                            {/* Form thêm đánh giá */}
+                      {/* Form thêm đánh giá */}
                       <div className="add-review-form">
                         <h6 className="fw-bold">Thêm đánh giá của bạn:</h6>
                         
@@ -1006,7 +1032,7 @@ export default function ProductDetailPage() {
                         {reviewMessage && (
                           <div className={`alert ${reviewMessage.includes('✅') ? 'alert-success' : 'alert-danger'} mt-3`}>
                             {reviewMessage}
-      </div>
+                          </div>
                         )}
                         
                         <form onSubmit={handleReviewSubmit} className="row g-3">
@@ -1020,8 +1046,8 @@ export default function ProductDetailPage() {
                               onChange={(e) => handleReviewChange('customerName', e.target.value)}
                               required
                               disabled={isSubmittingReview}
-                  />
-                </div>
+                            />
+                          </div>
                           <div className="col-md-6">
                             <label className="form-label">Đánh giá: <span className="text-danger">*</span></label>
                             <select 
@@ -1036,7 +1062,7 @@ export default function ProductDetailPage() {
                               <option value={2}>2 sao - Kém</option>
                               <option value={1}>1 sao - Rất kém</option>
                             </select>
-                  </div>
+                          </div>
                           <div className="col-12">
                             <label className="form-label">Nhận xét: <span className="text-danger">*</span></label>
                             <textarea 
@@ -1052,7 +1078,7 @@ export default function ProductDetailPage() {
                             <small className="text-muted">
                               {reviewForm.comment.length}/10 ký tự tối thiểu
                             </small>
-                  </div>
+                          </div>
                           <div className="col-12">
                             <button 
                               type="submit" 
@@ -1070,11 +1096,11 @@ export default function ProductDetailPage() {
                                 </>
                               )}
                             </button>
-              </div>
+                          </div>
                         </form>
-            </div>
-        </div>
-      </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-4">
@@ -1088,7 +1114,7 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
-
-    </div>
+      </div>
+    </>
   )
 }

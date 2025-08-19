@@ -8,7 +8,7 @@ interface ReviewData {
   comment: string
 }
 
-// POST /api/reviews - Cập nhật đánh giá cho sản phẩm
+// POST /api/reviews - Thêm đánh giá mới cho sản phẩm
 export async function POST(request: NextRequest) {
   try {
     const body: ReviewData = await request.json()
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     
     // Kiểm tra sản phẩm có tồn tại không
     const productCheck = await executeQuery<any[]>(`
-      SELECT id, rating, comment FROM product WHERE id = ? AND deletedAt IS NULL
+      SELECT id FROM product WHERE id = ? AND deletedAt IS NULL
     `, [productId])
     
     if (productCheck.length === 0) {
@@ -49,35 +49,28 @@ export async function POST(request: NextRequest) {
       }, { status: 404 })
     }
     
-    const currentProduct = productCheck[0]
+    // Thêm đánh giá mới vào bảng rating
+    const insertResult = await executeQuery<any>(`
+      INSERT INTO rating (
+        productId,
+        customer_name,
+        rating,
+        comment,
+        createdAt,
+        updatedAt
+      ) VALUES (?, ?, ?, ?, NOW(), NOW())
+    `, [productId, customerName, rating, comment])
     
-    // Tính toán rating mới (trung bình với rating hiện tại)
-    // Giả sử chúng ta cộng thêm đánh giá mới vào rating hiện tại
-    const currentRating = parseFloat(currentProduct.rating || '0')
-    const newRating = (currentRating + rating) / 2 // Trung bình đơn giản
-    
-    // Format comment mới (kết hợp với comment cũ nếu muốn hoặc thay thế)
-    const newComment = `${comment} (Đánh giá bởi: ${customerName} - ${new Date().toLocaleDateString('vi-VN')})`
-    
-    // Cập nhật sản phẩm với rating và comment mới
-    await executeQuery(`
-      UPDATE product 
-      SET 
-        rating = ?,
-        comment = ?,
-        updatedAt = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `, [newRating, newComment, productId])
-    
-    console.log(`📝 Updated review for product ${productId}: Rating ${newRating}, Comment: ${newComment}`)
+    console.log(`📝 Added new review for product ${productId}: Rating ${rating}, Comment: ${comment}`)
     
     return NextResponse.json({
       success: true,
       message: 'Đánh giá đã được lưu thành công!',
       data: {
+        reviewId: insertResult.insertId,
         productId,
-        newRating,
-        newComment,
+        rating,
+        comment,
         customerName
       }
     })

@@ -1,13 +1,36 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Image optimization
   images: {
-    domains: ["dummyimage.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'dummyimage.com',
+      },
+    ],
+    domains: ['localhost'],
     formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   
-  // PWA Configuration
-  experimental: {
-    serverComponents: true,
+  // Webpack configuration with aliases
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'app'),
+      '@/components': require('path').resolve(__dirname, 'app/components'),
+      '@/lib': require('path').resolve(__dirname, 'app/lib'),
+    };
+    return config;
+  },
+  
+  // TypeScript and ESLint configuration
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
   },
   
   // Security headers
@@ -58,8 +81,11 @@ const nextConfig = {
   // Enable compression
   compress: true,
   
-  // Optimize build
-  swcMinify: true,
+  // Performance optimizations
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['@/components', '@/hooks'],
+  },
   
   // Environment variables
   env: {

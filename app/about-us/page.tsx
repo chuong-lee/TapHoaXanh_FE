@@ -1,9 +1,26 @@
 "use client";
 import React from "react";
+import Link from 'next/link';
+
 export default function AboutUsPage() {
   return (
     <section>
       <div className="abouts">
+        {/* Breadcrumb Section */}
+        <div className="breadcrumb-section">
+          <div className="container">
+            <h3 className="text-center">Về Chúng Tôi</h3>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link href="/">Trang Chủ</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">Về Chúng Tôi</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
         <div className="container my-3">
           {/* Hero section*/}
           <div className="row align-items-start mb-4">

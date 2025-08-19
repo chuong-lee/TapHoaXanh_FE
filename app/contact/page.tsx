@@ -1,22 +1,27 @@
 "use client";
 
 import Image from "next/image";
+import Link from 'next/link';
 
 export default function ContactUs() {
   return (
     <section>
       <div className="contact-page">
-        {/* Header*/}
-        <div className="container">
-          <div className="contact-header">
-            <h2 className="title">Contact Us</h2>
-            <div className="breadcrumb">
-              <a href="/">Home</a>
-              <span>/ </span>
-              <span>Contact Us</span>
-            </div>
+        {/* Breadcrumb Section */}
+        <div className="breadcrumb-section">
+          <div className="container">
+            <h3 className="text-center">Liên Hệ</h3>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link href="/">Trang Chủ</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">Liên Hệ</li>
+              </ol>
+            </nav>
           </div>
         </div>
+
         {/* Main content*/}
         <div className="contact-main container">
           <div className="row align-items-start">

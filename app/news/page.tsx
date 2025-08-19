@@ -3,17 +3,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-type News = {
-  id: number
-  title: string
-  image: string
-  date: string
-  views: number
-  readTime: string
-  description: string
-  category: string
-}
-
 interface ApiPost {
   id: number
   title?: string
@@ -30,7 +19,7 @@ interface ApiPost {
 }
 
 export default function PostPage() {
-  const [news, setNews] = useState<News[]>([])
+  const [news, setNews] = useState<ApiPost[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fixImageSrc = (src: string) => {
@@ -123,7 +112,6 @@ export default function PostPage() {
 
   if (isLoading) {
     return (
-      <main className="main-content">
         <div className="container py-4">
           <div className="text-center">
             <div className="spinner-border text-success" role="status">
@@ -132,13 +120,29 @@ export default function PostPage() {
             <p className="mt-3">Đang tải tin tức...</p>
           </div>
         </div>
-      </main>
+      
     )
   }
 
   return (
-    <main className="main-content">
-      <div className="container py-4">
+    <section>
+      {/* Breadcrumb Section */}
+      <div className="breadcrumb-section">
+        <div className="container">
+          <h3 className="text-center">Bài Viết</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item">
+                <Link href="/">Trang Chủ</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">Bài Viết</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="container my-4">
         {/* Header */}
         <div className="text-center mb-5">
           <h1 className="fw-bold" style={{color: '#22c55e', fontSize: '2.5rem'}}>Tin Tức & Khuyến Mãi</h1>
@@ -393,6 +397,6 @@ export default function PostPage() {
           </div>
         </div>
       </div>
-    </main>
+    </section>
   )
 }

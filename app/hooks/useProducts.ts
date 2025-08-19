@@ -1,261 +1,188 @@
-import { useState, useEffect, useCallback } from 'react'
-import { productService, categoryService, Product, Category } from '@/lib/productService'
+import { useState, useEffect, useCallback } from 'react';
+import api from '../lib/axios';
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  discount: number;
+  images: string;
+  slug: string;
+  description: string;
+  quantity: number;
+  categoryId?: number;
+  category?: string;
+  brandId?: number;
+  brand?: string;
+  rating?: number;
+}
 
 interface UseProductsOptions {
-  autoFetch?: boolean
-  initialPage?: number
-  itemsPerPage?: number
-  category?: string
-  search?: string
+  limit?: number;
+  page?: number;
+  categoryId?: number;
+  search?: string;
+  enableCache?: boolean;
 }
 
 interface UseProductsReturn {
-  // Data
-  products: Product[]
-  allProducts: Product[]
-  categories: Category[]
-  featuredProducts: Product[]
-  bestSellingProducts: Product[]
-  
-  // Pagination
-  currentPage: number
-  totalPages: number
-  currentProducts: Product[]
-  
-  // Loading states
-  loading: boolean
-  categoriesLoading: boolean
-  featuredLoading: boolean
-  
-  // Error states
-  error: string | null
-  
-  // Actions
-  fetchProducts: () => Promise<void>
-  fetchCategories: () => Promise<void>
-  fetchFeaturedProducts: (limit?: number) => Promise<void>
-  fetchBestSellingProducts: (limit?: number) => Promise<void>
-  searchProducts: (query: string) => Promise<void>
-  filterByCategory: (categoryId: number) => Promise<void>
-  setCurrentPage: (page: number) => void
-  refetch: () => Promise<void>
+  products: Product[];
+  loading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  loadMore: () => void;
+  refresh: () => void;
+  totalProducts: number;
 }
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const cache = new Map<string, { data: Product[]; timestamp: number; total: number }>();
 
 export function useProducts(options: UseProductsOptions = {}): UseProductsReturn {
   const {
-    autoFetch = true,
-    initialPage = 1,
-    itemsPerPage = 20,
-    category,
-    search
-  } = options
+    limit = 12,
+    page = 1,
+    categoryId,
+    search,
+    enableCache = true
+  } = options;
 
-  // State
-  const [products, setProducts] = useState<Product[]>([])
-  const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
-  const [bestSellingProducts, setBestSellingProducts] = useState<Product[]>([])
-  
-  const [currentPage, setCurrentPage] = useState(initialPage)
-  const [loading, setLoading] = useState(false)
-  const [categoriesLoading, setCategoriesLoading] = useState(false)
-  const [featuredLoading, setFeaturedLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
 
-  // Computed values
-  const totalPages = Math.ceil(products.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentProducts = products.slice(startIndex, endIndex)
+  // Generate cache key
+  const getCacheKey = useCallback(() => {
+    return `products_${limit}_${page}_${categoryId || 'all'}_${search || 'none'}`;
+  }, [limit, page, categoryId, search]);
+
+  // Check cache
+  const getFromCache = useCallback((key: string) => {
+    if (!enableCache) return null;
+    
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached;
+    }
+    return null;
+  }, [enableCache]);
+
+  // Set cache
+  const setCache = useCallback((key: string, data: Product[], total: number) => {
+    if (!enableCache) return;
+    
+    cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      total
+    });
+  }, [enableCache]);
 
   // Fetch products
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (isLoadMore = false) => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
+
+      const cacheKey = getCacheKey();
+      const cached = getFromCache(cacheKey);
+
+      if (cached && !isLoadMore) {
+        setProducts(cached.data);
+        setTotalProducts(cached.total);
+        setHasMore(cached.data.length < cached.total);
+        setLoading(false);
+        return;
+      }
+
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('limit', limit.toString());
+      params.append('page', page.toString());
       
-      const data = await productService.getAllProducts({
-        category,
-        search,
-        limit: 1000 // Lấy nhiều để có thể phân trang ở client
-      })
-      
-      setAllProducts(data)
-      setProducts(data)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Lỗi khi tải sản phẩm'
-      setError(errorMessage)
-      console.error('Error fetching products:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [category, search])
-
-  // Fetch categories
-  const fetchCategories = useCallback(async (withCount: boolean = true) => {
-    try {
-      setCategoriesLoading(true)
-      const data = await categoryService.getAllCategories(withCount)
-      setCategories(data)
-    } catch (err) {
-      console.error('Error fetching categories:', err)
-    } finally {
-      setCategoriesLoading(false)
-    }
-  }, [])
-
-  // Fetch featured products
-  const fetchFeaturedProducts = useCallback(async (limit: number = 8) => {
-    try {
-      setFeaturedLoading(true)
-      const data = await productService.getFeaturedProducts(limit)
-      setFeaturedProducts(data)
-    } catch (err) {
-      console.error('Error fetching featured products:', err)
-    } finally {
-      setFeaturedLoading(false)
-    }
-  }, [])
-
-  // Fetch best selling products
-  const fetchBestSellingProducts = useCallback(async (limit: number = 8) => {
-    try {
-      const data = await productService.getBestSellingProducts(limit)
-      setBestSellingProducts(data)
-    } catch (err) {
-      console.error('Error fetching best selling products:', err)
-    }
-  }, [])
-
-  // Search products
-  const searchProducts = useCallback(async (query: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      if (!query.trim()) {
-        setProducts(allProducts)
-        return
+      if (categoryId) {
+        params.append('categoryId', categoryId.toString());
       }
       
-      const data = await productService.searchProducts(query)
-      setProducts(data)
-      setCurrentPage(1) // Reset to first page
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Lỗi khi tìm kiếm sản phẩm'
-      setError(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }, [allProducts])
+      if (search) {
+        params.append('search', search);
+      }
 
-  // Filter by category
-  const filterByCategory = useCallback(async (categoryId: number) => {
-    try {
-      setLoading(true)
-      setError(null)
+      const response = await api.get(`/products?${params.toString()}`);
       
-      const data = await productService.getProductsByCategory(categoryId)
-      setProducts(data)
-      setCurrentPage(1) // Reset to first page
+      let newProducts: Product[] = [];
+      let total = 0;
+
+      if (response.data && Array.isArray(response.data.data)) {
+        newProducts = response.data.data;
+        total = response.data.total || response.data.data.length;
+      } else if (Array.isArray(response.data)) {
+        newProducts = response.data;
+        total = response.data.length;
+      } else {
+        throw new Error('Invalid response format');
+      }
+
+      if (isLoadMore) {
+        setProducts(prev => [...prev, ...newProducts]);
+      } else {
+        setProducts(newProducts);
+        setCache(cacheKey, newProducts, total);
+      }
+
+      setTotalProducts(total);
+      setHasMore(newProducts.length === limit && products.length + newProducts.length < total);
+      
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Lỗi khi lọc theo danh mục'
-      setError(errorMessage)
+      console.error('Error fetching products:', err);
+      setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, [limit, page, categoryId, search, enableCache, getCacheKey, getFromCache, setCache, products.length]);
 
-  // Refetch all data
-  const refetch = useCallback(async () => {
-    await Promise.all([
-      fetchProducts(),
-      fetchCategories(),
-      fetchFeaturedProducts(),
-      fetchBestSellingProducts()
-    ])
-  }, [fetchProducts, fetchCategories, fetchFeaturedProducts, fetchBestSellingProducts])
+  // Load more products
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      fetchProducts(true);
+    }
+  }, [loading, hasMore, fetchProducts]);
 
-  // Auto fetch on mount
+  // Refresh products
+  const refresh = useCallback(() => {
+    cache.delete(getCacheKey());
+    fetchProducts();
+  }, [getCacheKey, fetchProducts]);
+
+  // Initial fetch
   useEffect(() => {
-    if (autoFetch) {
-      fetchProducts()
-      fetchCategories()
-    }
-  }, [autoFetch, fetchProducts, fetchCategories])
+    fetchProducts();
+  }, [fetchProducts]);
 
   return {
-    // Data
     products,
-    allProducts,
-    categories,
-    featuredProducts,
-    bestSellingProducts,
-    
-    // Pagination
-    currentPage,
-    totalPages,
-    currentProducts,
-    
-    // Loading states
     loading,
-    categoriesLoading,
-    featuredLoading,
-    
-    // Error states
     error,
-    
-    // Actions
-    fetchProducts,
-    fetchCategories,
-    fetchFeaturedProducts,
-    fetchBestSellingProducts,
-    searchProducts,
-    filterByCategory,
-    setCurrentPage,
-    refetch
-  }
+    hasMore,
+    loadMore,
+    refresh,
+    totalProducts
+  };
 }
 
-// Hook riêng cho single product
-export function useProduct(id?: number, slug?: string) {
-  const [product, setProduct] = useState<Product | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+// Hook for featured products (cached for longer)
+export function useFeaturedProducts(limit = 8) {
+  return useProducts({ limit, enableCache: true });
+}
 
-  const fetchProduct = useCallback(async () => {
-    if (!id && !slug) return
+// Hook for category products
+export function useCategoryProducts(categoryId: number, limit = 12) {
+  return useProducts({ categoryId, limit, enableCache: true });
+}
 
-    try {
-      setLoading(true)
-      setError(null)
-      
-      let data: Product | null = null
-      
-      if (slug) {
-        data = await productService.getProductBySlug(slug)
-      } else if (id) {
-        data = await productService.getProductById(id)
-      }
-      
-      setProduct(data)
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Lỗi khi tải sản phẩm'
-      setError(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }, [id, slug])
-
-  useEffect(() => {
-    fetchProduct()
-  }, [fetchProduct])
-
-  return {
-    product,
-    loading,
-    error,
-    refetch: fetchProduct
-  }
+// Hook for search products
+export function useSearchProducts(search: string, limit = 20) {
+  return useProducts({ search, limit, enableCache: false });
 }

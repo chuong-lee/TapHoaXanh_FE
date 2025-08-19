@@ -10,11 +10,12 @@ interface ProductRow {
   discount: string
   description: string
   quantity: number
-  rating: string
   categoryId: number
   brandId: number
   weight_unit: string
   category_name?: string
+  avg_rating?: number
+  total_reviews?: number
 }
 
 // GET /api/products/related/[id] - Get related products based on current product
@@ -78,18 +79,22 @@ export async function GET(
         p.discount,
         p.description,
         p.quantity,
-        p.rating,
         p.categoryId,
         p.brandId,
         p.weight_unit,
         c.name as category_name,
+        COALESCE(AVG(r.rating), 0) as avg_rating,
+        COUNT(r.id) as total_reviews,
         'same_category_brand' as match_type
       FROM product p
       LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
       WHERE p.deletedAt IS NULL 
         AND p.id != ?
         AND p.categoryId = ?
         AND p.brandId = ?
+      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
+               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
       ORDER BY ABS(p.price - ?) ASC
       LIMIT ?
     `
@@ -105,18 +110,22 @@ export async function GET(
         p.discount,
         p.description,
         p.quantity,
-        p.rating,
         p.categoryId,
         p.brandId,
         p.weight_unit,
         c.name as category_name,
+        COALESCE(AVG(r.rating), 0) as avg_rating,
+        COUNT(r.id) as total_reviews,
         'same_category' as match_type
       FROM product p
       LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
       WHERE p.deletedAt IS NULL 
         AND p.id != ?
         AND p.categoryId = ?
         AND p.brandId != ?
+      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
+               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
       ORDER BY ABS(p.price - ?) ASC
       LIMIT ?
     `
@@ -135,18 +144,22 @@ export async function GET(
         p.discount,
         p.description,
         p.quantity,
-        p.rating,
         p.categoryId,
         p.brandId,
         p.weight_unit,
         c.name as category_name,
+        COALESCE(AVG(r.rating), 0) as avg_rating,
+        COUNT(r.id) as total_reviews,
         'similar_price' as match_type
       FROM product p
       LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
       WHERE p.deletedAt IS NULL 
         AND p.id != ?
         AND p.categoryId != ?
         AND p.price BETWEEN ? AND ?
+      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
+               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
       ORDER BY ABS(p.price - ?) ASC
       LIMIT ?
     `
@@ -170,11 +183,12 @@ export async function GET(
       name: row.name,
       price: parseFloat(row.price),
       slug: row.slug,
-      images: row.images || '/client/images/placeholder.png',
+      images: '/client/images/product.png',
       discount: parseFloat(row.discount || '0'),
       description: row.description,
       quantity: row.quantity,
-      rating: parseFloat(row.rating || '4.5'),
+      rating: Number(row.avg_rating || 4.5), // Rating từ bảng rating
+      totalReviews: Number(row.total_reviews || 0), // Số lượng đánh giá
       categoryId: row.categoryId,
       brandId: row.brandId,
       weight_unit: row.weight_unit,
