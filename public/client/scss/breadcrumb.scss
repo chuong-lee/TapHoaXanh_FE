@@ -1,0 +1,220 @@
+@use './breakpoints' as breakpoint;
+
+.breadcrumb-section {
+  background: url(/client/images/breabcrumb-bg.png) center center / cover no-repeat local;
+  padding: 188px 0 59px;
+  margin-bottom: 100px;
+  position: relative;
+  overflow: hidden;
+ 
+  // Background overlay for better text readability
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+  
+  .container {
+    position: relative;
+    z-index: 2;
+    
+    h3 {
+      color: #ffffff;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      letter-spacing: -0.5px;
+      text-align: center;
+      
+      @media (max-width: 768px) {
+        font-size: 2rem;
+      }
+      
+      @media (max-width: 576px) {
+        font-size: 1.5rem;
+      }
+    }
+    
+    .breadcrumb {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      justify-content: center;
+      
+      .breadcrumb-item {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        position: relative;
+        
+        a {
+          color: #ffffff;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          padding: 0.5rem 0.75rem;
+          
+          position: relative;
+          
+          &:hover {
+            color: #6bbf2d;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            text-decoration: underline;
+          }
+          
+          &:active {
+            transform: translateY(0);
+            color: #ffffff;
+          }
+        }
+        
+        &.active {
+          color: #6bbf2d;
+          font-weight: 600;
+          
+        }
+        
+        & + .breadcrumb-item::before {
+          content: "›";
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0 0.75rem;
+          font-weight: bold;
+          font-size: 1.2rem;
+          line-height: 1;
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+  
+  // Animation for page load
+  animation: fadeInUp 0.6s ease-out;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    padding: 120px 0 40px;
+    margin-bottom: 60px;
+    
+    .container {
+      h3 {
+        margin-bottom: 0.75rem;
+      }
+      
+      .breadcrumb {
+        .breadcrumb-item {
+          font-size: 0.85rem;
+          
+          a {
+            padding: 0.4rem 0.6rem;
+          }
+          
+          &.active {
+            padding: 0.4rem 0.8rem;
+          }
+          
+          & + .breadcrumb-item::before {
+            margin: 0 0.5rem;
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 576px) {
+    padding: 100px 0 30px;
+    margin-bottom: 40px;
+    
+    .container {
+      h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .breadcrumb {
+        flex-wrap: wrap;
+        justify-content: center;
+        
+        .breadcrumb-item {
+          font-size: 0.8rem;
+          margin-bottom: 0.25rem;
+          
+          a {
+            padding: 0.3rem 0.5rem;
+          }
+          
+          &.active {
+            padding: 0.3rem 0.7rem;
+          }
+          
+          & + .breadcrumb-item::before {
+            margin: 0 0.4rem;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+  
+  // Dark mode support (optional)
+  @media (prefers-color-scheme: dark) {
+    border-bottom-color: #4a5568;
+    
+    .container {
+      h3 {
+        color: #f7fafc;
+      }
+      
+      .breadcrumb {
+        .breadcrumb-item {
+          color: #a0aec0;
+          
+          a {
+            color: #68d391;
+            
+            &:hover {
+              color: #9ae6b4;
+              background: rgba(104, 211, 145, 0.1);
+            }
+          }
+          
+          &.active {
+            color: #e2e8f0;
+            background: rgba(226, 232, 240, 0.1);
+          }
+          
+          & + .breadcrumb-item::before {
+            color: #68d391;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Specific overrides for different page types
+.news .breadcrumb-section {
+  padding: 40px 0 40px;
+  margin-bottom: 40px;
+}
+
+.product-page .breadcrumb-section {
+  margin-bottom: 40px;
+}

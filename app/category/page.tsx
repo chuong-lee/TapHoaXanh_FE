@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import CategorySidebar from '@/components/CategorySidebar'
-import CategoryFilter from '@/components/CategoryFilter'
-import CategoryProductList from '@/components/CategoryProductList'
+import CategorySidebar from '@/components/product/CategorySidebar'
+import CategoryFilter from '@/components/product/CategoryFilter'
+import CategoryProductList from '@/components/product/CategoryProductList'
 import api from '@/lib/axios'
-import Pagination from '@/components/Pagination'
+import Pagination from '@/components/ui/Pagination'
 
 interface Product {
   id: number
@@ -102,7 +102,6 @@ export default function CategoryPage() {
   }
 
   const filteredProducts = getFilteredProducts()
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage)
 

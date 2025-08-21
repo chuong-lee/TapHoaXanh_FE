@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Generate PWA Assets",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"scripts/generate-icons.js"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
