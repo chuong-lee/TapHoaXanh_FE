@@ -5,17 +5,19 @@ import Image from 'next/image'
 
 interface ApiPost {
   id: number
-  title?: string
-  name?: string
-  image?: string
+  name: string
+  summary?: string
   images?: string
   description?: string
-  content?: string
-  category?: string | { id: number; name: string; slug?: string; parent_id?: number }
-  createdAt?: string
-  created_at?: string
   views?: number
-  readTime?: string
+  likes?: number
+  comments_count?: number
+  author_id?: number
+  category_id?: number
+  type?: string
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string
 }
 
 export default function PostPage() {
@@ -75,24 +77,21 @@ export default function PostPage() {
           // Debug logging cho mỗi item
           console.log('Processing item:', { 
             id: item.id, 
-            title: item.title, 
+            title: item.name, 
             name: item.name, 
-            category: item.category 
+            category: item.category_id 
           });
           
           return {
             id: item.id,
-            title: item.title || item.name || 'Tiêu đề bài viết', // title hoặc name
-            image: item.image || item.images || '/images/placeholder.png', // image hoặc images
+            title: item.name || 'Tiêu đề bài viết', // title hoặc name
+            image: item.images || '/images/placeholder.png', // image hoặc images
             date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : 
-                  item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') :
                   new Date().toLocaleDateString('vi-VN'), // format ngày Việt Nam
             views: item.views || Math.floor(Math.random() * 1000) + 100, // views hoặc random
-            readTime: item.readTime || (Math.floor(Math.random() * 10) + 3 + ' phút'), // readTime hoặc random
-            description: item.description || item.content || 'Nội dung bài viết...',
-            category: typeof item.category === 'string' ? item.category : 
-                      (typeof item.category === 'object' && item.category?.name ? item.category.name : 
-                      getRandomCategory()), // xử lý category object
+            readTime: 'N/A', // readTime hoặc random
+            description: item.description || item.summary || 'Nội dung bài viết...',
+            category: item.category_id ? getCategoryNameById(item.category_id) : getRandomCategory(), // xử lý category object
           }
         });
         setNews(mapped);
@@ -109,6 +108,23 @@ export default function PostPage() {
     const categories = ['Tin Khuyến Mãi', 'Sản Phẩm Mới', 'Sức Khỏe', 'Ẩm Thực', 'Lifestyle'];
     return categories[Math.floor(Math.random() * categories.length)];
   }
+
+  const getCategoryNameById = (categoryId: number) => {
+    switch (categoryId) {
+      case 1:
+        return 'Tin Khuyến Mãi';
+      case 2:
+        return 'Sản Phẩm Mới';
+      case 3:
+        return 'Sức Khỏe';
+      case 4:
+        return 'Ẩm Thực';
+      case 5:
+        return 'Lifestyle';
+      default:
+        return 'Không rõ';
+    }
+  };
 
   if (isLoading) {
     return (

@@ -28,7 +28,7 @@ export default function AboutUsPage() {
               <div className="abouts-img">
                 <img
                   className="rounded shadow hero-image"
-                  src="client/images/build.png"
+                  src="/client/images/build.png"
                   alt="Building"
                 />
               </div>
@@ -51,25 +51,25 @@ export default function AboutUsPage() {
                 <div className="col-3 hvr-float">
                   <img
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
-                    src="client/images/gallery-1.png"
+                    src="/client/images/gallery-1.png"
                   />
                 </div>
                 <div className="col-3 hvr-float">
                   <img
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
-                    src="client/images/gallery-2.png"
+                    src="/client/images/gallery-2.png"
                   />
                 </div>
                 <div className="col-3 hvr-float">
                   <img
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
-                    src="client/images/gallery-3.png"
+                    src="/client/images/gallery-3.png"
                   />
                 </div>
                 <div className="col-3 hvr-float">
                   <img
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
-                    src="client/images/gallery-4.png"
+                    src="/client/images/gallery-4.png"
                   />
                 </div>
               </div>
@@ -83,7 +83,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-1.png"
+                    src="/client/images/icon-1.png"
                     alt="Best Prices"
                   />
                 </div>
@@ -102,7 +102,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-2.png"
+                    src="/client/images/icon-2.png"
                   />
                 </div>
                 <h5 className="text-about mb-2">Đa dạng sản phẩm</h5>
@@ -118,7 +118,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-3.png"
+                    src="/client/images/icon-3.png"
                   />
                 </div>
                 <h5 className="text-about mb-2">Giao hàng miễn phí</h5>
@@ -136,7 +136,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-4.png"
+                    src="/client/images/icon-4.png"
                   />
                 </div>
                 <h5 className="text-about mb-2">Đổi trả dễ dàng</h5>
@@ -152,7 +152,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-5.png"
+                    src="/client/images/icon-5.png"
                   />
                 </div>
                 <h5 className="text-about mb-2">100% hài lòng</h5>
@@ -168,7 +168,7 @@ export default function AboutUsPage() {
                 <div className="provide-box-img">
                   <img
                     className="mb-3 provide-box-img-icon"
-                    src="client/images/icon-6.png"
+                    src="/client/images/icon-6.png"
                   />
                 </div>
                 <h5 className="text-about mb-2">Khuyến mãi hằng ngày</h5>
