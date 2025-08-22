@@ -13,16 +13,7 @@ interface UserRow {
   updatedAt?: string;
 }
 
-// Mock user for demo
-const MOCK_USER = {
-  id: 1,
-  name: 'Demo User',
-  email: 'demo@gmail.com',
-  phone: '+84123456789',
-  image: '/client/images/profile.jpg',
-  role: 'user'
-};
-
+// GET /api/auth/profile - Get user profile
 export async function GET(request: NextRequest) {
   try {
     // Get token from Authorization header
@@ -34,12 +25,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.substring(7);
     
     // Verify JWT token
-    let decoded;
+    let decoded: any;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key') as any;
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
     } catch (jwtError) {
       return NextResponse.json(
         { error: 'Token không hợp lệ hoặc đã hết hạn' },
@@ -48,30 +39,34 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = decoded.userId;
-    let user = null;
 
-    // Try to find user in database first
-    try {
-      const dbUsers = await executeQuery<UserRow[]>(
-        'SELECT id, name, email, phone, image, role, createdAt, updatedAt FROM users WHERE id = ? AND deletedAt IS NULL LIMIT 1',
-        [userId]
+    // Get user from database
+    const users = await executeQuery<UserRow[]>(
+      'SELECT id, name, email, phone, image, role, createdAt, updatedAt FROM users WHERE id = ? AND deletedAt IS NULL',
+      [userId]
+    );
+
+    if (!users || users.length === 0) {
+      return NextResponse.json(
+        { error: 'Không tìm thấy người dùng' },
+        { status: 404 }
       );
-      
-      if (dbUsers && dbUsers.length > 0) {
-        user = dbUsers[0];
-      }
-    } catch (dbError) {
-      console.log('Database query failed, using mock data:', dbError);
     }
 
-    // Fallback to mock user if database doesn't work
-    if (!user) {
-      user = MOCK_USER;
-    }
+    const user = users[0];
 
     return NextResponse.json({
       success: true,
-      user: user
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     });
 
   } catch (error) {
@@ -83,7 +78,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT - Update profile
+// PUT /api/auth/profile - Update user profile
 export async function PUT(request: NextRequest) {
   try {
     // Get token from Authorization header
@@ -95,14 +90,12 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const token = authHeader.split(' ')[1];
-    const body = await request.json();
-    const { name, email, phone, image } = body;
+    const token = authHeader.substring(7);
     
     // Verify JWT token
-    let decoded;
+    let decoded: any;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key') as any;
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
     } catch (jwtError) {
       return NextResponse.json(
         { error: 'Token không hợp lệ hoặc đã hết hạn' },
@@ -111,36 +104,49 @@ export async function PUT(request: NextRequest) {
     }
 
     const userId = decoded.userId;
+    const body = await request.json();
+    const { name, phone, image } = body;
 
-    // Try to update user in database
-    try {
-      await executeQuery(
-        'UPDATE users SET name = ?, email = ?, phone = ?, image = ?, updatedAt = NOW() WHERE id = ?',
-        [name, email, phone, image, userId]
+    // Update user profile
+    const updateQuery = `
+      UPDATE users 
+      SET name = ?, phone = ?, image = ?, updatedAt = NOW()
+      WHERE id = ? AND deletedAt IS NULL
+    `;
+
+    await executeQuery(
+      updateQuery,
+      [name, phone, image, userId]
+    );
+
+    // Get updated user
+    const users = await executeQuery<UserRow[]>(
+      'SELECT id, name, email, phone, image, role, createdAt, updatedAt FROM users WHERE id = ? AND deletedAt IS NULL',
+      [userId]
+    );
+
+    if (!users || users.length === 0) {
+      return NextResponse.json(
+        { error: 'Không tìm thấy người dùng' },
+        { status: 404 }
       );
-
-      // Get updated user
-      const updatedUsers = await executeQuery<UserRow[]>(
-        'SELECT id, name, email, phone, image, role, createdAt, updatedAt FROM users WHERE id = ? LIMIT 1',
-        [userId]
-      );
-
-      if (updatedUsers && updatedUsers.length > 0) {
-        return NextResponse.json({
-          success: true,
-          message: 'Cập nhật thông tin thành công',
-          user: updatedUsers[0]
-        });
-      }
-    } catch (dbError) {
-      console.log('Database update failed:', dbError);
     }
 
-    // Return mock response if database fails
+    const user = users[0];
+
     return NextResponse.json({
       success: true,
-      message: 'Cập nhật thông tin thành công (demo mode)',
-      user: { ...MOCK_USER, name, email, phone, image }
+      message: 'Cập nhật thông tin thành công',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     });
 
   } catch (error) {

@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const params: (string | number)[] = []
     
     if (categoryId) {
-      whereClause += ' AND p.categoryId = ?'
+      whereClause += ' AND p.category_id = ?'
       params.push(parseInt(categoryId))
     }
     
@@ -79,20 +79,26 @@ export async function GET(request: NextRequest) {
         p.discount,
         p.description,
         p.quantity as stock,
-        p.categoryId as category_id,
+        p.category_id as category_id,
         c.name as category
       FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN category c ON p.category_id = c.id
       ${whereClause}
       ORDER BY p.id DESC
       LIMIT ? OFFSET ?
     `, [...params, limit, offset])
 
+    console.log('Products query result:', {
+      rowsCount: rows.length,
+      params: [...params, limit, offset],
+      whereClause
+    })
+
     // Get total count
     const countRows = await executeQuery<CountRow[]>(`
       SELECT COUNT(*) as total
       FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN category c ON p.category_id = c.id
       ${whereClause}
     `, params)
     
@@ -101,7 +107,7 @@ export async function GET(request: NextRequest) {
     // Function để xử lý URL hình ảnh
     function processImageUrl(imagePath: string | null): string {
       if (!imagePath) {
-        return '/client/images/product.png'
+        return '/client/images/product-placeholder-1.png'
       }
       
       // Nếu là URL đầy đủ
@@ -114,8 +120,13 @@ export async function GET(request: NextRequest) {
         return imagePath
       }
       
-      // Sử dụng placeholder cho tất cả sản phẩm
-      return '/client/images/product.png'
+      // Nếu là tên file trong thư mục client/images
+      if (imagePath.startsWith('client/images/')) {
+        return '/' + imagePath
+      }
+      
+      // Nếu là tên file khác, thêm prefix
+      return '/client/images/' + imagePath
     }
 
     // Format product data
@@ -149,6 +160,14 @@ export async function GET(request: NextRequest) {
       category_childId: row.category_childId
     }))
     
+    console.log('Returning products:', {
+      count: product.length,
+      total,
+      page,
+      limit,
+      sampleProduct: product[0]
+    });
+
     return NextResponse.json({
       success: true,
       data: product,

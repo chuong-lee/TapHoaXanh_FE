@@ -103,25 +103,36 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
       params.append('page', page.toString());
       
       if (categoryId) {
-        params.append('categoryId', categoryId.toString());
+        params.append('category_id', categoryId.toString());
       }
       
       if (search) {
         params.append('search', search);
       }
 
+      console.log('Fetching products with params:', params.toString());
       const response = await api.get(`/products?${params.toString()}`);
+      console.log('Products response:', response.data);
       
       let newProducts: Product[] = [];
       let total = 0;
 
-      if (response.data && Array.isArray(response.data.data)) {
+      console.log('Processing response data:', response.data);
+      
+      if (response.data && response.data.success && Array.isArray(response.data.data)) {
         newProducts = response.data.data;
         total = response.data.total || response.data.data.length;
+        console.log('Using response.data.data format');
+      } else if (response.data && Array.isArray(response.data.data)) {
+        newProducts = response.data.data;
+        total = response.data.total || response.data.data.length;
+        console.log('Using response.data.data format (no success field)');
       } else if (Array.isArray(response.data)) {
         newProducts = response.data;
         total = response.data.length;
+        console.log('Using direct array format');
       } else {
+        console.error('Invalid response format:', response.data);
         throw new Error('Invalid response format');
       }
 

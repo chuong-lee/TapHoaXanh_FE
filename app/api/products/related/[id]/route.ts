@@ -1,234 +1,169 @@
+import 'dotenv/config'
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db'
 
-interface ProductRow {
+interface RelatedProduct {
   id: number
   name: string
-  price: string
-  slug: string
+  price: number
+  discount: number
   images: string
-  discount: string
+  slug: string
   description: string
   quantity: number
-  categoryId: number
-  brandId: number
-  weight_unit: string
-  category_name?: string
-  avg_rating?: number
-  total_reviews?: number
+  category_id: number
+  category_name: string
+  brand_id?: number
+  brand_name?: string
 }
 
-// GET /api/products/related/[id] - Get related products based on current product
+// GET /api/products/related/[id] - Get related products
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
-    const productId = parseInt(id)
+    const productId = parseInt(params.id)
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '8')
-    
-    if (isNaN(productId)) {
-      return NextResponse.json({
-        success: false,
-        message: 'Invalid product ID'
-      }, { status: 400 })
-    }
+    const limit = parseInt(searchParams.get('limit') || '12')
+
+    console.log('🔍 Lấy sản phẩm liên quan cho product ID:', productId)
 
     // Lấy thông tin sản phẩm hiện tại
-    const currentProductRows = await executeQuery<ProductRow[]>(`
-      SELECT 
-        p.id,
-        p.name,
-        p.categoryId,
-        p.brandId,
-        p.weight_unit,
-        p.price
-      FROM product p
-      WHERE p.id = ? AND p.deletedAt IS NULL
-    `, [productId])
+    const currentProductQuery = `
+      SELECT category_id, brand_id, price
+      FROM product 
+      WHERE id = ? AND deletedAt IS NULL
+    `
+    const currentProduct = await executeQuery<any[]>(currentProductQuery, [productId])
 
-    if (currentProductRows.length === 0) {
+    if (currentProduct.length === 0) {
       return NextResponse.json({
         success: false,
-        message: 'Product not found'
+        message: 'Không tìm thấy sản phẩm gốc'
       }, { status: 404 })
     }
 
-    const currentProduct = currentProductRows[0]
-    const currentPrice = parseFloat(currentProduct.price)
+    const { category_id, brand_id, price } = currentProduct[0]
 
-    // Tìm sản phẩm liên quan theo thứ tự ưu tiên:
-    // 1. Cùng category và cùng brand (50% kết quả)
-    // 2. Cùng category, brand khác (30% kết quả) 
-    // 3. Cùng khoảng giá (20% kết quả)
-
-    const limit1 = Math.ceil(limit * 0.5) // 50% - cùng category + brand
-    const limit2 = Math.ceil(limit * 0.3) // 30% - cùng category khác brand
-    const limit3 = limit - limit1 - limit2 // 20% - cùng khoảng giá
-
-    // Query 1: Cùng category và cùng brand
-    const query1 = `
+    // Query để lấy sản phẩm liên quan
+    const relatedQuery = `
       SELECT 
         p.id,
         p.name,
         p.price,
-        p.slug,
-        p.images,
         p.discount,
+        p.images,
+        p.slug,
         p.description,
         p.quantity,
-        p.categoryId,
-        p.brandId,
-        p.weight_unit,
+        p.category_id,
         c.name as category_name,
-        COALESCE(AVG(r.rating), 0) as avg_rating,
-        COUNT(r.id) as total_reviews,
-        'same_category_brand' as match_type
+        p.brand_id,
+        b.name as brand_name
       FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
-      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
-      WHERE p.deletedAt IS NULL 
-        AND p.id != ?
-        AND p.categoryId = ?
-        AND p.brandId = ?
-      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
-               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
-      ORDER BY ABS(p.price - ?) ASC
+      LEFT JOIN category c ON p.category_id = c.id
+      LEFT JOIN brand b ON p.brand_id = b.id
+      WHERE p.id != ? 
+        AND p.deletedAt IS NULL 
+        AND p.quantity > 0
+        AND (
+          p.category_id = ? 
+          OR p.brand_id = ? 
+          OR ABS(p.price - ?) <= ? * 0.3
+        )
+      ORDER BY 
+        CASE 
+          WHEN p.category_id = ? AND p.brand_id = ? THEN 1
+          WHEN p.category_id = ? THEN 2
+          WHEN p.brand_id = ? THEN 3
+          ELSE 4
+        END,
+        p.id DESC
       LIMIT ?
     `
 
-    // Query 2: Cùng category, brand khác
-    const query2 = `
-      SELECT 
-        p.id,
-        p.name,
-        p.price,
-        p.slug,
-        p.images,
-        p.discount,
-        p.description,
-        p.quantity,
-        p.categoryId,
-        p.brandId,
-        p.weight_unit,
-        c.name as category_name,
-        COALESCE(AVG(r.rating), 0) as avg_rating,
-        COUNT(r.id) as total_reviews,
-        'same_category' as match_type
-      FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
-      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
-      WHERE p.deletedAt IS NULL 
-        AND p.id != ?
-        AND p.categoryId = ?
-        AND p.brandId != ?
-      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
-               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
-      ORDER BY ABS(p.price - ?) ASC
-      LIMIT ?
-    `
-
-    // Query 3: Cùng khoảng giá (±30%)
-    const priceMin = currentPrice * 0.7
-    const priceMax = currentPrice * 1.3
-    
-    const query3 = `
-      SELECT 
-        p.id,
-        p.name,
-        p.price,
-        p.slug,
-        p.images,
-        p.discount,
-        p.description,
-        p.quantity,
-        p.categoryId,
-        p.brandId,
-        p.weight_unit,
-        c.name as category_name,
-        COALESCE(AVG(r.rating), 0) as avg_rating,
-        COUNT(r.id) as total_reviews,
-        'similar_price' as match_type
-      FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
-      LEFT JOIN rating r ON p.id = r.productId AND r.deletedAt IS NULL
-      WHERE p.deletedAt IS NULL 
-        AND p.id != ?
-        AND p.categoryId != ?
-        AND p.price BETWEEN ? AND ?
-      GROUP BY p.id, p.name, p.price, p.slug, p.images, p.discount, p.description, 
-               p.quantity, p.categoryId, p.brandId, p.weight_unit, c.name
-      ORDER BY ABS(p.price - ?) ASC
-      LIMIT ?
-    `
-
-    // Thực hiện các query song song
-    const [rows1, rows2, rows3] = await Promise.all([
-      executeQuery<ProductRow[]>(query1, [productId, currentProduct.categoryId, currentProduct.brandId, currentPrice, limit1]),
-      executeQuery<ProductRow[]>(query2, [productId, currentProduct.categoryId, currentProduct.brandId, currentPrice, limit2]),
-      executeQuery<ProductRow[]>(query3, [productId, currentProduct.categoryId, priceMin, priceMax, currentPrice, limit3])
+    const priceRange = price * 0.3 // 30% của giá hiện tại
+    const rows = await executeQuery<RelatedProduct[]>(relatedQuery, [
+      productId, category_id, brand_id, price, priceRange,
+      category_id, brand_id, category_id, brand_id, limit
     ])
 
-    // Kết hợp kết quả và loại bỏ trùng lặp
-    const allRows = [...rows1, ...rows2, ...rows3]
-    const uniqueProducts = allRows.filter((product, index, self) => 
-      index === self.findIndex(p => p.id === product.id)
-    ).slice(0, limit)
+    console.log('📦 Related products found:', rows.length)
 
-    // Format dữ liệu
-    const relatedProducts = uniqueProducts.map(row => ({
-      id: row.id,
-      name: row.name,
-      price: parseFloat(row.price),
-      slug: row.slug,
-      images: '/client/images/product.png',
-      discount: parseFloat(row.discount || '0'),
-      description: row.description,
-      quantity: row.quantity,
-      rating: Number(row.avg_rating || 4.5), // Rating từ bảng rating
-      totalReviews: Number(row.total_reviews || 0), // Số lượng đánh giá
-      categoryId: row.categoryId,
-      brandId: row.brandId,
-      weight_unit: row.weight_unit,
-      category: { 
-        id: row.categoryId, 
-        name: row.category_name 
+    // Function để xử lý URL hình ảnh
+    function processImageUrl(imagePath: string | null): string {
+      if (!imagePath) {
+        return '/client/images/product-placeholder-1.png'
       }
+      
+      if (imagePath.startsWith('http')) {
+        return imagePath
+      }
+      
+      if (imagePath.startsWith('/')) {
+        return imagePath
+      }
+      
+      if (imagePath.startsWith('client/images/')) {
+        return '/' + imagePath
+      }
+      
+      return '/client/images/' + imagePath
+    }
+
+    // Format products
+    const formattedProducts = rows.map(product => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      discount: product.discount,
+      images: processImageUrl(product.images),
+      slug: product.slug,
+      description: product.description,
+      quantity: product.quantity,
+      categoryId: product.category_id,
+      category: {
+        id: product.category_id,
+        name: product.category_name
+      },
+      brandId: product.brand_id,
+      brand: product.brand_id ? {
+        id: product.brand_id,
+        name: product.brand_name || 'Chưa có thông tin'
+      } : null
     }))
 
-    console.log(`🔗 Found ${relatedProducts.length} related products for product ${productId}:`)
-    console.log(`- Same category + brand: ${rows1.length}`)
-    console.log(`- Same category: ${rows2.length}`) 
-    console.log(`- Similar price: ${rows3.length}`)
+    // Tính toán breakdown
+    const breakdown = {
+      sameCategoryBrand: formattedProducts.filter(p => 
+        p.categoryId === category_id && p.brandId === brand_id
+      ).length,
+      sameCategory: formattedProducts.filter(p => 
+        p.categoryId === category_id && p.brandId !== brand_id
+      ).length,
+      similarPrice: formattedProducts.filter(p => 
+        Math.abs(p.price - price) <= priceRange
+      ).length
+    }
+
+    console.log('📊 Related products breakdown:', breakdown)
 
     return NextResponse.json({
       success: true,
-      data: relatedProducts,
+      data: formattedProducts,
       meta: {
-        currentProduct: {
-          id: currentProduct.id,
-          name: currentProduct.name,
-          categoryId: currentProduct.categoryId,
-          brandId: currentProduct.brandId,
-          price: currentPrice
-        },
-        breakdown: {
-          sameCategoryBrand: rows1.length,
-          sameCategory: rows2.length,
-          similarPrice: rows3.length,
-          total: relatedProducts.length
-        }
+        total: formattedProducts.length,
+        breakdown
       }
     })
 
   } catch (error) {
-    console.error('Error fetching related products:', error)
+    console.error('🚨 Lỗi API related products:', error)
     
     return NextResponse.json({
       success: false,
-      message: 'Failed to fetch related products',
+      message: 'Lỗi server khi lấy sản phẩm liên quan',
       error: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }

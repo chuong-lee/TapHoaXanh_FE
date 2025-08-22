@@ -10,7 +10,7 @@ import { useCart } from '@/hooks/useCart'
 import CartNotification from '@/components/ui/CartNotification'
 
 function fixImgSrc(src: string) {
-  if (!src) return "/client/images/product.png";
+  if (!src) return "/client/images/product-placeholder-1.png";
   if (src.startsWith("http")) return src;
   if (src.startsWith("/")) return src;
   if (src.startsWith("client/images/")) return "/" + src;
@@ -87,7 +87,13 @@ export default function HomePage() {
 
   // Sử dụng optimized hooks
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategoriesQuery(true)
-  const { products: allProducts, loading: productsLoading } = useHomepageProducts()
+  const { products: allProducts, loading: productsLoading, error: productsError } = useHomepageProducts()
+
+  console.log('Homepage products state:', {
+    productsCount: allProducts?.length || 0,
+    loading: productsLoading,
+    error: productsError
+  });
 
   // Load wishlist từ localStorage khi component mount
   useEffect(() => {
@@ -362,12 +368,14 @@ export default function HomePage() {
                 <div className="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabIndex={0}>
                   <div className="product-list">
                     <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
-                      {isLoading ? (
+                      {productsLoading ? (
                         <ProductSkeleton count={10} />
-                      ) : allProducts.length === 0 ? (
+                      ) : !allProducts || allProducts.length === 0 ? (
                         <div className="col-12 text-center py-4">
-                          <div className="alert alert-info">Không có sản phẩm</div>
-                    </div>
+                          <div className="alert alert-info">
+                            {productsError ? `Lỗi: ${productsError}` : 'Không có sản phẩm'}
+                          </div>
+                        </div>
                       ) : (
                         allProducts.slice(0, 10).map((product: Product, i: number) => (
                           <div className="col" key={product.id}>

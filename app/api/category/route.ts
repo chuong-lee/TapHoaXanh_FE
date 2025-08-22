@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
           c.name,
           COUNT(p.id) as count
         FROM category c
-        LEFT JOIN product p ON c.id = p.categoryId AND p.deletedAt IS NULL
+        LEFT JOIN product p ON c.id = p.category_id AND p.deletedAt IS NULL
         GROUP BY c.id, c.name
         ORDER BY c.name ASC
       `)
@@ -43,14 +43,15 @@ export async function GET(request: NextRequest) {
         total: categories.length
       })
     } else {
-      // Get categories without count (faster)
-      const rows = await executeQuery<CategoryRow[]>(`
-        SELECT 
-          id,
-          name
-        FROM category
-        ORDER BY name ASC
-      `)
+             // Get categories without count (faster)
+       const rows = await executeQuery<CategoryRow[]>(`
+         SELECT 
+           id,
+           name
+         FROM category
+         WHERE parent_id = 0
+         ORDER BY name ASC
+       `)
       
       // Format category data
       const categories = rows.map(row => ({

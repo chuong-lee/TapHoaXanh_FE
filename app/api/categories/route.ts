@@ -4,7 +4,7 @@ import { executeQuery } from '@/lib/db';
 export async function GET() {
   try {
     const categories = await executeQuery(
-      'SELECT id, name, description, image FROM categories WHERE active = 1 ORDER BY sort_order ASC, name ASC'
+      'SELECT id, name, slug FROM category WHERE parent_id = 0 ORDER BY id ASC'
     );
 
     return NextResponse.json({

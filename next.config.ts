@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '3000',
-        pathname: '/images/**',
+        pathname: '/**',
       },
       {
         protocol: 'https',
@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       }
     ],
+    unoptimized: true,
   },
   webpack: (config) => {
     config.resolve.alias = {

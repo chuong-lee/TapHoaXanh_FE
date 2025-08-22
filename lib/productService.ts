@@ -41,9 +41,10 @@ export interface ProductFilters {
 }
 
 export const categoryService = {
-  getAllCategories: async (): Promise<Category[]> => {
+  getAllCategories: async (withCount: boolean = false): Promise<Category[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/categories`);
+      const url = withCount ? `${API_BASE_URL}/category?withCount=true` : `${API_BASE_URL}/categories`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`);
       }
@@ -62,7 +63,7 @@ export const categoryService = {
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
-      throw error;
+      return []; // Return empty array instead of throwing
     }
   },
 };

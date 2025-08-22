@@ -53,7 +53,7 @@ export function CategoryList({
     )
   }
 
-  if (!categories.length) {
+  if (!categories || !categories.length) {
     return (
       <section className="py-8">
         <div className="container mx-auto px-4">
