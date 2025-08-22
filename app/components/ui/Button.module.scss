@@ -1,0 +1,80 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.button {
+  @include button-base;
+  
+  // Variants
+  &.primary {
+    @include button-variant($primary-color, $primary-color, $text-light);
+  }
+  
+  &.secondary {
+    @include button-variant($secondary-color, $secondary-color, $text-light);
+  }
+  
+  &.success {
+    @include button-variant($success-color, $success-color, $text-light);
+  }
+  
+  &.warning {
+    @include button-variant($warning-color, $warning-color, $text-light);
+  }
+  
+  &.danger {
+    @include button-variant($danger-color, $danger-color, $text-light);
+  }
+  
+  &.outline {
+    background-color: transparent;
+    border-color: $primary-color;
+    color: $primary-color;
+    
+    &:hover {
+      background-color: $primary-color;
+      color: $text-light;
+    }
+  }
+  
+  // Sizes
+  &.small {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-xs;
+  }
+  
+  &.large {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-lg;
+  }
+  
+  // Full width
+  &.fullWidth {
+    width: 100%;
+  }
+  
+  // Loading state
+  &.loading {
+    position: relative;
+    color: transparent;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

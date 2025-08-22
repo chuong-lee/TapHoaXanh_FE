@@ -1,0 +1,120 @@
+// Product Detail Page Styles
+.related-products-slider {
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+    
+    &:hover {
+      background: #555;
+    }
+  }
+}
+
+.slider-controls {
+  button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.badge-hot {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ff4757;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.option-btn {
+  border: 2px solid #ddd;
+  color: #222;
+  background: #fff;
+  transition: border 0.2s, color 0.2s, background 0.2s;
+  
+  &:hover {
+    border: 2px solid #4CAF50 !important;
+    color: #4CAF50 !important;
+    background: #fff !important;
+  }
+  
+  &.active, &.selected {
+    border: 2px solid #4CAF50 !important;
+    color: #4CAF50 !important;
+    background: #fff !important;
+  }
+}
+
+.product-thumb {
+  transition: border 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    border: 2px solid #4CAF50;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  &.active {
+    border: 2px solid #4CAF50;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+}
+
+.quantity-controls {
+  .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+}
+
+.review-item {
+  border-left: 3px solid #4CAF50;
+  padding-left: 15px;
+  margin-bottom: 20px;
+  
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .review-rating {
+    color: #FFD700;
+  }
+  
+  .review-date {
+    color: #666;
+    font-size: 0.9rem;
+  }
+}
+
+.add-review-form {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}

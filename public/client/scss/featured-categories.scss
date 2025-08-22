@@ -1,0 +1,121 @@
+// Featured categories styles
+@use './breakpoints' as breakpoint;
+
+.section-featured-categories {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 0 24px 0;
+  margin-bottom: 32px;
+  .featured-categories-header {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 28px;
+    .featured-categories-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #22313f;
+      margin: 0 32px 0 32px;
+      flex-shrink: 0;
+    }
+    .featured-categories-tabs {
+      display: flex;
+      gap: 24px;
+      .tab-item {
+        font-size: 17px;
+        color: #22313f;
+        font-weight: 500;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: color 0.2s, opacity 0.2s;
+        &.active {
+          color: #6bbf2d;
+          opacity: 1;
+        }
+        &:hover {
+          color: #6bbf2d;
+          opacity: 1;
+        }
+      }
+    }
+    .featured-categories-nav {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      .nav-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        &:hover {
+          background: #e0e7ef;
+        }
+        i {
+          width: 18px;
+          height: 18px;
+          display: inline-block;
+        }
+        &.left i {
+          background: url('/public/images/icon/arrow-left.svg') no-repeat center/contain;
+        }
+        &.right i {
+          background: url('/public/images/icon/arrow-right.svg') no-repeat center/contain;
+        }
+      }
+    }
+  }
+  .featured-categories-list {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 0 32px;
+    .featured-category-item {
+      min-width: 150px;
+      max-width: 170px;
+      flex: 0 0 150px;
+      background: #f8fafb;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 22px 10px 16px 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+      &:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transform: translateY(-3px) scale(1.03);
+      }
+      img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        margin-bottom: 14px;
+      }
+      .category-name {
+        font-size: 17px;
+        font-weight: 600;
+        color: #22313f;
+        margin-bottom: 4px;
+        text-align: center;
+      }
+      .category-count {
+        font-size: 14px;
+        color: #8b98a9;
+        text-align: center;
+      }
+      &.bg-yellow { background: #fffbe6; }
+      &.bg-orange { background: #fff5e6; }
+      &.bg-green { background: #e8f5e8; }
+      &.bg-pink { background: #fff0f3; }
+      &.bg-purple { background: #f6f0ff; }
+    }
+  }
+}
+// Ghi chú: Cần có icon arrow-left.svg và arrow-right.svg trong /public/images/icon/ để hiển thị mũi tên cho nút điều hướng.

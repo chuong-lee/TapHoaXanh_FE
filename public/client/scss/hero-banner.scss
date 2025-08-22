@@ -1,0 +1,174 @@
+// Hero Banner Component - Reusable across all pages
+.hero-section {
+  background: #f8f9fa;
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+  height: 700px;
+  display: flex;
+  align-items: center;
+  background-image: url("../images/breabcrumb-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  
+  .hero-background {
+    display: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hero-content {
+    padding-right: 60px;
+    
+    .hero-title {
+      font-size: 4rem;
+      font-weight: 800;
+      color: #6bbf2d;
+      margin-bottom: 25px;
+      line-height: 1.1;
+      font-family: 'Playfair Display', serif;
+      
+      br {
+        display: block;
+        content: "";
+        margin-top: 5px;
+      }
+    }
+    
+    .hero-subtitle {
+      font-size: 1.3rem;
+      color: #555;
+      margin-bottom: 35px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    
+    .shop-now-btn {
+      background: #6bbf2d;
+      border: none;
+      padding: 18px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      &:hover {
+        background: #5aa825;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(107, 191, 45, 0.4);
+      }
+    }
+  }
+  
+  .hero-image {
+    position: relative;
+    text-align: center;
+    
+    .hero-fruit-bowl {
+      max-width: 90%;
+      height: auto;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+    }
+    
+    .hero-decorations {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      
+      .hero-leaf {
+        position: absolute;
+        animation: float 4s ease-in-out infinite;
+        width: 40px;
+        height: auto;
+        opacity: 0.8;
+        
+        &.leaf-1 {
+          top: 15%;
+          right: 25%;
+          animation-delay: 0s;
+          transform: rotate(15deg);
+        }
+        
+        &.leaf-2 {
+          top: 45%;
+          right: 10%;
+          animation-delay: 1.5s;
+          transform: rotate(-10deg);
+        }
+        
+        &.leaf-3 {
+          bottom: 25%;
+          right: 20%;
+          animation-delay: 3s;
+          transform: rotate(25deg);
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 0;
+    min-height: auto;
+    
+    .hero-background .hero-curve {
+      width: 50%;
+    }
+    
+    .hero-content {
+      padding-right: 0;
+      text-align: center;
+      margin-bottom: 40px;
+      
+      .hero-title {
+        font-size: 2.8rem;
+        line-height: 1.2;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+      
+      .shop-now-btn {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+      }
+    }
+    
+    .hero-image {
+      .hero-fruit-bowl {
+        max-width: 80%;
+      }
+      
+      .hero-decorations {
+        .hero-leaf {
+          width: 30px;
+        }
+      }
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Jun 20, 2025 at 12:43 PM
+-- Generation Time: Aug 20, 2025 at 12:27 PM
 -- Server version: 5.7.39
--- PHP Version: 7.4.33
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -30,14 +30,14 @@ SET time_zone = "+00:00";
 CREATE TABLE `address` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `street` varchar(255) NOT NULL,
   `city` varchar(255) NOT NULL,
   `district` varchar(255) NOT NULL,
   `is_default` tinyint(4) NOT NULL,
-  `usersId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -48,105 +48,74 @@ CREATE TABLE `address` (
 CREATE TABLE `brand` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `phone` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `slug` varchar(255) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `brand`
 --
 
-INSERT INTO `brand` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `address`, `phone`) VALUES
-(1, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Coca-Cola', '34 Đường số 5, Quận 1, TP.HCM', '0931504733'),
-(2, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'PepsiCo', '20 Đường số 17, Quận 9, TP.HCM', '0931298158'),
-(3, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'SABECO', '72 Đường số 34, Quận 8, TP.HCM', '0933811375'),
-(4, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Heineken Vietnam', '36 Đường số 24, Quận 10, TP.HCM', '0939823372'),
-(5, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'TH True Milk', '34 Đường số 20, Quận 4, TP.HCM', '0937524665'),
-(6, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'DalatGap', '17 Đường số 4, Quận 4, TP.HCM', '0936805886'),
-(7, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'VinEco', '59 Đường số 12, Quận 7, TP.HCM', '0938793579'),
-(8, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'OrgaFarm', '48 Đường số 25, Quận 8, TP.HCM', '0938961786'),
-(9, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'VietGAP', '96 Đường số 3, Quận 6, TP.HCM', '0935354244'),
-(10, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Minh Phú Seafood', '43 Đường số 31, Quận 2, TP.HCM', '0938794412'),
-(11, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Vĩnh Hoàn Corp', '80 Đường số 23, Quận 8, TP.HCM', '0937685418'),
-(12, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Hùng Vương Group', '80 Đường số 29, Quận 8, TP.HCM', '0937928547'),
-(13, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Seaspimex', '41 Đường số 4, Quận 1, TP.HCM', '0934724964'),
-(14, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'VISSAN', '22 Đường số 5, Quận 4, TP.HCM', '0936871153'),
-(15, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'CP Vietnam', '35 Đường số 19, Quận 9, TP.HCM', '0933684566'),
-(16, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'MEATDeli', '21 Đường số 3, Quận 9, TP.HCM', '0931211785'),
-(17, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Ba Huân', '17 Đường số 18, Quận 8, TP.HCM', '0938794732'),
-(18, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Acecook Việt Nam', '68 Đường số 18, Quận 8, TP.HCM', '0937941009'),
-(19, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'VIFON', '11 Đường số 34, Quận 8, TP.HCM', '0936526458'),
-(20, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'CJ Cầu Tre', '21 Đường số 22, Quận 9, TP.HCM', '0931830018'),
-(21, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Masan Food', '72 Đường số 17, Quận 4, TP.HCM', '0935449394'),
-(22, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Chin-su', '63 Đường số 5, Quận 12, TP.HCM', '0936781946'),
-(23, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Nam Ngư', '19 Đường số 20, Quận 7, TP.HCM', '0936112241'),
-(24, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Miwon', '13 Đường số 4, Quận 7, TP.HCM', '0939124576'),
-(25, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Ajinomoto', '27 Đường số 18, Quận 3, TP.HCM', '0934043193'),
-(26, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Orion', '29 Đường số 28, Quận 11, TP.HCM', '0934874244'),
-(27, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Hữu Nghị Food', '32 Đường số 4, Quận 12, TP.HCM', '0933335192'),
-(28, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Bibica', '22 Đường số 6, Quận 2, TP.HCM', '0932539155'),
-(29, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Oishi', '10 Đường số 11, Quận 11, TP.HCM', '0934763194'),
-(30, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Poca', '45 Đường số 10, Quận 3, TP.HCM', '0939226484'),
-(31, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Vinamilk', '98 Đường số 13, Quận 9, TP.HCM', '0933264421'),
-(32, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'TH True Milk', '79 Đường số 38, Quận 11, TP.HCM', '0934454769'),
-(33, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Nutifood', '50 Đường số 35, Quận 2, TP.HCM', '0938444572'),
-(34, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Ensure', '40 Đường số 34, Quận 12, TP.HCM', '0938712364'),
-(35, '2025-06-14 13:56:13.000000', '2025-06-14 13:56:13.000000', NULL, 'Abbott', '59 Đường số 37, Quận 3, TP.HCM', '0931533035'),
-(36, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Sprite', 'USA', '0994172617'),
-(37, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Fanta', 'Germany', '0914124836'),
-(38, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Aquafina', 'USA', '0955324165'),
-(39, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Pocari Sweat', 'Japan', '0989673816'),
-(40, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Schweppes', 'UK', '0966348705'),
-(41, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Monster Energy', 'USA', '0966924356'),
-(42, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Red Bull', 'Austria', '0916804195'),
-(43, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, '7Up', 'USA', '0949200482'),
-(44, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Gatorade', 'USA', '0990694893'),
-(45, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Lipton', 'UK', '0929368734'),
-(46, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Dole', 'USA', '0978509892'),
-(47, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Chiquita', 'USA', '0986663473'),
-(48, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Del Monte', 'USA', '0918215041'),
-(49, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Nature’s Path', 'Canada', '0992388922'),
-(50, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Trung An', 'Việt Nam', '0951896803'),
-(51, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Lộc Trời Group', 'Việt Nam', '0972077657'),
-(52, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Vina T&T', 'Việt Nam', '0959619294'),
-(53, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Gạo ST25', 'Việt Nam', '0923386637'),
-(54, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Vinamit', 'Việt Nam', '0961018559'),
-(55, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Green Giant', 'USA', '0969924775'),
-(56, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Bumble Bee', 'USA', '0920924192'),
-(57, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Chicken of the Sea', 'USA', '0956522791'),
-(58, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Royal Greenland', 'Denmark', '0995093856'),
-(59, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Seafood Connection', 'Netherlands', '0930285427'),
-(60, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Norwegian Seafood Council', 'Norway', '0916670546'),
-(61, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Seafood Saigon', 'Việt Nam', '0916926932'),
-(62, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Bianfishco', 'Việt Nam', '0993374144'),
-(63, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Hải Nam Co.', 'Việt Nam', '0919173199'),
-(64, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Tyson Foods', 'USA', '0916551140'),
-(65, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'JBS', 'Brazil', '0987831330'),
-(66, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Smithfield', 'USA', '0982441971'),
-(67, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Cargill', 'USA', '0924462339'),
-(68, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Japfa', 'Indonesia', '0970264988'),
-(69, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'GreenFeed', 'Việt Nam', '0978589988'),
-(70, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'De Heus', 'Netherlands', '0931760562'),
-(71, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Nestlé', 'Switzerland', '0910053094'),
-(72, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Heinz', 'USA', '0927004739'),
-(73, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'CJ Foods', 'Korea', '0951375365'),
-(74, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Ottogi', 'Korea', '0956395498'),
-(75, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Maruchan', 'USA', '0937830320'),
-(76, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Unilever', 'UK/Netherlands', '0945706796'),
-(77, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Hormel Foods', 'USA', '0943086117'),
-(78, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Knorr', 'Germany', '0917728671'),
-(79, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Maggie', 'Switzerland', '0957561557'),
-(80, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Ajinomoto Japan', 'Japan', '0985699976'),
-(81, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Kikkoman', 'Japan', '0984666212'),
-(82, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Lee Kum Kee', 'Hong Kong', '0958229731'),
-(83, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'McCormick', 'USA', '0910781296'),
-(84, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Tabasco', 'USA', '0921035267'),
-(85, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Maggi', 'Switzerland', '0912368026'),
-(86, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Lay’s', 'USA', '0983423201'),
-(87, '2025-06-14 08:26:59.000000', '2025-06-14 08:26:59.000000', NULL, 'Doritos', 'USA', '0935317454');
+INSERT INTO `brand` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `slug`, `category_id`) VALUES
+(1, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vinmart', 'vinmart', 1),
+(2, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'CP', 'cp', 2),
+(3, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Maggi', 'maggi', 3),
+(4, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nutrilite', 'nutrilite', 4),
+(5, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vinamilk Organic', 'vinamilk-organic', 5),
+(6, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Coca-Cola', 'coca-cola', 6),
+(7, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Dutch Lady', 'dutch-lady', 7),
+(8, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Kinh Đô', 'kinh-do', 8),
+(9, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vega', 'vega', 9),
+(10, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Đa Cua Hải Phòng', 'banh-da-cua-hai-phong', 10),
+(11, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vissan', 'vissan', 2),
+(12, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Ba Con Cừu', 'ba-con-cuu', 2),
+(13, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nestle', 'nestle', 4),
+(14, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Herbalife', 'herbalife', 4),
+(15, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Biogreen', 'biogreen', 5),
+(16, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Biona', 'biona', 5),
+(17, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Pepsi', 'pepsi', 6),
+(18, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tân Hiệp Phát', 'tan-hiep-phat', 6),
+(19, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Phò Mai Cô Gái', 'pho-mai-co-gai', 7),
+(20, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Anchor', 'anchor', 7),
+(21, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Oreo', 'oreo', 8),
+(22, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mars', 'mars', 8),
+(23, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Annam Gourmet', 'annam-gourmet', 9),
+(24, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fruits & Veggies', 'fruits-veg', 9),
+(25, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Dac San Viet', 'dac-san-viet', 10),
+(26, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Quà tặng Việt Nam', 'qua-tang-viet-nam', 10),
+(27, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Satrafoods', 'satrafoods', 1),
+(28, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Big C', 'big-c', 1),
+(29, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Green Farm', 'green-farm', 2),
+(30, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Jollibee', 'jollibee', 2),
+(31, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Knorr', 'knorr', 3),
+(32, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Hải Hà', 'hai-ha', 3),
+(33, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Blackmores', 'blackmores', 4),
+(34, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Amway', 'amway', 4),
+(35, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Organic Valley', 'organic-valley', 5),
+(36, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nature\'s Path', 'natures-path', 5),
+(37, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Suntory', 'suntory', 6),
+(38, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fanta', 'fanta', 6),
+(39, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak', 'tetra-pak', 7),
+(40, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Yomilk', 'yomilk', 7),
+(41, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Pía', 'banh-pia', 8),
+(42, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Glico', 'glico', 8),
+(43, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vegemite', 'vegemite', 9),
+(44, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Lao Dao', 'lao-dao', 9),
+(45, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Đa Cua Quảng Ninh', 'banh-da-cua-quang-ninh', 10),
+(46, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sản phẩm đặc sản Phú Quốc', 'dac-san-phu-quoc', 10),
+(47, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sagrifood', 'sagrifood', 1),
+(48, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fami', 'fami', 1),
+(49, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Jelly Belly', 'jelly-belly', 2),
+(50, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Hormel', 'hormel', 2),
+(51, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Guilin', 'guilin', 3),
+(52, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Haitian', 'haitian', 3),
+(53, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Life Space', 'life-space', 4),
+(54, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Swisse', 'swisse', 4),
+(55, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nature\'s Way', 'natures-way', 5),
+(56, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Kirkland', 'kirkland', 5);
 
 -- --------------------------------------------------------
 
@@ -156,22 +125,8 @@ INSERT INTO `brand` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `addre
 
 CREATE TABLE `cart` (
   `id` int(11) NOT NULL,
-  `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  `deletedAt` datetime(6) DEFAULT NULL,
-  `usersId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `usersId`) VALUES
-(1, '2025-06-10 08:30:00.000000', '2025-06-10 08:30:00.000000', NULL, 101),
-(2, '2025-06-11 09:00:00.000000', '2025-06-11 10:00:00.000000', NULL, 102),
-(3, '2025-06-12 07:45:00.000000', '2025-06-13 08:00:00.000000', '2025-06-15 09:00:00.000000', 103),
-(4, '2025-06-13 10:15:00.000000', '2025-06-13 10:30:00.000000', NULL, 104),
-(5, '2025-06-14 11:00:00.000000', '2025-06-14 11:15:00.000000', NULL, 105);
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -181,15 +136,15 @@ INSERT INTO `cart` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `usersId`) VALU
 
 CREATE TABLE `cart_item` (
   `id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `productId` int(11) DEFAULT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
+  `quantity` int(11) NOT NULL DEFAULT '1',
   `total_price` int(11) NOT NULL,
   `price` int(11) NOT NULL,
-  `cartId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `product_id` int(11) DEFAULT NULL,
+  `cart_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -200,7 +155,7 @@ CREATE TABLE `cart_item` (
 CREATE TABLE `category` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
@@ -212,77 +167,90 @@ CREATE TABLE `category` (
 --
 
 INSERT INTO `category` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `slug`, `parent_id`) VALUES
-(1, '2025-06-11 22:55:27.000000', '2025-06-11 22:55:27.000000', NULL, 'Đồ uống', 'do-uong', 0),
-(2, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Nông sản thực phẩm', 'nong-san-thuc-pham', 0),
-(3, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Thủy hải sản', 'thuy-hai-san', 0),
-(4, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Thực phẩm từ chăn nuôi', 'chan-nuoi', 0),
-(5, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Thực phẩm chế biến', 'thuc-pham-che-bien', 0),
-(6, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Gia vị & nguyên liệu nấu ăn', 'gia-vi-nguyen-lieu', 0),
-(7, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Đồ ăn vặt & bánh kẹo', 'an-vat-banh-keo', 0),
-(8, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Thức uống thực phẩm', 'thuc-uong-thuc-pham', 0),
-(9, '2025-06-13 11:01:00.000000', '2025-06-13 11:01:00.000000', NULL, 'Đặc sản & thực phẩm truyền thống', 'dac-san-truyen-thong', 0),
-(10, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Rau ăn lá', 'rau-an-la', 1),
-(11, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Rau ăn củ', 'rau-an-cu', 1),
-(12, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Rau ăn quả', 'rau-an-qua', 1),
-(13, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Trái cây', 'trai-cay', 1),
-(14, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Ngũ cốc', 'ngu-coc', 1),
-(15, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Đậu, hạt', 'dau-hat', 1),
-(16, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Cây gia vị', 'cay-gia-vi', 1),
-(17, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Cá biển', 'ca-bien', 2),
-(18, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Cá nước ngọt', 'ca-nuoc-ngot', 2),
-(19, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Tôm, tép', 'tom-tep', 2),
-(20, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Mực, bạch tuộc', 'muc-bach-tuoc', 2),
-(21, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Cua, ghẹ', 'cua-ghe', 2),
-(22, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Nhuyễn thể khác', 'nhuyen-the-khac', 2),
-(23, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Thủy sản khô', 'thuy-san-kho', 2),
-(24, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Thịt gia súc', 'thit-gia-suc', 3),
-(25, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Thịt gia cầm', 'thit-gia-cam', 3),
-(26, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Trứng', 'trung', 3),
-(27, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Sữa', 'sua', 3),
-(28, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Nội tạng', 'noi-tang', 3),
-(29, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Đồ hộp', 'do-hop', 4),
-(30, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Xúc xích, giò chả', 'xuc-xich-gio-cha', 4),
-(31, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Thực phẩm đông lạnh', 'dong-lanh', 4),
-(32, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Món ăn sơ chế', 'mon-so-che', 4),
-(33, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Đồ chay chế biến', 'do-chay', 4),
-(34, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Gia vị khô', 'gia-vi-kho', 5),
-(35, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Gia vị lỏng', 'gia-vi-long', 5),
-(36, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Tinh dầu, mỡ', 'tinh-dau-mo', 5),
-(37, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Nguyên liệu tươi', 'nguyen-lieu-tuoi', 5),
-(38, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Bánh snack', 'banh-snack', 6),
-(39, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Hạt rang', 'hat-rang', 6),
-(40, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Mứt các loại', 'mut-cac-loai', 6),
-(41, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Kẹo, chocolate', 'keo-chocolate', 6),
-(42, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Thạch & đồ dẻo', 'thach-do-deo', 6),
-(43, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Nước ép, sinh tố', 'nuoc-ep-sinh-to', 7),
-(44, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Sữa & thức uống từ sữa', 'sua-uong', 7),
-(45, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Trà, cà phê', 'tra-ca-phe', 7),
-(46, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Nước giải khát', 'nuoc-giai-khat', 7),
-(47, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Đồ uống có cồn', 'do-uong-co-con', 7),
-(48, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Bánh truyền thống', 'banh-truyen-thong', 8),
-(49, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Món khô & mắm', 'mon-kho-mam', 8),
-(50, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Dưa muối & lên men', 'dua-muoi-len-men', 8),
-(51, '2025-06-13 11:04:23.000000', '2025-06-13 11:04:23.000000', NULL, 'Đặc sản vùng miền', 'dac-san-vung-mien', 8);
+(1, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm tươi sống', 'thuc-pham-tuoi-sống', 0),
+(2, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm chế biến sẵn', 'thuc-pham-che-bien-san', 0),
+(3, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm đóng hộp và gia vị', 'thuc-pham-dong-hop-gia-vi', 0),
+(4, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm chức năng và bổ sung dinh dưỡng', 'thuc-pham-chuc-nang-bo-sung-dinh-duong', 0),
+(5, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm hữu cơ và ăn kiêng', 'thuc-pham-huu-co-va-an-kieng', 0),
+(6, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Đồ uống', 'do-uong', 0),
+(7, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sản phẩm từ sữa và phô mai', 'san-pham-tu-sua-va-pho-mai', 0),
+(8, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh kẹo và các món tráng miệng', 'banh-keo-va-cac-mon-trang-mieng', 0),
+(9, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm chay và thực phẩm thuần chay', 'thuc-pham-chay-va-thuc-pham-thuan-chay', 0),
+(10, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm đặc sản', 'thuc-pham-dac-san', 0),
+(11, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Rau củ quả', 'rau-cu-qua', 1),
+(12, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thịt tươi', 'thit-tuoi', 1),
+(13, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Hải sản', 'hai-san', 1),
+(14, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Trái cây tươi', 'trai-cay-tuoi', 1),
+(15, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Xúc xích', 'xuc-xich', 2),
+(16, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Giò chả', 'gio-cha', 2),
+(17, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mì ăn liền', 'mi-an-lien', 2),
+(18, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh mì', 'banh-mi', 2),
+(19, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Cá hộp', 'ca-hop', 3),
+(20, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thịt hộp', 'thit-hop', 3),
+(21, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nước mắm', 'nuoc-mam', 3),
+(22, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Gia vị nấu ăn', 'gia-vi-nau-an', 3),
+(23, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vitamin', 'vitamin', 4),
+(24, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bột protein', 'bot-protein', 4),
+(25, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Omega-3', 'omega-3', 4),
+(26, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Men vi sinh', 'men-vi-sinh', 4),
+(27, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa hữu cơ', 'sua-huu-co', 5),
+(28, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Ngũ cốc hữu cơ', 'ngu-coc-huu-co', 5),
+(29, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm chay', 'thuc-pham-chay', 5),
+(30, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thực phẩm thuần chay', 'thuc-pham-thuan-chay', 5),
+(31, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nước ngọt', 'nuoc-ngot', 6),
+(32, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Trà', 'tra', 6),
+(33, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nước ép', 'nuoc-ep', 6),
+(34, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bia', 'bia', 6),
+(35, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Phô mai', 'pho-mai', 7),
+(36, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa tươi', 'sua-tuoi', 7),
+(37, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa chua', 'sua-chua', 7),
+(38, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bơ', 'bo', 7),
+(39, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh ngọt', 'banh-ngot', 8),
+(40, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Kẹo', 'keo', 8),
+(41, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sô cô la', 'so-co-la', 8),
+(42, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh quy', 'banh-quy', 8),
+(43, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Đậu hũ', 'dau-hu', 9),
+(44, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Giò chay', 'gio-chay', 9),
+(45, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Chả chay', 'cha-chay', 9),
+(46, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh chay', 'banh-chay', 9),
+(47, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Đa Cua Hải Phòng', 'banh-da-cua-hai-phong', 10),
+(48, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh khọt Vũng Tàu', 'banh-khot-vung-tau', 10),
+(49, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mắm Tôm', 'mam-tom', 10),
+(50, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sò huyết', 'so-huyet', 10);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `delivery`
+-- Table structure for table `migrations`
 --
 
-CREATE TABLE `delivery` (
+CREATE TABLE `migrations` (
   `id` int(11) NOT NULL,
-  `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  `deletedAt` datetime(6) DEFAULT NULL,
-  `tracking_number` varchar(255) NOT NULL,
-  `status` varchar(255) NOT NULL,
-  `notes` varchar(255) NOT NULL,
-  `estimated_date` datetime NOT NULL,
-  `shipped_at` datetime NOT NULL,
-  `delivered_at` datetime NOT NULL,
-  `delivery_fee` int(11) NOT NULL,
-  `orderId` int(11) DEFAULT NULL
+  `timestamp` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `news`
+--
+
+CREATE TABLE `news` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `summary` text,
+  `images` text,
+  `description` text NOT NULL,
+  `views` int(11) DEFAULT '0',
+  `likes` int(11) DEFAULT '0',
+  `comments_count` int(11) DEFAULT '0',
+  `author_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `type` varchar(50) DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deletedAt` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -294,14 +262,16 @@ CREATE TABLE `delivery` (
 CREATE TABLE `order` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
-  `price` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `images` varchar(255) NOT NULL,
+  `total_price` int(11) NOT NULL,
+  `note` int(11) NOT NULL,
+  `order_code` varchar(255) NOT NULL,
+  `status` varchar(255) NOT NULL,
   `comment` varchar(255) NOT NULL,
-  `usersId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `payment_method` varchar(255) NOT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -312,32 +282,14 @@ CREATE TABLE `order` (
 CREATE TABLE `order_item` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `quantity` int(11) NOT NULL,
-  `images` varchar(255) NOT NULL,
   `unit_price` int(11) NOT NULL,
-  `productId` int(11) DEFAULT NULL,
-  `orderId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `payment`
---
-
-CREATE TABLE `payment` (
-  `id` int(11) NOT NULL,
-  `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  `deletedAt` datetime(6) DEFAULT NULL,
-  `payment_method` varchar(255) NOT NULL,
-  `payment_status` varchar(255) NOT NULL,
-  `paid_at` datetime NOT NULL,
-  `orderId` int(11) DEFAULT NULL,
-  `usersId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `product_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `productVariant_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -348,7 +300,7 @@ CREATE TABLE `payment` (
 CREATE TABLE `product` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `price` int(11) NOT NULL,
@@ -361,175 +313,117 @@ CREATE TABLE `product` (
   `weight_unit` varchar(255) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `quantity` int(11) NOT NULL,
-  `categoryId` int(11) DEFAULT NULL,
-  `brandId` int(11) DEFAULT NULL
+  `purchase` int(11) NOT NULL DEFAULT '0',
+  `category_id` int(11) DEFAULT NULL,
+  `brand_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `product`
 --
 
-INSERT INTO `product` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `price`, `discount`, `images`, `slug`, `barcode`, `expiry_date`, `origin`, `weight_unit`, `description`, `quantity`, `categoryId`, `brandId`) VALUES
-(1, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.144778', NULL, 'Nước ép cam VinEco', 18000, 10, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM1', 'nuoc-ep-cam-vineco', 'SPM00001', '2025-12-31 00:00:00', 'Việt Nam', 'chai', 'Nước ép cam nguyên chất từ trang trại VinEco, giàu vitamin C, tăng cường đề kháng, thanh lọc cơ thể mỗi ngày.', 120, 1, 7),
-(2, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.158273', NULL, 'Sữa chua TH True Milk', 12000, 5, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM2', 'sua', 'SPM00002', '2025-11-10 00:00:00', 'Việt Nam', 'hộp', 'Sữa chua lên men tự nhiên từ sữa tươi sạch TH, vị dịu nhẹ, tốt cho hệ tiêu hóa và làn da.', 200, 1, 5),
-(3, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.165257', NULL, 'Mực khô Seaspimex', 58000, 15, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM3', 'muc-kho-seaspimex', 'SPM00003', '2026-02-20 00:00:00', 'Việt Nam', 'gói', 'Mực khô tuyển chọn, phơi nắng tự nhiên, thịt dai ngọt, phù hợp làm món nướng hay rim mắm.', 80, 1, 13),
-(4, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.171775', NULL, 'Cá basa đông lạnh Vĩnh Hoàn', 47000, 8, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM4', 'ca-basa-dong-lanh', 'SPM00004', '2025-09-15 00:00:00', 'Việt Nam', 'túi', 'Phi lê cá basa tươi ngon, đóng gói tiện lợi, giàu omega-3, thích hợp chiên, kho hay nấu canh.', 65, 1, 11),
-(5, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.180114', NULL, 'Trứng gà Ba Huân', 25000, 0, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM5', 'trung', 'SPM00005', '2025-07-01 00:00:00', 'Việt Nam', 'vỉ', 'Trứng gà sạch từ trang trại Ba Huân, giàu dinh dưỡng, vỏ dày, lòng đỏ tươi sáng, an toàn tuyệt đối.', 150, 1, 17),
-(6, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.187415', NULL, 'Giò lụa CJ Cầu Tre', 54000, 12, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM6', 'gio-lua-cj', 'SPM00006', '2025-08-20 00:00:00', 'Việt Nam', 'gói', 'Giò lụa truyền thống dai giòn sần sật, chế biến từ thịt heo sạch, không hàn the, vị thơm đậm đà.', 70, 1, 20),
-(7, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.194062', NULL, 'Đậu phộng Oishi', 32000, 20, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM7', 'dau-phong-oishi', 'SPM00007', '2026-03-05 00:00:00', 'Việt Nam', 'gói', 'Đậu phộng rang giòn thơm lừng, tẩm vị mặn ngọt hấp dẫn, snack lý tưởng cho mọi lứa tuổi.', 100, 1, 29),
-(8, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.201016', NULL, 'Cà rốt tươi DalatGap', 15000, 5, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM8', 'ca-rot-dalatgap', 'SPM00008', '2025-06-30 00:00:00', 'Đà Lạt', 'bó', 'Cà rốt canh tác theo chuẩn hữu cơ tại Đà Lạt, củ to, ngọt thanh, phù hợp ép nước, nấu canh.', 90, 1, 6),
-(9, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.208185', NULL, 'Cá thu tươi Minh Phú', 72000, 10, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM9', 'ca-thu-minhphu', 'SPM00009', '2025-07-20 00:00:00', 'Việt Nam', 'con', 'Cá thu tươi đại dương, thịt chắc, béo nhẹ, giàu DHA và Omega-3, ngon nhất khi chiên áp chảo.', 40, 1, 10),
-(10, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.215591', NULL, 'Dầu ăn Meizan', 48000, 0, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM10', 'dau-an-meizan', 'SPM00010', '2026-01-01 00:00:00', 'Việt Nam', 'chai', 'Dầu đậu nành tinh luyện, không cholesterol, giữ nguyên hương vị món ăn và tốt cho tim mạch.', 110, 1, 22),
-(11, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.221976', NULL, 'Thịt heo CP Việt Nam', 68000, 7, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM11', 'thit-heo-cp', 'SPM00011', '2025-06-25 00:00:00', 'Việt Nam', 'kg', 'Thịt heo sạch, truy xuất nguồn gốc, thịt mềm, tươi, thích hợp chế biến nhiều món ngon hàng ngày.', 95, 1, 15),
-(12, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.229606', NULL, 'Cá nục khô Hùng Vương', 60000, 10, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM12', 'ca-nuc-kho', 'SPM00012', '2025-12-15 00:00:00', 'Việt Nam', 'gói', 'Cá nục chọn lọc, phơi nắng vừa phải, mùi thơm đặc trưng, lý tưởng cho món rim mặn ngọt.', 50, 1, 12),
-(13, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.236834', NULL, 'Trà xanh TH', 15000, 5, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM13', 'tra-xanh-th', 'SPM00013', '2025-08-30 00:00:00', 'Việt Nam', 'chai', 'Trà xanh nguyên lá chiết xuất từ nông trại sạch, vị thanh mát, giúp tỉnh táo và chống lão hóa.', 100, 1, 5),
-(14, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.244931', NULL, 'Mứt dâu Bibica', 30000, 10, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM14', 'mut-dau', 'SPM00014', '2026-04-10 00:00:00', 'Việt Nam', 'hộp', 'Mứt dâu nguyên trái, mềm ngọt, thơm tự nhiên, thích hợp ăn kèm bánh mì hoặc làm topping.', 70, 1, 28),
-(15, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.252143', NULL, 'Thịt gà MEATDeli', 62000, 8, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM15', 'thit-ga-meatdeli', 'SPM00015', '2025-07-18 00:00:00', 'Việt Nam', 'kg', 'Thịt gà MEATDeli kiểm soát chặt chẽ từ nông trại, thịt dai ngon, không chất tăng trưởng.', 60, 1, 16),
-(16, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.258919', NULL, 'Nước khoáng Coca-Cola', 10000, 0, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM16', 'nuoc-khoang-coca', 'SPM00016', '2026-05-10 00:00:00', 'Việt Nam', 'chai', 'Nước khoáng tinh khiết, bổ sung khoáng chất, đóng chai tiện dụng, thích hợp mọi hoạt động.', 180, 1, 1),
-(17, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.266329', NULL, 'Sữa Ensure Vani', 95000, 5, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM17', 'sua-ensure', 'SPM00017', '2026-02-28 00:00:00', 'Mỹ', 'lon', 'Sữa bổ sung dinh dưỡng dành cho người lớn tuổi, vị vani dịu nhẹ, hỗ trợ sức khỏe tim mạch.', 85, 1, 34),
-(18, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.272713', NULL, 'Bánh snack Orion', 28000, 15, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM18', 'banh-snack-orion', 'SPM00018', '2025-09-05 00:00:00', 'Hàn Quốc', 'gói', 'Snack giòn rụm phủ lớp phô mai đậm đà, ngon miệng cho bé và bữa ăn nhẹ văn phòng.', 90, 1, 26),
-(19, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.278521', NULL, 'Mắm cá linh VISSAN', 35000, 7, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM19', 'mam-ca-linh', 'SPM00019', '2026-06-01 00:00:00', 'Việt Nam', 'chai', 'Mắm cá linh nguyên con lên men tự nhiên, vị đậm đà, đặc sản miền Tây truyền thống.', 75, 1, 14),
-(20, '2025-06-14 14:10:18.000000', '2025-06-14 14:10:34.284795', NULL, 'Rau xà lách VinEco', 14000, 5, 'https://dummyimage.com/600x400/cccccc/000000&text=SPM20', 'rau-xa-lach', 'SPM00020', '2025-06-30 00:00:00', 'Việt Nam', 'bó', 'Rau xà lách sạch, giòn mát, trồng theo công nghệ hiện đại, dùng làm salad hoặc cuốn thịt.', 100, 1, 7),
-(21, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Nước cam tươi', 18000, 0, '/images/products/nuoc-cam-tuoi.jpg', 'nuoc-cam-tuoi', '8936000010012', '2025-12-14 14:21:17', 'Việt Nam', 'ml', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 50, 43, 5),
-(22, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Cà rốt Đà Lạt', 25000, 0, '/images/products/ca-rot-da-lat.jpg', 'ca-rot-da-lat', '8936000010029', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 60, 11, 6),
-(23, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Cá basa phi lê đông lạnh', 69000, 0, '/images/products/ca-basa-phi-le-dong-lanh.jpg', 'ca-basa-phi-le-dong-lanh', '8936000010036', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 40, 23, 11),
-(24, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Thịt bò Úc đông lạnh', 130000, 0, '/images/products/thit-bo-uc-dong-lanh.jpg', 'thit-bo-uc-dong-lanh', '8936000010043', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 35, 24, 14),
-(25, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Bánh snack vị phô mai', 15000, 0, '/images/products/banh-snack-vi-pho-mai.jpg', 'banh-snack-vi-pho-mai', '8936000010050', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 80, 38, 29),
-(26, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Gạo ST25', 19000, 0, '/images/products/gao-st25.jpg', 'gao-st25', '8936000010067', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 70, 14, 7),
-(27, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Trứng gà ta', 28000, 0, '/images/products/trung-ga-ta.jpg', 'trung-ga-ta', '8936000010074', '2025-12-14 14:21:17', 'Việt Nam', 'pcs', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 90, 26, 17),
-(28, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Mắm cá linh', 34000, 0, '/images/products/mam-ca-linh.jpg', 'mam-ca-linh', '8936000010081', '2025-12-14 14:21:17', 'Việt Nam', 'ml', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 25, 49, 21),
-(29, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Bánh cốm Hà Nội', 22000, 0, '/images/products/banh-com-ha-noi.jpg', 'banh-com-ha-noi', '8936000010098', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 45, 48, 27),
-(30, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Hành lá tươi', 12000, 0, '/images/products/hanh-la-tuoi.jpg', 'hanh-la-tuoi', '8936000010104', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 30, 16, 6),
-(31, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Thịt gà ta làm sạch', 95000, 0, '/images/products/thit-ga-ta-lam-sach.jpg', 'thit-ga-ta-lam-sach', '8936000010111', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 55, 25, 16),
-(32, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Nước tương Chin-su', 18000, 0, '/images/products/nuoc-tuong-chin-su.jpg', 'nuoc-tuong-chin-su', '8936000010128', '2025-12-14 14:21:17', 'Việt Nam', 'ml', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 60, 35, 22),
-(33, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Chocolate đen 70%', 65000, 0, '/images/products/chocolate-den-70.jpg', 'chocolate-den-70', '8936000010135', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 38, 41, 26),
-(34, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Sữa tươi tiệt trùng Vinamilk', 31000, 0, '/images/products/sua-tuoi-tiet-trung-vinamilk.jpg', 'sua-tuoi-tiet-trung-vinamilk', '8936000010142', '2025-12-14 14:21:17', 'Việt Nam', 'ml', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 48, 27, 31),
-(35, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Mứt dâu Đà Lạt', 40000, 0, '/images/products/mut-dau-da-lat.jpg', 'mut-dau-da-lat', '8936000010159', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 58, 40, 28),
-(36, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Cá ngừ đại dương', 82000, 0, '/images/products/ca-ngu-dai-duong.jpg', 'ca-ngu-dai-duong', '8936000010166', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 33, 17, 12),
-(37, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Tôm sú sống', 135000, 0, '/images/products/tom-su-song.jpg', 'tom-su-song', '8936000010173', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 42, 19, 10),
-(38, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Dưa muối truyền thống', 29000, 0, '/images/products/dua-muoi-truyen-thong.jpg', 'dua-muoi-truyen-thong', '8936000010180', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 29, 50, 14),
-(39, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Bánh trung thu nhân thập cẩm', 55000, 0, '/images/products/banh-trung-thu-thap-cam.jpg', 'banh-trung-thu-thap-cam', '8936000010197', '2025-12-14 14:21:17', 'Việt Nam', 'g', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 65, 48, 30),
-(40, '2025-06-14 14:21:17.000000', '2025-06-14 14:21:17.000000', NULL, 'Sữa chua uống hương dâu TH True', 17000, 0, '/images/products/sua-chua-uong-dau-th-true.jpg', 'sua-chua-uong-dau-th-true', '8936000010203', '2025-12-14 14:21:17', 'Việt Nam', 'ml', 'Sản phẩm chất lượng cao, đảm bảo an toàn vệ sinh thực phẩm.', 77, 44, 32),
-(41, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Dưa hấu không hạt', 30000, 0, '/images/products/dua-hau-khong-hat.jpg', 'dua-hau-khong-hat', '8936000010210', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Sản phẩm tươi ngon, ngọt mát tự nhiên.', 80, 13, 6),
-(42, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Cá thu cắt lát đông lạnh', 98000, 0, '/images/products/ca-thu-cat-lat-dong-lanh.jpg', 'ca-thu-cat-lat-dong-lanh', '8936000010227', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Cá thu ngon, phù hợp các món kho, nướng.', 60, 17, 13),
-(43, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Thịt ba chỉ heo', 120000, 0, '/images/products/thit-ba-chi-heo.jpg', 'thit-ba-chi-heo', '8936000010234', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Thịt ba chỉ heo sạch, chất lượng cao.', 70, 24, 15),
-(44, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Nước mắm Nam Ngư 3 in 1', 32000, 0, '/images/products/nuoc-mam-nam-ngu-3in1.jpg', 'nuoc-mam-nam-ngu-3in1', '8936000010241', '2025-12-14 14:24:10', 'Việt Nam', 'ml', 'Nước mắm đậm đà, thơm ngon tự nhiên.', 45, 35, 23),
-(45, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Khoai lang mật Đà Lạt', 27000, 0, '/images/products/khoai-lang-mat-da-lat.jpg', 'khoai-lang-mat-da-lat', '8936000010258', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Khoai lang mật ngọt tự nhiên, giàu dinh dưỡng.', 90, 11, 6),
-(46, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Bánh gạo Orion vị phô mai', 24000, 0, '/images/products/banh-gao-orion-pho-mai.jpg', 'banh-gao-orion-pho-mai', '8936000010265', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Bánh giòn ngon, vị phô mai hấp dẫn.', 65, 38, 26),
-(47, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Nước ép dứa nguyên chất', 19000, 0, '/images/products/nuoc-ep-dua.jpg', 'nuoc-ep-dua', '8936000010272', '2025-12-14 14:24:10', 'Việt Nam', 'ml', 'Nước ép dứa tươi mát, không chất bảo quản.', 40, 43, 5),
-(48, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Giò lụa truyền thống', 67000, 0, '/images/products/gio-lua-truyen-thong.jpg', 'gio-lua-truyen-thong', '8936000010289', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Giò lụa dai ngon, chuẩn vị truyền thống.', 50, 30, 14),
-(49, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Rau cải thìa', 17000, 0, '/images/products/rau-cai-thia.jpg', 'rau-cai-thia', '8936000010296', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Rau cải tươi xanh, sạch an toàn.', 55, 10, 6),
-(50, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Chả cá thác lác', 58000, 0, '/images/products/cha-ca-thac-lac.jpg', 'cha-ca-thac-lac', '8936000010302', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Chả cá dai, ngọt thịt tự nhiên.', 35, 30, 11),
-(51, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Sữa chua uống có đường', 16000, 0, '/images/products/sua-chua-uong-co-duong.jpg', 'sua-chua-uong-co-duong', '8936000010319', '2025-12-14 14:24:10', 'Việt Nam', 'ml', 'Sữa chua thơm ngon, hỗ trợ tiêu hóa.', 85, 44, 31),
-(52, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Mực nang làm sạch đông lạnh', 125000, 0, '/images/products/muc-nang-lam-sach.jpg', 'muc-nang-lam-sach', '8936000010326', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Mực nang tươi, phù hợp nấu lẩu, chiên.', 30, 20, 13),
-(53, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Bánh pía đậu xanh trứng muối', 33000, 0, '/images/products/banh-pia-dau-xanh.jpg', 'banh-pia-dau-xanh', '8936000010333', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Bánh pía thơm bùi, nhân trứng muối hấp dẫn.', 50, 48, 18),
-(54, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Dầu ăn hướng dương', 49000, 0, '/images/products/dau-an-huong-duong.jpg', 'dau-an-huong-duong', '8936000010340', '2025-12-14 14:24:10', 'Việt Nam', 'ml', 'Dầu ăn tinh luyện, giàu vitamin E.', 68, 36, 25),
-(55, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Gạo lứt đỏ sạch', 41000, 0, '/images/products/gao-lut-do.jpg', 'gao-lut-do', '8936000010357', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Gạo sạch tốt cho người ăn kiêng.', 52, 14, 7),
-(56, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Chanh không hạt', 21000, 0, '/images/products/chanh-khong-hat.jpg', 'chanh-khong-hat', '8936000010364', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Chanh tươi sạch, vỏ mỏng nước nhiều.', 70, 13, 6),
-(57, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Bánh quy bơ Hữu Nghị', 27000, 0, '/images/products/banh-quy-bo.jpg', 'banh-quy-bo', '8936000010371', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Bánh giòn, thơm vị bơ đặc trưng.', 38, 38, 27),
-(58, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Mì gói VIFON tôm chua cay', 11000, 0, '/images/products/mi-gai-vifon-tom-chua-cay.jpg', 'mi-gai-vifon-tom-chua-cay', '8936000010388', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Mì ăn liền đậm đà hương vị Việt.', 120, 5, 19),
-(59, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Xúc xích tiệt trùng CP', 45000, 0, '/images/products/xuc-xich-tiet-trung.jpg', 'xuc-xich-tiet-trung', '8936000010395', '2025-12-14 14:24:10', 'Việt Nam', 'g', 'Xúc xích ngon, an toàn cho bé.', 40, 30, 15),
-(60, '2025-06-14 14:24:10.000000', '2025-06-14 14:24:10.000000', NULL, 'Trà xanh đóng chai', 15000, 0, '/images/products/tra-xanh-dong-chai.jpg', 'tra-xanh-dong-chai', '8936000010401', '2025-12-14 14:24:10', 'Việt Nam', 'ml', 'Trà thanh mát, tốt cho sức khỏe.', 75, 45, 2),
-(61, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Coca-Cola lon 330ml', 12000, 0, '/images/products/coca-cola-lon-330ml.jpg', 'coca-cola-lon-330ml', '8936000010418', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Nước ngọt có ga vị nguyên bản.', 100, 46, 1),
-(62, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Pepsi lon 330ml', 11000, 0, '/images/products/pepsi-lon-330ml.jpg', 'pepsi-lon-330ml', '8936000010425', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Nước ngọt có ga sảng khoái.', 100, 46, 2),
-(63, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, '7Up không calo', 13000, 0, '/images/products/7up-khong-calo.jpg', '7up-khong-calo', '8936000010432', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Giải khát mát lạnh không đường.', 90, 46, 2),
-(64, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Fanta cam lon 330ml', 11500, 0, '/images/products/fanta-cam-lon.jpg', 'fanta-cam-lon', '8936000010449', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Hương cam tươi mát, thơm ngon.', 80, 46, 1),
-(65, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Sting dâu chai 330ml', 10500, 0, '/images/products/sting-dau-330ml.jpg', 'sting-dau-330ml', '8936000010456', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Nước tăng lực vị dâu hấp dẫn.', 85, 46, 21),
-(66, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Mirinda soda kem', 12500, 0, '/images/products/mirinda-soda-kem.jpg', 'mirinda-soda-kem', '8936000010463', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Hương kem thơm béo, mát lạnh.', 70, 46, 2),
-(67, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Trà xanh không độ', 10000, 0, '/images/products/tra-xanh-khong-do.jpg', 'tra-xanh-khong-do', '8936000010470', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Trà thanh mát, không chất bảo quản.', 95, 45, 21),
-(68, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Nước ép táo nguyên chất', 18000, 0, '/images/products/nuoc-ep-tao.jpg', 'nuoc-ep-tao', '8936000010487', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Ép lạnh từ táo tươi tự nhiên.', 65, 43, 5),
-(69, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Nước cam ép Vinamilk', 20000, 0, '/images/products/nuoc-cam-ep-vinamilk.jpg', 'nuoc-cam-ep-vinamilk', '8936000010494', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Cam tươi mát, nhiều vitamin C.', 60, 43, 31),
-(70, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Sữa tươi tiệt trùng TH có đường', 21000, 0, '/images/products/sua-th-co-duong.jpg', 'sua-th-co-duong', '8936000010500', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Sữa sạch từ trang trại TH.', 75, 44, 5),
-(71, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Sữa đậu nành Fami', 9000, 0, '/images/products/sua-dau-nanh-fami.jpg', 'sua-dau-nanh-fami', '8936000010517', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Sữa thực vật giàu dinh dưỡng.', 85, 44, 33),
-(72, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Bia Heineken lon 330ml', 18000, 0, '/images/products/bia-heineken-330ml.jpg', 'bia-heineken-330ml', '8936000010524', '2025-12-14 14:26:05', 'Hà Lan', 'ml', 'Hương vị bia cao cấp.', 50, 47, 4),
-(73, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Bia Tiger bạc', 16000, 0, '/images/products/bia-tiger-bac.jpg', 'bia-tiger-bac', '8936000010531', '2025-12-14 14:26:05', 'Singapore', 'ml', 'Bia lager vị đậm.', 55, 47, 4),
-(74, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Nước chanh muối Restore', 12000, 0, '/images/products/chanh-muoi-restore.jpg', 'chanh-muoi-restore', '8936000010548', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Giải khát điện giải bù khoáng.', 60, 46, 20),
-(75, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Sữa dâu tiệt trùng TH True Milk', 22000, 0, '/images/products/sua-dau-th-true.jpg', 'sua-dau-th-true', '8936000010555', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Sữa dâu thơm ngon dành cho bé.', 80, 44, 32),
-(76, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Revive chanh muối', 10000, 0, '/images/products/revive-chanh-muoi.jpg', 'revive-chanh-muoi', '8936000010562', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Nước uống thể thao giúp bù khoáng.', 85, 46, 2),
-(77, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Pocari Sweat', 17000, 0, '/images/products/pocari-sweat.jpg', 'pocari-sweat', '8936000010579', '2025-12-14 14:26:05', 'Nhật Bản', 'ml', 'Nước điện giải bổ sung năng lượng.', 50, 46, 35),
-(78, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Oolong Tea Plus', 14000, 0, '/images/products/oolong-tea-plus.jpg', 'oolong-tea-plus', '8936000010586', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Trà ô long vị thanh dịu, ít calo.', 90, 45, 2),
-(79, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Nước khoáng La Vie 500ml', 7000, 0, '/images/products/nuoc-khoang-la-vie.jpg', 'nuoc-khoang-la-vie', '8936000010593', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Nước khoáng thiên nhiên tinh khiết.', 120, 46, 20),
-(80, '2025-06-14 14:26:05.000000', '2025-06-14 14:26:05.000000', NULL, 'Sữa đậu xanh Vinasoy', 9500, 0, '/images/products/sua-dau-xanh-vinasoy.jpg', 'sua-dau-xanh-vinasoy', '8936000010609', '2025-12-14 14:26:05', 'Việt Nam', 'ml', 'Đậm đà hương vị đậu xanh.', 95, 44, 33),
-(81, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Coca-Cola lon 330ml', 12000, 0, '/images/products/coca-cola-330ml.jpg', 'coca-cola-330ml', '8936000020011', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước ngọt có ga vị nguyên bản mát lạnh.', 100, 46, 1),
-(82, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Pepsi lon 330ml', 11000, 0, '/images/products/pepsi-330ml.jpg', 'pepsi-330ml', '8936000020028', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Giải khát sảng khoái, đậm đà hương vị.', 100, 46, 2),
-(83, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Sting dâu 330ml', 10500, 0, '/images/products/sting-dau.jpg', 'sting-dau', '8936000020035', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước tăng lực hương dâu mạnh mẽ.', 90, 46, 21),
-(84, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Mirinda soda kem', 12000, 0, '/images/products/mirinda-soda-kem.jpg', 'mirinda-soda-kem', '8936000020042', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Hương kem sữa ngọt ngào, mát lạnh.', 85, 46, 2),
-(85, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, '7Up không calo', 13000, 0, '/images/products/7up-zero.jpg', '7up-zero', '8936000020059', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước chanh có ga không đường, ít calo.', 75, 46, 2),
-(86, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Number 1 chanh 330ml', 9500, 0, '/images/products/number1-chanh.jpg', 'number1-chanh', '8936000020066', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Tăng lực vị chanh sảng khoái.', 100, 46, 21),
-(87, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Red Bull Thái 250ml', 15000, 0, '/images/products/redbull-thai.jpg', 'redbull-thai', '8936000020073', '2025-12-14 14:28:44', 'Thái Lan', 'ml', 'Tăng lực tức thì, vị ngọt dịu nhẹ.', 80, 46, 20),
-(88, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Revive chanh muối', 11000, 0, '/images/products/revive-chanh-muoi.jpg', 'revive-chanh-muoi', '8936000020080', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước uống thể thao bổ sung khoáng.', 95, 46, 2),
-(89, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Revive hương cam', 11000, 0, '/images/products/revive-cam.jpg', 'revive-cam', '8936000020097', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Hương cam tươi mát cho người năng động.', 85, 46, 2),
-(90, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'La Vie 500ml', 8000, 0, '/images/products/la-vie-500ml.jpg', 'la-vie-500ml', '8936000020103', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước khoáng thiên nhiên tinh khiết.', 120, 46, 20),
-(91, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'La Vie Sparkling', 14000, 0, '/images/products/la-vie-sparkling.jpg', 'la-vie-sparkling', '8936000020110', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước khoáng có ga nhẹ, hương tự nhiên.', 60, 46, 20),
-(92, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Aquafina chai 500ml', 9000, 0, '/images/products/aquafina.jpg', 'aquafina', '8936000020127', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước tinh khiết cho cuộc sống năng động.', 100, 46, 2),
-(93, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'i-on Life 500ml', 9500, 0, '/images/products/ion-life.jpg', 'ion-life', '8936000020134', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước ion kiềm bổ sung điện giải.', 100, 46, 20),
-(94, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Pocari Sweat 330ml', 17000, 0, '/images/products/pocari-sweat.jpg', 'pocari-sweat', '8936000020141', '2025-12-14 14:28:44', 'Nhật Bản', 'ml', 'Nước điện giải giúp hồi phục năng lượng.', 60, 46, 35),
-(95, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Sprite lon 330ml', 12000, 0, '/images/products/sprite-330ml.jpg', 'sprite-330ml', '8936000020158', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Nước chanh có ga, mát lạnh sảng khoái.', 90, 46, 1),
-(96, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Mirinda cam lon 330ml', 11500, 0, '/images/products/mirinda-cam.jpg', 'mirinda-cam', '8936000020165', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Vị cam ngọt mát, đậm đà hương vị.', 95, 46, 2),
-(97, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Nước tăng lực Warrior', 10000, 0, '/images/products/warrior.jpg', 'warrior', '8936000020172', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Tăng lực tức thì cho người trẻ năng động.', 80, 46, 21),
-(98, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Samurai tăng lực dâu 250ml', 9500, 0, '/images/products/samurai-dau.jpg', 'samurai-dau', '8936000020189', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Hương dâu ngọt ngào, tăng sức bền.', 70, 46, 2),
-(99, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'Nước yến ngân nhĩ Wonderfarm', 18000, 0, '/images/products/nuoc-yen-wonderfarm.jpg', 'nuoc-yen-wonderfarm', '8936000020196', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Bồi bổ cơ thể, thanh mát mỗi ngày.', 45, 46, 20),
-(100, '2025-06-14 14:28:44.000000', '2025-06-14 14:28:44.000000', NULL, 'C2 trà chanh 360ml', 10000, 0, '/images/products/c2-tra-chanh.jpg', 'c2-tra-chanh', '8936000020202', '2025-12-14 14:28:44', 'Việt Nam', 'ml', 'Giải nhiệt với trà chanh đậm vị.', 88, 46, 2),
-(101, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Rau muống sạch', 12000, 0, '/images/products/rau-muong.jpg', 'rau-muong', '8936000020219', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Rau muống tươi sạch, không hóa chất.', 60, 10, 6),
-(102, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cải ngọt Đà Lạt', 13000, 0, '/images/products/cai-ngot-da-lat.jpg', 'cai-ngot-da-lat', '8936000020226', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Cải ngọt xanh mướt, giàu vitamin.', 55, 10, 7),
-(103, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cải bó xôi (rau bina)', 17000, 0, '/images/products/cai-bo-xoi.jpg', 'cai-bo-xoi', '8936000020233', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Bổ sung sắt, tốt cho sức khỏe.', 40, 10, 8),
-(104, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Xà lách Romaine', 14000, 0, '/images/products/xa-lach-romaine.jpg', 'xa-lach-romaine', '8936000020240', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Xà lách giòn ngọt, phù hợp salad.', 48, 10, 6),
-(105, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cải thìa tươi', 15000, 0, '/images/products/cai-thia.jpg', 'cai-thia', '8936000020257', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Giàu chất xơ, ít đắng.', 52, 10, 7),
-(106, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cà rốt Đà Lạt', 18000, 0, '/images/products/ca-rot.jpg', 'ca-rot', '8936000020264', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Cà rốt giòn, ngọt tự nhiên.', 70, 11, 6),
-(107, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Củ cải trắng', 15000, 0, '/images/products/cu-cai-trang.jpg', 'cu-cai-trang', '8936000020271', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Thanh nhiệt, tốt cho tiêu hóa.', 60, 11, 7),
-(108, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Khoai lang tím', 22000, 0, '/images/products/khoai-lang-tim.jpg', 'khoai-lang-tim', '8936000020288', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Bổ dưỡng, thơm ngon đặc trưng.', 58, 11, 6),
-(109, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Củ dền đỏ', 17000, 0, '/images/products/cu-den-do.jpg', 'cu-den-do', '8936000020295', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Chống oxy hóa, đẹp da.', 42, 11, 8),
-(110, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Củ năng tươi', 19000, 0, '/images/products/cu-nang.jpg', 'cu-nang', '8936000020301', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Giòn ngọt, dùng nấu chè, canh.', 50, 11, 6),
-(111, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cà chua bi đỏ', 23000, 0, '/images/products/ca-chua-bi.jpg', 'ca-chua-bi', '8936000020318', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Ngọt dịu, thích hợp ăn sống.', 40, 12, 7),
-(112, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Bầu hồ lô non', 18000, 0, '/images/products/bau-ho-lo.jpg', 'bau-ho-lo', '8936000020325', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Bầu ngọt mềm, dùng nấu canh.', 55, 12, 6),
-(113, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Bí đỏ tròn giống Nhật', 22000, 0, '/images/products/bi-do-tron.jpg', 'bi-do-tron', '8936000020332', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Bí ngọt, giàu vitamin A.', 48, 12, 6),
-(114, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Đậu bắp xanh', 16000, 0, '/images/products/dau-bap.jpg', 'dau-bap', '8936000020349', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Giúp tiêu hóa tốt, ăn kèm lẩu.', 60, 12, 7),
-(115, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Mướp hương sạch', 17000, 0, '/images/products/muop-huong.jpg', 'muop-huong', '8936000020356', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Mướp ngọt, mềm, dễ nấu.', 50, 12, 6),
-(116, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Khổ qua (mướp đắng)', 18000, 0, '/images/products/kho-qua.jpg', 'kho-qua', '8936000020363', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Thanh nhiệt, lợi mật.', 38, 12, 8),
-(117, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Cà tím dài', 20000, 0, '/images/products/ca-tim.jpg', 'ca-tim', '8936000020370', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Cà tím mềm, ít hạt, vị dịu nhẹ.', 65, 12, 7),
-(118, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Ớt chuông xanh', 25000, 0, '/images/products/ot-chuong-xanh.jpg', 'ot-chuong-xanh', '8936000020387', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Giàu vitamin C, dùng xào nấu, nướng.', 42, 12, 7),
-(119, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Dưa leo Baby', 21000, 0, '/images/products/dua-leo-baby.jpg', 'dua-leo-baby', '8936000020394', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Dưa nhỏ, giòn, thích hợp ăn sống.', 58, 12, 6),
-(120, '2025-06-14 14:31:21.000000', '2025-06-14 14:31:21.000000', NULL, 'Su su quả', 19000, 0, '/images/products/su-su.jpg', 'su-su', '8936000020400', '2025-06-20 14:31:21', 'Việt Nam', 'g', 'Thanh mát, dễ chế biến.', 54, 12, 8),
-(121, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá ngừ đại dương phi lê', 95000, 0, '/images/products/ca-ngu-phile.jpg', 'ca-ngu-phile', '8936000020417', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Cá ngừ tươi ngon, nhiều dinh dưỡng.', 50, 17, 11),
-(122, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá saba Na Uy cắt lát', 98000, 0, '/images/products/ca-saba.jpg', 'ca-saba', '8936000020424', '2025-12-14 14:33:26', 'Na Uy', 'g', 'Cá béo, thịt chắc, ít tanh.', 45, 17, 12),
-(123, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá hố cắt khúc đông lạnh', 82000, 0, '/images/products/ca-ho.jpg', 'ca-ho', '8936000020431', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt mềm, ít xương, dễ chế biến.', 60, 17, 13),
-(124, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá bống dừa tươi', 60000, 0, '/images/products/ca-bong-dua.jpg', 'ca-bong-dua', '8936000020448', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Ngon kho tiêu, phù hợp bữa cơm Việt.', 40, 18, 11),
-(125, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá rô phi fillet', 75000, 0, '/images/products/ca-ro-phi.jpg', 'ca-ro-phi', '8936000020455', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt trắng, thơm, ít xương.', 55, 18, 12),
-(126, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá lóc đồng nguyên con', 85000, 0, '/images/products/ca-loc-dong.jpg', 'ca-loc-dong', '8936000020462', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Dai ngon, phù hợp nấu canh chua.', 50, 18, 13),
-(127, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Tôm thẻ sống', 135000, 0, '/images/products/tom-the-song.jpg', 'tom-the-song', '8936000020479', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Tôm ngọt thịt, giàu canxi.', 38, 19, 10),
-(128, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Tôm sú đông lạnh', 145000, 0, '/images/products/tom-su-dong-lanh.jpg', 'tom-su-dong-lanh', '8936000020486', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thích hợp nướng, hấp, lẩu.', 42, 19, 11),
-(129, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Tép đồng tươi', 55000, 0, '/images/products/tep-dong.jpg', 'tep-dong', '8936000020493', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Ngon kho quẹt, chiên giòn.', 60, 19, 13),
-(130, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Mực ống nguyên con', 120000, 0, '/images/products/muc-ong.jpg', 'muc-ong', '8936000020509', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Mực dày thịt, vị ngọt tự nhiên.', 35, 20, 12),
-(131, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Mực lá làm sạch', 135000, 0, '/images/products/muc-la.jpg', 'muc-la', '8936000020516', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Nướng, xào hoặc hấp đều ngon.', 30, 20, 13),
-(132, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Bạch tuộc baby', 140000, 0, '/images/products/bach-tuoc-baby.jpg', 'bach-tuoc-baby', '8936000020523', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt dai ngọt, hấp dẫn.', 45, 20, 12),
-(133, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Bạch tuộc to nguyên con', 155000, 0, '/images/products/bach-tuoc-lon.jpg', 'bach-tuoc-lon', '8936000020530', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Phù hợp lẩu hải sản.', 25, 20, 13),
-(134, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cua biển Cà Mau', 185000, 0, '/images/products/cua-bien.jpg', 'cua-bien', '8936000020547', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt chắc, gạch béo.', 20, 21, 10),
-(135, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cua lột đông lạnh', 150000, 0, '/images/products/cua-lot.jpg', 'cua-lot', '8936000020554', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Dễ chế biến, phù hợp chiên giòn.', 30, 21, 11),
-(136, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Ghẹ xanh hấp chín', 170000, 0, '/images/products/ghe-xanh.jpg', 'ghe-xanh', '8936000020561', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Ghẹ thịt chắc, ít nước, ngọt.', 28, 21, 12),
-(137, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Ghẹ sống nguyên con', 180000, 0, '/images/products/ghe-song.jpg', 'ghe-song', '8936000020578', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Ghẹ tươi sống, chế biến đa dạng.', 22, 21, 11),
-(138, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá thu cắt lát đông lạnh', 98000, 0, '/images/products/ca-thu.jpg', 'ca-thu', '8936000020585', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt chắc, phù hợp chiên, sốt cà.', 50, 17, 13),
-(139, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá chép sống', 65000, 0, '/images/products/ca-chep.jpg', 'ca-chep', '8936000020592', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Thịt dai, ngọt, nấu cháo rất ngon.', 60, 18, 10),
-(140, '2025-06-14 14:33:26.000000', '2025-06-14 14:33:26.000000', NULL, 'Cá trê vàng', 69000, 0, '/images/products/ca-tre-vang.jpg', 'ca-tre-vang', '8936000020608', '2025-12-14 14:33:26', 'Việt Nam', 'g', 'Kho nghệ hoặc om chuối đậm đà.', 55, 18, 13),
-(141, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Cá chỉ vàng khô', 75000, 0, '/images/products/ca-chi-vang-kho.jpg', 'ca-chi-vang-kho', '8936000020615', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Phơi nắng tự nhiên, thích hợp nướng.', 45, 23, 13),
-(142, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Mực một nắng', 165000, 0, '/images/products/muc-mot-nang.jpg', 'muc-mot-nang', '8936000020622', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Dày thịt, thơm ngon, nướng tuyệt hảo.', 30, 23, 12),
-(143, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Tôm khô loại 1', 210000, 0, '/images/products/tom-kho.jpg', 'tom-kho', '8936000020639', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Tôm khô màu đẹp, vị ngọt tự nhiên.', 25, 23, 11),
-(144, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Cá bống khô', 68000, 0, '/images/products/ca-bong-kho.jpg', 'ca-bong-kho', '8936000020646', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Kho tiêu hoặc rim mắm đường rất ngon.', 40, 23, 13),
-(145, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Cá cơm khô', 72000, 0, '/images/products/ca-com-kho.jpg', 'ca-com-kho', '8936000020653', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Cá nhỏ, vị ngọt, dùng chiên hoặc rim.', 55, 23, 10),
-(146, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt bò Úc tươi', 180000, 0, '/images/products/thit-bo-uc.jpg', 'thit-bo-uc', '8936000020660', '2025-12-14 14:36:30', 'Úc', 'g', 'Thịt bò mềm, thích hợp nướng hoặc xào.', 30, 24, 14),
-(147, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt heo ba chỉ', 95000, 0, '/images/products/thit-heo-ba-chi.jpg', 'thit-heo-ba-chi', '8936000020677', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Lớp mỡ - nạc xen kẽ, phù hợp kho, nướng.', 55, 24, 16),
-(148, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Sườn non heo', 125000, 0, '/images/products/suon-non-heo.jpg', 'suon-non-heo', '8936000020684', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Sườn mềm, phù hợp nấu canh, nướng BBQ.', 35, 24, 16),
-(149, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt bò xay MEATDeli', 132000, 0, '/images/products/thit-bo-xay.jpg', 'thit-bo-xay', '8936000020691', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Xay mịn, thích hợp làm burger, bò viên.', 40, 24, 16),
-(150, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt nạc vai heo', 89000, 0, '/images/products/thit-nac-vai.jpg', 'thit-nac-vai', '8936000020707', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Nhiều thịt, ít mỡ, dễ chế biến.', 60, 24, 14),
-(151, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt gà ta nguyên con', 135000, 0, '/images/products/ga-ta-nguyen-con.jpg', 'ga-ta-nguyen-con', '8936000020714', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Gà thịt chắc, thơm, thích hợp luộc.', 30, 25, 16),
-(152, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Ức gà phi lê', 85000, 0, '/images/products/uc-ga-phile.jpg', 'uc-ga-phile', '8936000020721', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Ít mỡ, nhiều đạm, hợp ăn kiêng.', 70, 25, 15),
-(153, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Đùi gà công nghiệp', 67000, 0, '/images/products/dui-ga.jpg', 'dui-ga', '8936000020738', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Giá rẻ, dễ chế biến.', 90, 25, 15),
-(154, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Cánh gà giữa', 72000, 0, '/images/products/canh-ga-giua.jpg', 'canh-ga-giua', '8936000020745', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Chiên giòn hoặc sốt cay đều ngon.', 45, 25, 15),
-(155, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Gà ta làm sẵn nguyên con', 140000, 0, '/images/products/ga-ta-lam-san.jpg', 'ga-ta-lam-san', '8936000020752', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Tiện lợi, làm sạch, giữ hương vị tự nhiên.', 25, 25, 14),
-(156, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt vịt nguyên con', 95000, 0, '/images/products/thit-vit.jpg', 'thit-vit', '8936000020769', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Thịt mềm, thơm, hợp làm bún măng vịt.', 38, 25, 14),
-(157, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Vịt quay nguyên con', 185000, 0, '/images/products/vit-quay.jpg', 'vit-quay', '8936000020776', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Vỏ giòn, thịt mềm, đậm vị gia vị truyền thống.', 20, 25, 14),
-(158, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt đùi gà CP', 71000, 0, '/images/products/thit-dui-ga.jpg', 'thit-dui-ga', '8936000020783', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Thịt mềm, dễ tẩm ướp và chế biến.', 65, 25, 15),
-(159, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Chân gà rút xương', 68000, 0, '/images/products/chan-ga-rut-xuong.jpg', 'chan-ga-rut-xuong', '8936000020790', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Phù hợp món ngâm sả tắc hoặc sốt cay.', 50, 25, 14),
-(160, '2025-06-14 14:36:30.000000', '2025-06-14 14:36:30.000000', NULL, 'Thịt cổ gà lọc xương', 60000, 0, '/images/products/co-ga.jpg', 'co-ga', '8936000020806', '2025-12-14 14:36:30', 'Việt Nam', 'g', 'Ngon khi nướng hoặc chiên giòn.', 40, 25, 14);
+INSERT INTO `product` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `price`, `discount`, `images`, `slug`, `barcode`, `expiry_date`, `origin`, `weight_unit`, `description`, `quantity`, `purchase`, `category_id`, `brand_id`) VALUES
+(1, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Rau củ hữu cơ', 50000, 10, 'client/images/product-1.png', 'rau-cu-huu-co', '1234567890123', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Rau củ hữu cơ tươi ngon, an toàn.', 100, 30000, 2, 5),
+(2, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Thịt bò tươi', 250000, 5, 'client/images/product-2.png', 'thit-bo-tuoi', '2345678901234', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Thịt bò tươi, giàu dinh dưỡng.', 50, 200000, 3, 1),
+(3, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Xúc xích C.P.', 45000, 15, 'client/images/product-3.png', 'xuc-xich-cp', '3456789012345', '2026-12-31 00:00:00', 'Thái Lan', 'g', 'Xúc xích thơm ngon, dễ chế biến.', 200, 35000, 2, 2),
+(4, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Giò chả Vissan', 75000, 10, 'client/images/product-4.png', 'gio-cha-vissan', '4567890123456', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Giò chả tươi ngon, chất lượng cao.', 150, 60000, 2, 3),
+(5, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh mì sandwich', 20000, 5, 'client/images/product-5.png', 'banh-mi-sandwich', '5678901234567', '2026-08-20 00:00:00', 'Việt Nam', 'g', 'Bánh mì sandwich mềm mịn, thích hợp ăn sáng.', 300, 15000, 2, 1),
+(6, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Phô mai mozzarella', 150000, 20, 'client/images/product-6.png', 'pho-mai-mozzarella', '6789012345678', '2026-08-20 00:00:00', 'New Zealand', 'kg', 'Phô mai mozzarella thơm ngon, dễ chế biến.', 75, 120000, 7, 4),
+(7, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa tươi Vinamilk', 35000, 5, 'client/images/product-7.png', 'sua-tuoi-vinamilk', '7890123456789', '2026-08-20 00:00:00', 'Việt Nam', 'l', 'Sữa tươi Vinamilk, bổ dưỡng, thích hợp cho mọi lứa tuổi.', 500, 30000, 7, 5),
+(8, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh ngọt Kinh Đô', 25000, 10, 'client/images/product-8.png', 'banh-ngot-kinh-do', '8901234567890', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Bánh ngọt Kinh Đô, ngọt ngào và thơm ngon.', 150, 20000, 8, 6),
+(9, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Kẹo dẻo Haribo', 35000, 15, 'client/images/product-9.png', 'keo-deo-haribo', '9012345678901', '2026-12-31 00:00:00', 'Đức', 'g', 'Kẹo dẻo Haribo với nhiều hương vị hấp dẫn.', 250, 30000, 8, 7),
+(10, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Cà phê hòa tan Nestle', 60000, 10, 'client/images/product-10.png', 'ca-phe-hoa-tan-nestle', '0123456789012', '2026-12-31 00:00:00', 'Thụy Sĩ', 'g', 'Cà phê hòa tan Nestle, thơm ngon, dễ pha chế.', 200, 50000, 6, 8),
+(11, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa đặc có đường', 25000, 5, 'client/images/product-11.png', 'sua-dac-co-duong', '1234567890111', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Sữa đặc có đường, thích hợp cho pha chế.', 400, 20000, 7, 5),
+(12, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh quy Oreo', 35000, 10, 'client/images/product-12.png', 'banh-quy-oreo', '2345678900122', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Bánh quy Oreo thơm ngon, ngọt ngào.', 250, 30000, 8, 6),
+(13, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Trà Lipton', 20000, 5, 'client/images/product-13.png', 'tra-lipton', '3456789010123', '2026-08-20 00:00:00', 'Anh', 'g', 'Trà Lipton đậm đà, dễ uống.', 300, 15000, 6, 7),
+(14, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mì ăn liền Vifon', 12000, 10, 'client/images/product-14.png', 'mi-an-lien-vifon', '4567890120134', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Mì ăn liền Vifon, tiện lợi và nhanh chóng.', 500, 10000, 2, 1),
+(15, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Chè đậu xanh', 30000, 5, 'client/images/product-15.png', 'che-dau-xanh', '5678901230145', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Chè đậu xanh thơm ngon, mát lành.', 200, 25000, 9, 10),
+(16, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh chả chay', 40000, 10, 'client/images/product-16.png', 'banh-cha-chay', '6789012340146', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Bánh chả chay thơm ngon, hấp dẫn.', 150, 35000, 9, 10),
+(17, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Đa Cua Hải Phòng', 70000, 15, 'client/images/product-17.png', 'banh-da-cua-hai-phong', '7890123450147', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Bánh Đa Cua Hải Phòng đặc sản nổi tiếng.', 100, 50000, 10, 11),
+(18, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mắm Tôm', 25000, 5, 'client/images/product-18.png', 'mam-tom', '8901234560148', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Mắm Tôm đặc sản, gia vị tuyệt vời cho các món ăn.', 150, 20000, 10, 12),
+(19, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sò huyết', 100000, 5, 'client/images/product-19.png', 'so-huyet', '9012345670149', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Sò huyết tươi, ngon và giàu dinh dưỡng.', 50, 90000, 10, 12),
+(20, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Trái cây nhập khẩu', 150000, 10, 'client/images/product-20.png', 'trai-cay-nhap-khau', '0123456780150', '2026-08-20 00:00:00', 'Châu Âu', 'kg', 'Trái cây nhập khẩu, tươi ngon và chất lượng.', 120, 130000, 1, 5),
+(21, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vissan Pork', 200000, 5, 'client/images/product-11.png', 'vissan-pork', '1234567890011', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Thịt heo tươi Vissan, ngon và sạch.', 150, 180000, 2, 11),
+(22, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Organic Honey', 250000, 5, 'client/images/product-22.png', 'organic-honey', '1234567890022', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Mật ong hữu cơ, nguyên chất, an toàn cho sức khỏe.', 100, 230000, 5, 3),
+(23, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nestle Chocolate', 35000, 10, 'client/images/product-23.png', 'nestle-chocolate', '1234567890023', '2026-12-31 00:00:00', 'Thụy Sĩ', 'g', 'Sô cô la Nestle, ngọt ngào và thơm ngon.', 200, 32000, 8, 12),
+(24, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Herbalife Protein', 400000, 10, 'client/images/product-24.png', 'herbalife-protein', '1234567890024', '2026-08-20 00:00:00', 'Mỹ', 'kg', 'Bột protein Herbalife, hỗ trợ tăng cơ và giảm cân.', 150, 370000, 4, 14),
+(25, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sữa Vinamilk', 70000, 5, 'client/images/product-25.png', 'sua-vinamilk', '1234567890025', '2026-08-20 00:00:00', 'Việt Nam', 'l', 'Sữa Vinamilk tươi, bổ dưỡng, dành cho mọi lứa tuổi.', 300, 65000, 5, 16),
+(26, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Pepsi Cola', 15000, 10, 'client/images/product-26.png', 'pepsi-cola', '1234567890026', '2026-12-31 00:00:00', 'USA', 'l', 'Nước ngọt Pepsi Cola, giải khát tuyệt vời.', 500, 14000, 6, 17),
+(27, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tân Hiệp Phát Tea', 25000, 5, 'client/images/product-27.png', 'tan-hiep-phat-tea', '1234567890027', '2026-12-31 00:00:00', 'Việt Nam', 'l', 'Trà Tân Hiệp Phát, thơm ngon, thanh mát.', 400, 22000, 6, 18),
+(28, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Oreo Cookies', 35000, 10, 'client/images/product-28.png', 'oreo-cookies', '1234567890028', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Bánh quy Oreo, ngọt ngào, dễ ăn.', 250, 32000, 8, 21),
+(29, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mars Chocolate', 50000, 5, 'client/images/product-29.png', 'mars-chocolate', '1234567890029', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Sô cô la Mars, thơm ngon và bổ dưỡng.', 300, 45000, 8, 22),
+(30, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fruits & Veggies Fresh', 150000, 5, 'client/images/product-30.png', 'fruits-veg-fresh', '1234567890030', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Trái cây và rau củ tươi, giàu vitamin và dinh dưỡng.', 150, 140000, 9, 24),
+(31, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Knorr Soup', 50000, 10, 'client/images/product-31.png', 'knorr-soup', '1234567890031', '2026-12-31 00:00:00', 'Ấn Độ', 'g', 'Súp Knorr, tiện lợi và bổ dưỡng.', 200, 45000, 3, 31),
+(32, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Hải Hà Salted Fish', 150000, 5, 'client/images/product-32.png', 'hai-ha-salted-fish', '1234567890032', '2026-12-31 00:00:00', 'Việt Nam', 'kg', 'Cá biển Hải Hà, tươi ngon, đặc sản nổi tiếng.', 100, 140000, 3, 32),
+(33, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Blackmores Vitamins', 350000, 10, 'client/images/product-33.png', 'blackmores-vitamins', '1234567890033', '2026-12-31 00:00:00', 'Úc', 'g', 'Viên uống Blackmores, bổ sung vitamin và khoáng chất.', 150, 320000, 4, 33),
+(34, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Amway Supplements', 600000, 5, 'client/images/product-34.png', 'amway-supplements', '1234567890034', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Thực phẩm bổ sung Amway, hỗ trợ tăng cường sức khỏe.', 100, 570000, 4, 34),
+(35, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Organic Valley Milk', 70000, 10, 'client/images/product-35.png', 'organic-valley-milk', '1234567890035', '2026-08-20 00:00:00', 'Mỹ', 'l', 'Sữa hữu cơ Organic Valley, chất lượng tuyệt vời.', 300, 65000, 5, 35),
+(36, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nature\'s Path Organic', 60000, 5, 'client/images/product-36.png', 'natures-path-organic', '1234567890036', '2026-08-20 00:00:00', 'Mỹ', 'kg', 'Sản phẩm hữu cơ Nature\'s Path, tốt cho sức khỏe.', 150, 57000, 5, 36),
+(37, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Suntory Water', 15000, 5, 'client/images/product-37.png', 'suntory-water', '1234567890037', '2026-12-31 00:00:00', 'Nhật Bản', 'l', 'Nước giải khát Suntory, thanh mát và bổ dưỡng.', 500, 14000, 6, 37),
+(38, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fanta Soft Drink', 18000, 10, 'client/images/product-38.png', 'fanta-soft-drink', '1234567890038', '2026-12-31 00:00:00', 'USA', 'l', 'Nước ngọt Fanta, ngọt ngào và giải khát.', 400, 16000, 6, 38),
+(39, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Juice', 35000, 5, 'client/images/product-39.png', 'tetra-pak-juice', '1234567890039', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép Tetra Pak, tươi ngon và bổ dưỡng.', 300, 32000, 7, 39),
+(40, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Yomilk Yogurt', 25000, 10, 'client/images/product-40.png', 'yomilk-yogurt', '1234567890040', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Sữa chua Yomilk, ngon và giàu dinh dưỡng.', 300, 22000, 7, 40),
+(41, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Pía', 45000, 5, 'client/images/product-41.png', 'banh-pia', '1234567890041', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Bánh Pía thơm ngon, đặc sản nổi tiếng của Sóc Trăng.', 200, 40000, 8, 41),
+(42, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Glico Biscuits', 25000, 10, 'client/images/product-42.png', 'glico-biscuits', '1234567890042', '2026-12-31 00:00:00', 'Nhật Bản', 'g', 'Bánh quy Glico, giòn tan, ngọt ngào và thơm ngon.', 300, 22000, 8, 42),
+(43, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vegemite Spread', 150000, 10, 'client/images/product-43.png', 'vegemite-spread', '1234567890043', '2026-12-31 00:00:00', 'Úc', 'g', 'Mứt Vegemite đặc trưng của Úc, đậm đà hương vị.', 100, 140000, 9, 43),
+(44, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Lao Dao Rice', 22000, 5, 'client/images/product-44.png', 'lao-dao-rice', '1234567890044', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Gạo Lao Dao, chất lượng cao, thích hợp cho gia đình.', 500, 20000, 9, 44),
+(45, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Bánh Đa Cua Quảng Ninh', 85000, 10, 'client/images/product-45.png', 'banh-da-cua-quang-ninh', '1234567890045', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Bánh đa cua Quảng Ninh, món ăn đặc sản của miền Bắc.', 150, 80000, 10, 45),
+(46, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sản phẩm đặc sản Phú Quốc', 120000, 5, 'client/images/product-46.png', 'dac-san-phu-quoc', '1234567890046', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Sản phẩm đặc sản Phú Quốc, chất lượng tuyệt vời, giá trị dinh dưỡng cao.', 200, 110000, 10, 46),
+(47, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sagrifood Snacks', 30000, 5, 'client/images/product-47.png', 'sagrifood-snacks', '1234567890047', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Snack Sagrifood, giòn rụm, ngon miệng.', 400, 27000, 1, 47),
+(48, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fami Cereal', 25000, 10, 'client/images/product-48.png', 'fami-cereal', '1234567890048', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Ngũ cốc Fami, giàu dinh dưỡng, tốt cho bữa sáng.', 350, 23000, 1, 48),
+(49, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Jelly Belly Candies', 70000, 10, 'client/images/product-49.png', 'jelly-belly-candies', '1234567890049', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Kẹo Jelly Belly, nhiều hương vị ngon miệng.', 200, 65000, 2, 49),
+(50, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Hormel Bacon', 150000, 10, 'client/images/product-50.png', 'hormel-bacon', '1234567890050', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Thịt xông khói Hormel, thơm ngon và giàu hương vị.', 150, 140000, 2, 50),
+(51, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Guilin Instant Noodles', 25000, 5, 'client/images/product-51.png', 'guilin-instant-noodles', '1234567890051', '2026-12-31 00:00:00', 'Trung Quốc', 'g', 'Mì ăn liền Guilin, thơm ngon và tiện lợi.', 350, 22000, 3, 51),
+(52, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Haitian Sauces', 120000, 10, 'client/images/product-52.png', 'haitian-sauces', '1234567890052', '2026-12-31 00:00:00', 'Trung Quốc', 'g', 'Gia vị Haitian, đậm đà hương vị cho các món ăn.', 200, 110000, 3, 52),
+(53, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Life Space Probiotics', 450000, 10, 'client/images/product-53.png', 'life-space-probiotics', '1234567890053', '2026-08-20 00:00:00', 'Úc', 'g', 'Viên uống Life Space, hỗ trợ tiêu hóa và sức khỏe hệ miễn dịch.', 100, 400000, 4, 53),
+(54, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Swisse Supplements', 500000, 15, 'client/images/product-54.png', 'swisse-supplements', '1234567890054', '2026-12-31 00:00:00', 'Úc', 'g', 'Thực phẩm bổ sung Swisse, hỗ trợ tăng cường sức khỏe.', 150, 470000, 4, 54),
+(55, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nature\'s Way Vitamins', 300000, 5, 'client/images/product-55.png', 'natures-way-vitamins', '1234567890055', '2026-12-31 00:00:00', 'Úc', 'g', 'Vitamin Nature\'s Way, bổ sung dinh dưỡng cho cơ thể.', 200, 285000, 5, 55),
+(56, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Kirkland Signature', 65000, 5, 'client/images/product-56.png', 'kirkland-signature', '1234567890056', '2026-08-20 00:00:00', 'Mỹ', 'kg', 'Sản phẩm Kirkland Signature, chất lượng cao, giá trị tuyệt vời.', 300, 62000, 5, 56),
+(57, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Suntory Green Tea', 22000, 5, 'client/images/product-57.png', 'suntory-green-tea', '1234567890057', '2026-08-20 00:00:00', 'Nhật Bản', 'l', 'Trà xanh Suntory, thanh mát và giải khát.', 500, 20000, 6, 37),
+(58, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fanta Orange', 15000, 5, 'client/images/product-58.png', 'fanta-orange', '1234567890058', '2026-12-31 00:00:00', 'USA', 'l', 'Nước ngọt Fanta, hương vị cam tươi ngon, mát lạnh.', 600, 14000, 6, 38),
+(59, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Tomato Juice', 35000, 10, 'client/images/product-59.png', 'tetra-pak-tomato-juice', '1234567890059', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép cà chua Tetra Pak, giàu vitamin và dinh dưỡng.', 300, 32000, 7, 39),
+(60, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Yomilk Yogurt Drink', 25000, 10, 'client/images/product-60.png', 'yomilk-yogurt-drink', '1234567890060', '2026-08-20 00:00:00', 'Việt Nam', 'l', 'Sữa chua Yomilk dạng uống, ngon và giàu dinh dưỡng.', 350, 22000, 7, 40),
+(61, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Ocean Spray Cranberry Juice', 35000, 5, 'client/images/product-61.png', 'ocean-spray-cranberry-juice', '1234567890061', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ép nam việt quất Ocean Spray, tốt cho sức khỏe.', 300, 32000, 7, 1),
+(62, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Lipton Green Tea', 25000, 5, 'client/images/product-62.png', 'lipton-green-tea', '1234567890062', '2026-12-31 00:00:00', 'Anh', 'g', 'Trà xanh Lipton, thanh mát và dễ uống.', 400, 23000, 6, 2),
+(63, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Knorr Seasoning', 18000, 5, 'client/images/product-63.png', 'knorr-seasoning', '1234567890063', '2026-12-31 00:00:00', 'Ấn Độ', 'g', 'Gia vị Knorr, thêm hương vị cho các món ăn của bạn.', 500, 15000, 3, 3),
+(64, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vita Coco Coconut Water', 50000, 10, 'client/images/product-64.png', 'vita-coco-coconut-water', '1234567890064', '2026-12-31 00:00:00', 'Thái Lan', 'l', 'Nước dừa Vita Coco, giải khát và bổ sung năng lượng.', 250, 45000, 7, 4),
+(65, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Amway Nutrilite', 600000, 10, 'client/images/product-65.png', 'amway-nutrilite', '1234567890065', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Viên uống Nutrilite của Amway, hỗ trợ tăng cường sức khỏe.', 100, 550000, 4, 5),
+(66, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Suntory Pepsi', 15000, 10, 'client/images/product-66.png', 'suntory-pepsi', '1234567890066', '2026-12-31 00:00:00', 'Nhật Bản', 'l', 'Nước ngọt Suntory Pepsi, ngọt ngào và giải khát.', 500, 13000, 6, 6),
+(67, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Glico Pocky', 30000, 5, 'client/images/product-67.png', 'glico-pocky', '1234567890067', '2026-12-31 00:00:00', 'Nhật Bản', 'g', 'Bánh quy Pocky Glico, thơm ngon, dễ ăn.', 400, 27000, 8, 7),
+(68, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Annam Gourmet Foods', 150000, 10, 'client/images/product-68.png', 'annam-gourmet-foods', '1234567890068', '2026-12-31 00:00:00', 'Việt Nam', 'kg', 'Các sản phẩm Annam Gourmet, chất lượng cao, nhập khẩu.', 150, 130000, 9, 8),
+(69, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fruits & Veggies Fresh', 130000, 5, 'client/images/product-69.png', 'fruits-veg-fresh', '1234567890069', '2026-08-31 00:00:00', 'Việt Nam', 'kg', 'Trái cây và rau củ tươi, giàu vitamin và dinh dưỡng.', 200, 120000, 9, 9),
+(70, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Dried Fruits', 90000, 10, 'client/images/product-70.png', 'dried-fruits', '1234567890070', '2026-08-20 00:00:00', 'Việt Nam', 'kg', 'Trái cây sấy khô, bảo quản lâu dài, dễ dàng sử dụng.', 150, 85000, 9, 10),
+(71, '2025-08-01 18:00:00.000000', '2025-08-01 18:00:00.000000', NULL, 'Thịt bò tươi', 150000, 10, 'client/images/product-71.png', 'thit-bo-tuoi', '12345678901244gd', '2026-12-31 00:00:00', 'Việt Nam', 'kg', 'Thịt bò tươi ngon, giàu dinh dưỡng.', 100, 120000, 2, 1),
+(72, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'M&M\'s Chocolate', 35000, 5, 'client/images/product-71.png', 'mms-chocolate', '1234567890071', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Sô cô la M&M\'s, ngọt ngào, nhiều hương vị.', 300, 32000, 8, 1),
+(73, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Coca-Cola Zero', 20000, 10, 'client/images/product-72.png', 'coca-cola-zero', '1234567890072', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Coca-Cola Zero, không đường, giải khát tuyệt vời.', 500, 18000, 6, 2),
+(74, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Annam Rice', 30000, 5, 'client/images/product-73.png', 'annam-rice', '1234567890073', '2026-12-31 00:00:00', 'Việt Nam', 'kg', 'Gạo Annam, chất lượng cao, phù hợp cho mọi bữa ăn.', 500, 28000, 9, 3),
+(75, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Oreo Biscuits', 35000, 10, 'client/images/product-74.png', 'oreo-biscuits', '1234567890074', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Bánh quy Oreo, giòn, ngọt ngào, nhiều hương vị.', 250, 32000, 8, 4),
+(76, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nestle Coffee', 150000, 10, 'client/images/product-75.png', 'nestle-coffee', '1234567890075', '2026-12-31 00:00:00', 'Thụy Sĩ', 'g', 'Cà phê Nestle, đậm đà, thức uống lý tưởng cho buổi sáng.', 300, 130000, 6, 5),
+(77, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Suntory Fanta', 22000, 5, 'client/images/product-76.png', 'suntory-fanta', '1234567890076', '2026-12-31 00:00:00', 'Nhật Bản', 'l', 'Nước ngọt Fanta Suntory, hương vị thơm ngon, giải khát.', 400, 20000, 6, 6),
+(78, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vega Tea', 25000, 5, 'client/images/product-77.png', 'vega-tea', '1234567890077', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Trà xanh Vega, thanh mát, giải nhiệt ngày hè.', 300, 23000, 7, 7),
+(79, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Dutch Lady Milk', 45000, 10, 'client/images/product-78.png', 'dutch-lady-milk', '1234567890078', '2026-08-20 00:00:00', 'Hà Lan', 'l', 'Sữa Dutch Lady, bổ dưỡng, thích hợp cho trẻ em.', 250, 42000, 7, 8),
+(80, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vissan Sausage', 120000, 5, 'client/images/product-79.png', 'vissan-sausage', '1234567890079', '2026-12-31 00:00:00', 'Việt Nam', 'g', 'Lạp xưởng Vissan, chất lượng cao, thơm ngon.', 300, 110000, 2, 9),
+(81, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Orange Juice', 25000, 5, 'client/images/product-80.png', 'tetra-pak-orange-juice', '1234567890080', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép cam Tetra Pak, tươi ngon và bổ dưỡng.', 350, 23000, 7, 10),
+(83, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'M&M\'s Chocolate', 35000, 5, 'client/images/product-81.png', 'mms-chocolate', '9876543210981', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Sô cô la M&M\'s, ngọt ngào, nhiều hương vị.', 300, 32000, 8, 1),
+(84, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Coca-Cola Zero', 20000, 10, 'client/images/product-82.png', 'coca-cola-zero', '9876543210982', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Coca-Cola Zero, không đường, giải khát tuyệt vời.', 500, 18000, 6, 2),
+(85, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Cadbury Chocolate', 45000, 10, 'client/images/product-83.png', 'cadbury-chocolate', '9876543210983', '2026-12-31 00:00:00', 'Anh', 'g', 'Sô cô la Cadbury, ngọt ngào và thơm ngon.', 300, 40000, 8, 3),
+(86, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Sapporo Beer', 100000, 5, 'client/images/product-84.png', 'sapporo-beer', '9876543210984', '2026-12-31 00:00:00', 'Nhật Bản', 'l', 'Bia Sapporo, thơm ngon, đậm đà.', 200, 95000, 6, 4),
+(87, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tropicana Juice', 35000, 5, 'client/images/product-85.png', 'tropicana-juice', '9876543210985', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ép trái cây Tropicana, tươi ngon và bổ dưỡng.', 400, 32000, 7, 5),
+(88, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Coca-Cola Original', 20000, 5, 'client/images/product-86.png', 'coca-cola-original', '9876543210986', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Coca-Cola, hương vị đặc trưng của thương hiệu.', 500, 18000, 6, 6),
+(89, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Danone Yogurt', 25000, 5, 'client/images/product-87.png', 'danone-yogurt', '9876543210987', '2026-12-31 00:00:00', 'Pháp', 'kg', 'Sữa chua Danone, mềm mịn và ngon miệng.', 300, 22000, 7, 7),
+(90, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Mars Chocolate', 50000, 10, 'client/images/product-88.png', 'mars-chocolate', '9876543210988', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Sô cô la Mars, thơm ngon và bổ dưỡng.', 300, 45000, 8, 8),
+(91, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Pepsi Cola', 15000, 10, 'client/images/product-89.png', 'pepsi-cola', '9876543210989', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Pepsi Cola, thơm ngon, giải khát.', 500, 13000, 6, 9),
+(92, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Fanta Orange', 18000, 5, 'client/images/product-90.png', 'fanta-orange', '9876543210990', '2026-12-31 00:00:00', 'USA', 'l', 'Nước ngọt Fanta hương cam, tươi mát và bổ dưỡng.', 500, 16000, 6, 10),
+(93, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Orange Juice', 25000, 5, 'client/images/product-91.png', 'tetra-pak-orange-juice', '9876543210991', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép cam Tetra Pak, tươi ngon và bổ dưỡng.', 350, 23000, 7, 1),
+(94, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Tomato Juice', 35000, 10, 'client/images/product-92.png', 'tetra-pak-tomato-juice', '9876543210992', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép cà chua Tetra Pak, bổ dưỡng và tốt cho sức khỏe.', 400, 32000, 7, 2),
+(95, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nestle Milk', 70000, 5, 'client/images/product-93.png', 'nestle-milk', '9876543210993', '2026-12-31 00:00:00', 'Thụy Sĩ', 'l', 'Sữa Nestle, bổ dưỡng cho mọi gia đình.', 300, 67000, 7, 3),
+(96, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Vega Rice', 25000, 5, 'client/images/product-94.png', 'vega-rice', '9876543210994', '2026-12-31 00:00:00', 'Việt Nam', 'kg', 'Gạo Vega, chất lượng cao, giá hợp lý.', 400, 23000, 9, 4),
+(97, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Coca-Cola Cherry', 30000, 5, 'client/images/product-95.png', 'coca-cola-cherry', '9876543210995', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Coca-Cola hương cherry, ngon tuyệt vời.', 500, 28000, 6, 5),
+(98, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Lays Chips', 25000, 5, 'client/images/product-96.png', 'lays-chips', '9876543210996', '2026-12-31 00:00:00', 'Mỹ', 'g', 'Bánh snack Lays, giòn tan, nhiều hương vị.', 300, 23000, 8, 6),
+(99, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Pepsi Max', 22000, 10, 'client/images/product-97.png', 'pepsi-max', '9876543210997', '2026-12-31 00:00:00', 'Mỹ', 'l', 'Nước ngọt Pepsi Max, ít calo, giải khát tuyệt vời.', 400, 20000, 6, 7),
+(100, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Red Bull Sugarfree', 30000, 10, 'client/images/product-98.png', 'red-bull-sugarfree', '9876543210998', '2026-12-31 00:00:00', 'Áo', 'l', 'Nước tăng lực Red Bull không đường, giúp tăng cường năng lượng.', 500, 28000, 6, 8),
+(101, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nestle Milo', 45000, 5, 'client/images/product-99.png', 'nestle-milo', '9876543210999', '2026-12-31 00:00:00', 'Úc', 'g', 'Sữa Milo Nestle, bổ dưỡng và giàu năng lượng.', 300, 42000, 7, 9),
+(102, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Tetra Pak Apple Juice', 30000, 5, 'client/images/product-100.png', 'tetra-pak-apple-juice', '9876543210100', '2026-12-31 00:00:00', 'Thụy Điển', 'l', 'Nước ép táo Tetra Pak, tươi ngon và bổ dưỡng.', 400, 28000, 7, 10);
 
 -- --------------------------------------------------------
 
@@ -540,10 +434,9 @@ INSERT INTO `product` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `pri
 CREATE TABLE `product_images` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `image_url` varchar(255) NOT NULL,
-  `image_main` varchar(255) NOT NULL,
   `productId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -556,13 +449,242 @@ CREATE TABLE `product_images` (
 CREATE TABLE `product_variant` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `variant_name` varchar(255) NOT NULL,
   `price_modifier` int(11) NOT NULL,
   `stock` int(11) NOT NULL,
-  `productId` int(11) DEFAULT NULL
+  `product_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `product_variant`
+--
+
+INSERT INTO `product_variant` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `variant_name`, `price_modifier`, `stock`, `product_id`) VALUES
+(31, '2025-06-30 23:05:33.331959', '2025-07-01 23:58:05.524583', NULL, '330ml', 0, 100, 1),
+(32, '2025-06-30 23:05:33.331959', '2025-07-01 23:58:35.278357', NULL, '500ml', 500, 50, 1),
+(33, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 2),
+(34, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 1L', 1000, 70, 2),
+(35, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 330ml', 0, 100, 3),
+(36, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 3),
+(37, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 330ml', 0, 100, 4),
+(38, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 4),
+(39, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 50000, 100, 5),
+(40, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 100000, 50, 5),
+(41, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 70000, 150, 6),
+(42, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 140000, 100, 6),
+(43, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 45000, 200, 7),
+(44, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 90000, 150, 7),
+(45, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 60000, 180, 8),
+(46, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 120000, 120, 8),
+(47, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 500g', 30000, 200, 9),
+(48, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 1kg', 60000, 150, 9),
+(49, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 500g', 20000, 250, 10),
+(50, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 10),
+(51, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 11),
+(52, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 1L', 1000, 70, 11),
+(53, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 330ml', 0, 100, 12),
+(54, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 12),
+(55, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 330ml', 0, 100, 13),
+(56, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 13),
+(57, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 330ml', 0, 100, 14),
+(58, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Loại 500ml', 500, 50, 14),
+(59, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 50000, 100, 15),
+(60, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 100000, 50, 15),
+(61, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 70000, 150, 16),
+(62, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 140000, 100, 16),
+(63, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 45000, 200, 17),
+(64, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 90000, 150, 17),
+(65, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '500g', 60000, 180, 18),
+(66, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, '1kg', 120000, 120, 18),
+(67, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 500g', 30000, 200, 19),
+(68, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 1kg', 60000, 150, 19),
+(69, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 500g', 20000, 250, 20),
+(70, '2025-07-18 10:20:14.000000', '2025-07-18 10:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 20),
+(71, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 50000, 100, 25),
+(72, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 100000, 50, 25),
+(73, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 70000, 150, 26),
+(74, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 140000, 100, 26),
+(75, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 45000, 200, 27),
+(76, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 90000, 150, 27),
+(77, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 60000, 180, 28),
+(78, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 120000, 120, 28),
+(79, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 30000, 200, 29),
+(80, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 60000, 150, 29),
+(81, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 20000, 250, 30),
+(82, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 30),
+(83, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 31),
+(84, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 31),
+(85, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 32),
+(86, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 32),
+(87, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 33),
+(88, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 33),
+(89, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 34),
+(90, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 34),
+(91, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 35),
+(92, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 35),
+(93, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 45000, 200, 36),
+(94, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 90000, 150, 36),
+(95, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 60000, 180, 37),
+(96, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 120000, 100, 37),
+(97, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 70000, 150, 38),
+(98, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 140000, 80, 38),
+(99, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 80000, 200, 39),
+(100, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 160000, 120, 39),
+(101, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 65000, 180, 40),
+(102, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 130000, 100, 40),
+(103, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 25000, 200, 41),
+(104, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 50000, 150, 41),
+(105, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 20000, 250, 42),
+(106, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 42),
+(107, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 15000, 300, 43),
+(108, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 30000, 200, 43),
+(109, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 25000, 200, 41),
+(110, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 50000, 150, 41),
+(111, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 20000, 250, 42),
+(112, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 42),
+(113, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 15000, 300, 43),
+(114, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 30000, 200, 43),
+(115, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 18000, 250, 44),
+(116, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 36000, 200, 44),
+(117, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 45),
+(118, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 45),
+(119, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 46),
+(120, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 46),
+(121, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 47),
+(122, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 47),
+(123, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 48),
+(124, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 48),
+(125, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 45000, 200, 49),
+(126, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 90000, 150, 49),
+(127, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 70000, 150, 50),
+(128, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 140000, 100, 50),
+(129, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 50000, 200, 51),
+(130, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 100000, 150, 51),
+(131, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 60000, 180, 52),
+(132, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 120000, 120, 52),
+(133, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '500g', 65000, 180, 53),
+(134, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, '1kg', 130000, 100, 53),
+(135, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 500g', 18000, 250, 54),
+(136, '2025-07-31 18:20:14.000000', '2025-07-31 18:20:14.000000', NULL, 'Gói 1kg', 36000, 200, 54),
+(137, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 55),
+(138, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 55),
+(139, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 56),
+(140, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 56),
+(141, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 57),
+(142, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 57),
+(143, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 58),
+(144, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 58),
+(145, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 0, 100, 59),
+(146, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 500, 50, 59),
+(147, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '500g', 60000, 150, 60),
+(148, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '1kg', 120000, 100, 60),
+(149, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '500g', 55000, 200, 61),
+(150, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '1kg', 110000, 150, 61),
+(151, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '500g', 70000, 180, 62),
+(152, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '1kg', 140000, 120, 62),
+(153, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '500g', 75000, 150, 63),
+(154, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '1kg', 150000, 100, 63),
+(155, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '500g', 85000, 120, 64),
+(156, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, '1kg', 170000, 80, 64),
+(157, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Gói 500g', 20000, 250, 65),
+(158, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Gói 1kg', 40000, 150, 65),
+(159, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200ml', 8000, 150, 66),
+(160, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 10000, 100, 66),
+(161, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 30000, 50, 66),
+(162, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200ml', 9000, 150, 67),
+(163, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 300ml', 13000, 120, 67),
+(164, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 35000, 70, 67),
+(165, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 12000, 180, 68),
+(166, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 25000, 150, 68),
+(167, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 50000, 50, 68),
+(168, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 8000, 100, 69),
+(169, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 15000, 70, 69),
+(170, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 30000, 50, 69),
+(171, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 9000, 150, 70),
+(172, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 18000, 120, 70),
+(173, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 35000, 80, 70),
+(177, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 40000, 250, 71),
+(178, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 100000, 150, 71),
+(179, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1.5kg', 300000, 50, 71),
+(180, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 100g', 35000, 200, 72),
+(181, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 70000, 150, 72),
+(182, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 20000, 300, 73),
+(183, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 40000, 150, 73),
+(184, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 15000, 500, 74),
+(185, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1kg', 30000, 300, 74),
+(186, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2kg', 60000, 100, 74),
+(187, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 150g', 25000, 250, 75),
+(188, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 300g', 50000, 150, 75),
+(189, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 150000, 250, 76),
+(190, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 300000, 150, 76),
+(191, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1kg', 600000, 80, 76),
+(192, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 22000, 400, 77),
+(193, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 40000, 200, 77),
+(194, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 25000, 300, 78),
+(195, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 50000, 250, 78),
+(196, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 15000, 250, 79),
+(197, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 60000, 200, 79),
+(198, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 60000, 300, 80),
+(199, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 150000, 200, 80),
+(200, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200ml', 25000, 350, 81),
+(201, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 50000, 250, 81),
+(202, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 100000, 150, 81),
+(203, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 20000, 300, 84),
+(204, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 40000, 250, 84),
+(205, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 80000, 150, 84),
+(206, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 100g', 25000, 200, 85),
+(207, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 50000, 150, 85),
+(208, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 120000, 100, 85),
+(209, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 100000, 150, 86),
+(210, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 150000, 100, 86),
+(211, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 250000, 50, 86),
+(212, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 15000, 250, 87),
+(213, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 25000, 200, 87),
+(214, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 50000, 150, 87),
+(215, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 18000, 300, 88),
+(216, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 35000, 250, 88),
+(217, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 70000, 150, 88),
+(218, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 100g', 12000, 300, 89),
+(219, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 25000, 250, 89),
+(220, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 50000, 150, 89),
+(221, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 100g', 30000, 250, 90),
+(222, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 60000, 150, 90),
+(223, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 120000, 100, 90),
+(224, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 15000, 300, 91),
+(225, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 30000, 250, 91),
+(226, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 60000, 150, 91),
+(227, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 18000, 400, 92),
+(228, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 35000, 300, 92),
+(229, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 70000, 200, 92),
+(230, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 18000, 400, 92),
+(231, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 35000, 300, 92),
+(232, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 70000, 200, 92),
+(233, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 25000, 300, 93),
+(234, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 45000, 250, 93),
+(235, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 70000, 200, 93),
+(236, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 22000, 350, 94),
+(237, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 42000, 250, 94),
+(238, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 2L', 85000, 100, 94),
+(239, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 20000, 300, 95),
+(240, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 35000, 250, 95),
+(241, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1kg', 60000, 150, 95),
+(242, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 15000, 300, 96),
+(243, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 30000, 200, 96),
+(244, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 50000, 100, 96),
+(245, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 330ml', 20000, 350, 97),
+(246, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 35000, 300, 97),
+(247, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 70000, 150, 97),
+(248, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 15000, 400, 98),
+(249, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 30000, 250, 98),
+(250, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1kg', 50000, 100, 98),
+(251, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 250ml', 20000, 350, 99),
+(252, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500ml', 40000, 300, 99),
+(253, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1L', 70000, 150, 99),
+(254, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 200g', 18000, 400, 100),
+(255, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 500g', 35000, 250, 100),
+(256, '2025-08-01 18:20:14.000000', '2025-08-01 18:20:14.000000', NULL, 'Loại 1kg', 55000, 100, 100);
 
 -- --------------------------------------------------------
 
@@ -573,14 +695,234 @@ CREATE TABLE `product_variant` (
 CREATE TABLE `rating` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `comment` varchar(255) NOT NULL,
   `rating` int(11) NOT NULL,
-  `orderId` int(11) DEFAULT NULL,
-  `usersId` int(11) DEFAULT NULL,
-  `productId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `user_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `rating`
+--
+
+INSERT INTO `rating` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `comment`, `rating`, `user_id`, `product_id`) VALUES
+(4, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'Rau củ tươi ngon, rất thích hợp để chế biến món ăn.', 5, 1, 1),
+(5, '2025-08-20 12:05:00.000000', '2025-08-20 12:05:00.000000', NULL, 'Sản phẩm khá tươi, nhưng có vẻ hơi đắt.', 3, 2, 1),
+(6, '2025-08-20 12:10:00.000000', '2025-08-20 12:10:00.000000', NULL, 'Rau không được tươi lắm, tôi khá thất vọng.', 2, 3, 1),
+(10, '2025-08-20 12:30:00.000000', '2025-08-20 12:30:00.000000', NULL, 'Thịt bò ngon, mềm và rất tươi.', 5, 1, 2),
+(11, '2025-08-20 12:35:00.000000', '2025-08-20 12:35:00.000000', NULL, 'Thịt hơi dai, nhưng chất lượng khá ổn.', 3, 2, 2),
+(12, '2025-08-20 12:40:00.000000', '2025-08-20 12:40:00.000000', NULL, 'Giá cao hơn mong đợi, nhưng vẫn chấp nhận được.', 4, 3, 2),
+(13, '2025-08-20 12:45:00.000000', '2025-08-20 12:45:00.000000', NULL, 'Thịt rất ngon và tươi, tôi rất hài lòng.', 5, 4, 2),
+(14, '2025-08-20 12:50:00.000000', '2025-08-20 12:50:00.000000', NULL, 'Thịt có mùi hơi lạ, nhưng chấp nhận được.', 2, 5, 2),
+(15, '2025-08-20 13:00:00.000000', '2025-08-20 13:00:00.000000', NULL, 'Xúc xích rất ngon, dễ dàng chế biến cho bữa sáng.', 5, 1, 3),
+(16, '2025-08-20 13:05:00.000000', '2025-08-20 13:05:00.000000', NULL, 'Mùi vị ổn, nhưng hơi nhiều gia vị.', 3, 2, 3),
+(17, '2025-08-20 13:10:00.000000', '2025-08-20 13:10:00.000000', NULL, 'Xúc xích không tươi, hơi khô một chút.', 2, 3, 3),
+(18, '2025-08-20 13:15:00.000000', '2025-08-20 13:15:00.000000', NULL, 'Ngon, đặc biệt là khi ăn với bánh mì.', 5, 4, 3),
+(19, '2025-08-20 13:20:00.000000', '2025-08-20 13:20:00.000000', NULL, 'Chất lượng khá tốt, nhưng giá cao.', 4, 5, 3),
+(20, '2025-08-20 13:25:00.000000', '2025-08-20 13:25:00.000000', NULL, 'Giò chả rất ngon, chất lượng cao, thích hợp cho bữa cơm gia đình.', 5, 1, 4),
+(21, '2025-08-20 13:30:00.000000', '2025-08-20 13:30:00.000000', NULL, 'Giò chả khá ngọt, không hợp khẩu vị của tôi.', 3, 2, 4),
+(22, '2025-08-20 13:35:00.000000', '2025-08-20 13:35:00.000000', NULL, 'Giò chả tươi ngon, tôi rất thích.', 5, 3, 4),
+(23, '2025-08-20 13:40:00.000000', '2025-08-20 13:40:00.000000', NULL, 'Giò chả hơi mặn, nhưng vẫn có thể chấp nhận được.', 4, 4, 4),
+(24, '2025-08-20 13:45:00.000000', '2025-08-20 13:45:00.000000', NULL, 'Chất lượng tuyệt vời, sẽ mua lại.', 5, 5, 4),
+(25, '2025-08-20 13:50:00.000000', '2025-08-20 13:50:00.000000', NULL, 'Bánh mì mềm mịn, rất thích hợp cho bữa sáng.', 5, 1, 5),
+(26, '2025-08-20 13:55:00.000000', '2025-08-20 13:55:00.000000', NULL, 'Bánh mì hơi khô, không mềm như tôi mong đợi.', 2, 2, 5),
+(27, '2025-08-20 14:00:00.000000', '2025-08-20 14:00:00.000000', NULL, 'Chất lượng ổn, nhưng tôi thích loại khác hơn.', 3, 3, 5),
+(28, '2025-08-20 14:05:00.000000', '2025-08-20 14:05:00.000000', NULL, 'Bánh mì ngon, ăn sáng rất hợp.', 5, 4, 5),
+(29, '2025-08-20 14:10:00.000000', '2025-08-20 14:10:00.000000', NULL, 'Bánh mì ngon nhưng giá hơi cao.', 4, 5, 5),
+(30, '2025-08-20 14:15:00.000000', '2025-08-20 14:15:00.000000', NULL, 'Phô mai rất thơm, dễ chế biến, tôi rất thích.', 5, 1, 6),
+(31, '2025-08-20 14:20:00.000000', '2025-08-20 14:20:00.000000', NULL, 'Phô mai hơi dai, không phù hợp với khẩu vị của tôi.', 2, 2, 6),
+(32, '2025-08-20 14:25:00.000000', '2025-08-20 14:25:00.000000', NULL, 'Phô mai khá ngon, nhưng giá hơi cao.', 3, 3, 6),
+(33, '2025-08-20 14:30:00.000000', '2025-08-20 14:30:00.000000', NULL, 'Phô mai rất tươi và béo, ăn rất ngon.', 5, 4, 6),
+(34, '2025-08-20 14:35:00.000000', '2025-08-20 14:35:00.000000', NULL, 'Phô mai rất tốt, sẽ tiếp tục mua.', 5, 5, 6),
+(39, '2025-08-20 14:40:00.000000', '2025-08-20 14:40:00.000000', NULL, 'Sữa tươi rất ngon, uống vào cảm giác tươi mát.', 5, 1, 7),
+(40, '2025-08-20 14:45:00.000000', '2025-08-20 14:45:00.000000', NULL, 'Sữa hơi ngọt, nhưng vẫn chấp nhận được.', 4, 2, 7),
+(41, '2025-08-20 14:50:00.000000', '2025-08-20 14:50:00.000000', NULL, 'Sữa có mùi hơi lạ, nhưng khá ngon.', 3, 3, 7),
+(42, '2025-08-20 14:55:00.000000', '2025-08-20 14:55:00.000000', NULL, 'Sữa tươi chất lượng cao, rất phù hợp cho trẻ nhỏ.', 5, 4, 7),
+(43, '2025-08-20 15:00:00.000000', '2025-08-20 15:00:00.000000', NULL, 'Sữa ngon, nhưng giá hơi cao.', 4, 5, 7),
+(44, '2025-08-20 16:00:00.000000', '2025-08-20 16:00:00.000000', NULL, 'Bánh ngọt rất ngon, giòn và thơm.', 5, 1, 8),
+(45, '2025-08-20 16:05:00.000000', '2025-08-20 16:05:00.000000', NULL, 'Bánh hơi ngọt, nhưng vẫn rất ngon.', 4, 2, 8),
+(46, '2025-08-20 16:10:00.000000', '2025-08-20 16:10:00.000000', NULL, 'Bánh không quá ngọt, giòn và dễ ăn.', 3, 3, 8),
+(47, '2025-08-20 16:15:00.000000', '2025-08-20 16:15:00.000000', NULL, 'Bánh rất ngon, nhưng giá hơi cao.', 4, 4, 8),
+(48, '2025-08-20 16:20:00.000000', '2025-08-20 16:20:00.000000', NULL, 'Bánh rất ngọt, thích hợp cho những ai thích ngọt.', 5, 5, 8),
+(49, '2025-08-20 16:25:00.000000', '2025-08-20 16:25:00.000000', NULL, 'Kẹo dẻo ngon, nhiều hương vị hấp dẫn.', 5, 1, 9),
+(50, '2025-08-20 16:30:00.000000', '2025-08-20 16:30:00.000000', NULL, 'Kẹo quá ngọt và hơi dai.', 3, 2, 9),
+(51, '2025-08-20 16:35:00.000000', '2025-08-20 16:35:00.000000', NULL, 'Kẹo dẻo rất ngon, nhưng hơi ngọt.', 4, 3, 9),
+(52, '2025-08-20 16:40:00.000000', '2025-08-20 16:40:00.000000', NULL, 'Kẹo quá ngọt và không tươi.', 2, 4, 9),
+(53, '2025-08-20 16:45:00.000000', '2025-08-20 16:45:00.000000', NULL, 'Kẹo dẻo tuyệt vời, ngọt ngào và giòn.', 5, 5, 9),
+(54, '2025-08-20 16:50:00.000000', '2025-08-20 16:50:00.000000', NULL, 'Cà phê hòa tan rất thơm và dễ pha chế.', 5, 1, 10),
+(55, '2025-08-20 16:55:00.000000', '2025-08-20 16:55:00.000000', NULL, 'Cà phê đắng quá, không hợp khẩu vị của tôi.', 3, 2, 10),
+(56, '2025-08-20 17:00:00.000000', '2025-08-20 17:00:00.000000', NULL, 'Cà phê rất đậm đà, phù hợp với tôi.', 4, 3, 10),
+(57, '2025-08-20 17:05:00.000000', '2025-08-20 17:05:00.000000', NULL, 'Cà phê hòa tan không tươi, có vị hơi lạ.', 2, 4, 10),
+(58, '2025-08-20 17:10:00.000000', '2025-08-20 17:10:00.000000', NULL, 'Cà phê này rất ngon, tôi sẽ mua lại.', 5, 5, 10),
+(59, '2025-08-20 17:15:00.000000', '2025-08-20 17:15:00.000000', NULL, 'Sữa đặc có đường rất ngon, thích hợp pha chế các món.', 5, 1, 11),
+(60, '2025-08-20 17:20:00.000000', '2025-08-20 17:20:00.000000', NULL, 'Sữa đặc ngọt ngào, nhưng hơi ngấy.', 3, 2, 11),
+(61, '2025-08-20 17:25:00.000000', '2025-08-20 17:25:00.000000', NULL, 'Chất lượng sữa ổn, nhưng tôi không thích vị ngọt quá.', 4, 3, 11),
+(62, '2025-08-20 17:30:00.000000', '2025-08-20 17:30:00.000000', NULL, 'Tốt cho các món pha chế, ngọt vừa phải.', 5, 4, 11),
+(63, '2025-08-20 17:35:00.000000', '2025-08-20 17:35:00.000000', NULL, 'Sữa đặc ngon, nhưng giá hơi cao.', 4, 5, 11),
+(64, '2025-08-20 17:40:00.000000', '2025-08-20 17:40:00.000000', NULL, 'Nước ép cam rất tươi và ngon, tôi rất thích.', 5, 1, 12),
+(65, '2025-08-20 17:45:00.000000', '2025-08-20 17:45:00.000000', NULL, 'Nước ép có vị chua quá, không hợp khẩu vị của tôi.', 2, 2, 12),
+(66, '2025-08-20 17:50:00.000000', '2025-08-20 17:50:00.000000', NULL, 'Nước cam khá ngọt, uống rất dễ chịu.', 4, 3, 12),
+(67, '2025-08-20 17:55:00.000000', '2025-08-20 17:55:00.000000', NULL, 'Cam rất ngọt, nhưng tôi không thích hương vị nhân tạo.', 3, 4, 12),
+(68, '2025-08-20 18:00:00.000000', '2025-08-20 18:00:00.000000', NULL, 'Nước ép cam tuyệt vời, tươi ngon và bổ dưỡng.', 5, 5, 12),
+(69, '2025-08-20 18:05:00.000000', '2025-08-20 18:05:00.000000', NULL, 'Nước ép cam rất tươi và ngon, tôi rất thích.', 5, 1, 12),
+(70, '2025-08-20 18:10:00.000000', '2025-08-20 18:10:00.000000', NULL, 'Nước ép có vị chua quá, không hợp khẩu vị của tôi.', 2, 2, 12),
+(71, '2025-08-20 18:15:00.000000', '2025-08-20 18:15:00.000000', NULL, 'Nước cam khá ngọt, uống rất dễ chịu.', 4, 3, 12),
+(72, '2025-08-20 18:20:00.000000', '2025-08-20 18:20:00.000000', NULL, 'Cam rất ngọt, nhưng tôi không thích hương vị nhân tạo.', 3, 4, 12),
+(73, '2025-08-20 18:25:00.000000', '2025-08-20 18:25:00.000000', NULL, 'Nước ép cam tuyệt vời, tươi ngon và bổ dưỡng.', 5, 5, 12),
+(74, '2025-08-20 18:30:00.000000', '2025-08-20 18:30:00.000000', NULL, 'Gạo rất thơm, chất lượng tốt.', 5, 1, 13),
+(75, '2025-08-20 18:35:00.000000', '2025-08-20 18:35:00.000000', NULL, 'Gạo có mùi hơi khó chịu, không tươi.', 2, 2, 13),
+(76, '2025-08-20 18:40:00.000000', '2025-08-20 18:40:00.000000', NULL, 'Chất lượng gạo khá tốt, nhưng giá hơi cao.', 3, 3, 13),
+(77, '2025-08-20 18:45:00.000000', '2025-08-20 18:45:00.000000', NULL, 'Gạo rất tươi, tôi sẽ tiếp tục mua.', 5, 4, 13),
+(78, '2025-08-20 18:50:00.000000', '2025-08-20 18:50:00.000000', NULL, 'Gạo ngon, phù hợp cho bữa cơm gia đình.', 4, 5, 13),
+(79, '2025-08-20 18:55:00.000000', '2025-08-20 18:55:00.000000', NULL, 'Bánh quy ngon, giòn và ngọt ngào.', 5, 1, 14),
+(80, '2025-08-20 19:00:00.000000', '2025-08-20 19:00:00.000000', NULL, 'Bánh hơi ngọt, nhưng vẫn rất ngon.', 4, 2, 14),
+(81, '2025-08-20 19:05:00.000000', '2025-08-20 19:05:00.000000', NULL, 'Bánh quy giòn, nhưng tôi thích loại khác hơn.', 3, 3, 14),
+(82, '2025-08-20 19:10:00.000000', '2025-08-20 19:10:00.000000', NULL, 'Bánh quy rất ngon, ăn rất thích.', 5, 4, 14),
+(83, '2025-08-20 19:15:00.000000', '2025-08-20 19:15:00.000000', NULL, 'Bánh hơi ngọt, nhưng vẫn ngon miệng.', 4, 5, 14),
+(84, '2025-08-20 19:20:00.000000', '2025-08-20 19:20:00.000000', NULL, 'Cà phê hòa tan rất ngon, dễ pha chế và thơm.', 5, 1, 15),
+(85, '2025-08-20 19:25:00.000000', '2025-08-20 19:25:00.000000', NULL, 'Cà phê có vị hơi đắng, nhưng tôi thích.', 4, 2, 15),
+(86, '2025-08-20 19:30:00.000000', '2025-08-20 19:30:00.000000', NULL, 'Cà phê rất đậm đà, phù hợp với tôi.', 5, 3, 15),
+(87, '2025-08-20 19:35:00.000000', '2025-08-20 19:35:00.000000', NULL, 'Cà phê không tươi, có vị hơi lạ.', 2, 4, 15),
+(88, '2025-08-20 19:40:00.000000', '2025-08-20 19:40:00.000000', NULL, 'Cà phê hòa tan này rất thơm và dễ uống.', 5, 5, 15),
+(89, '2025-08-20 19:45:00.000000', '2025-08-20 19:45:00.000000', NULL, 'Bánh mì sandwich mềm mịn, ngon miệng.', 5, 1, 16),
+(90, '2025-08-20 19:50:00.000000', '2025-08-20 19:50:00.000000', NULL, 'Bánh mì hơi khô, nhưng vẫn ăn được.', 3, 2, 16),
+(91, '2025-08-20 19:55:00.000000', '2025-08-20 19:55:00.000000', NULL, 'Bánh mì ngon, phù hợp cho bữa sáng.', 4, 3, 16),
+(92, '2025-08-20 20:00:00.000000', '2025-08-20 20:00:00.000000', NULL, 'Bánh mì hơi cứng, không thật sự thích hợp.', 2, 4, 16),
+(93, '2025-08-20 20:05:00.000000', '2025-08-20 20:05:00.000000', NULL, 'Bánh mì sandwich rất ngon, mềm và dễ ăn.', 5, 5, 16),
+(94, '2025-08-20 20:10:00.000000', '2025-08-20 20:10:00.000000', NULL, 'Phô mai mozzarella thơm ngon, dễ chế biến.', 5, 1, 17),
+(95, '2025-08-20 20:15:00.000000', '2025-08-20 20:15:00.000000', NULL, 'Phô mai hơi mặn, nhưng vẫn ổn.', 4, 2, 17),
+(96, '2025-08-20 20:20:00.000000', '2025-08-20 20:20:00.000000', NULL, 'Phô mai ngon, dễ chế biến, phù hợp với món ăn.', 5, 3, 17),
+(97, '2025-08-20 20:25:00.000000', '2025-08-20 20:25:00.000000', NULL, 'Phô mai không tươi, có mùi lạ.', 2, 4, 17),
+(98, '2025-08-20 20:30:00.000000', '2025-08-20 20:30:00.000000', NULL, 'Phô mai mozzarella rất ngon, tôi sẽ mua lại.', 5, 5, 17),
+(99, '2025-08-20 22:00:00.000000', '2025-08-20 22:00:00.000000', NULL, 'Trà Vega rất thơm, dễ uống.', 5, 1, 18),
+(100, '2025-08-20 22:05:00.000000', '2025-08-20 22:05:00.000000', NULL, 'Trà hơi ngọt, nhưng ngon miệng.', 4, 2, 18),
+(101, '2025-08-20 22:10:00.000000', '2025-08-20 22:10:00.000000', NULL, 'Trà không đủ đậm, cảm giác hơi nhạt.', 3, 3, 18),
+(102, '2025-08-20 22:15:00.000000', '2025-08-20 22:15:00.000000', NULL, 'Trà rất ngon, giúp giải nhiệt ngày hè.', 5, 4, 18),
+(103, '2025-08-20 22:20:00.000000', '2025-08-20 22:20:00.000000', NULL, 'Trà thơm, nhưng tôi thích hương vị đậm hơn.', 4, 5, 18),
+(104, '2025-08-20 22:25:00.000000', '2025-08-20 22:25:00.000000', NULL, 'Sữa rất bổ dưỡng, rất thích hợp cho trẻ em.', 5, 1, 19),
+(105, '2025-08-20 22:30:00.000000', '2025-08-20 22:30:00.000000', NULL, 'Sữa có vị hơi ngọt, nhưng vẫn ngon.', 4, 2, 19),
+(106, '2025-08-20 22:35:00.000000', '2025-08-20 22:35:00.000000', NULL, 'Sữa rất tốt, nhưng tôi cảm thấy hơi ngấy.', 3, 3, 19),
+(107, '2025-08-20 22:40:00.000000', '2025-08-20 22:40:00.000000', NULL, 'Sữa có vị tươi và dễ uống.', 5, 4, 19),
+(108, '2025-08-20 22:45:00.000000', '2025-08-20 22:45:00.000000', NULL, 'Sữa bổ dưỡng, nhưng hơi ngọt đối với tôi.', 4, 5, 19),
+(109, '2025-08-20 22:50:00.000000', '2025-08-20 22:50:00.000000', NULL, 'Lạp xưởng Vissan rất thơm và ngon.', 5, 1, 20),
+(110, '2025-08-20 22:55:00.000000', '2025-08-20 22:55:00.000000', NULL, 'Lạp xưởng rất ngon, nhưng tôi thấy hơi mặn.', 4, 2, 20),
+(111, '2025-08-20 23:00:00.000000', '2025-08-20 23:00:00.000000', NULL, 'Lạp xưởng Vissan quá ngấy, không thích hợp với tôi.', 2, 3, 20),
+(112, '2025-08-20 23:05:00.000000', '2025-08-20 23:05:00.000000', NULL, 'Lạp xưởng rất ngon, tôi sẽ mua lại.', 5, 4, 20),
+(113, '2025-08-20 23:10:00.000000', '2025-08-20 23:10:00.000000', NULL, 'Lạp xưởng vừa ngon vừa dễ ăn, rất thích.', 4, 5, 20),
+(114, '2025-08-20 23:15:00.000000', '2025-08-20 23:15:00.000000', NULL, 'Nước ép cam rất tươi và ngon.', 5, 1, 21),
+(115, '2025-08-20 23:20:00.000000', '2025-08-20 23:20:00.000000', NULL, 'Nước cam khá ngọt, nhưng không có gì đặc biệt.', 3, 2, 21),
+(116, '2025-08-20 23:25:00.000000', '2025-08-20 23:25:00.000000', NULL, 'Nước ép cam rất ngon, tươi mát.', 5, 3, 21),
+(117, '2025-08-20 23:30:00.000000', '2025-08-20 23:30:00.000000', NULL, 'Nước cam quá ngọt, tôi không thích.', 2, 4, 21),
+(118, '2025-08-20 23:35:00.000000', '2025-08-20 23:35:00.000000', NULL, 'Nước cam tuyệt vời, tươi ngon và bổ dưỡng.', 5, 5, 21),
+(119, '2025-08-20 23:40:00.000000', '2025-08-20 23:40:00.000000', NULL, 'Sô cô la Mars rất ngon, ngọt ngào.', 5, 1, 22),
+(120, '2025-08-20 23:45:00.000000', '2025-08-20 23:45:00.000000', NULL, 'Sô cô la rất ngọt, tôi không thích vị này.', 3, 2, 22),
+(121, '2025-08-20 23:50:00.000000', '2025-08-20 23:50:00.000000', NULL, 'Sô cô la Mars tuyệt vời, tôi rất thích.', 5, 3, 22),
+(122, '2025-08-20 23:55:00.000000', '2025-08-20 23:55:00.000000', NULL, 'Sô cô la ngon nhưng quá ngọt với tôi.', 4, 4, 22),
+(123, '2025-08-21 00:00:00.000000', '2025-08-21 00:00:00.000000', NULL, 'Sô cô la rất thơm và ngon, chắc chắn sẽ mua lại.', 5, 5, 22),
+(124, '2025-08-21 00:05:00.000000', '2025-08-21 00:05:00.000000', NULL, 'Milo rất ngon, bổ dưỡng và dễ uống.', 5, 1, 23),
+(125, '2025-08-21 00:10:00.000000', '2025-08-21 00:10:00.000000', NULL, 'Milo có vị ngọt, rất thích hợp cho trẻ em.', 4, 2, 23),
+(126, '2025-08-21 00:15:00.000000', '2025-08-21 00:15:00.000000', NULL, 'Milo rất ngon, nhưng tôi thích loại khác hơn.', 3, 3, 23),
+(127, '2025-08-21 00:20:00.000000', '2025-08-21 00:20:00.000000', NULL, 'Milo ngon, nhưng hơi ngọt với tôi.', 4, 4, 23),
+(128, '2025-08-21 00:25:00.000000', '2025-08-21 00:25:00.000000', NULL, 'Milo rất bổ dưỡng, tôi sẽ mua lại.', 5, 5, 23),
+(129, '2025-08-21 00:30:00.000000', '2025-08-21 00:30:00.000000', NULL, 'Bánh Lays rất giòn, hương vị tuyệt vời.', 5, 1, 24),
+(130, '2025-08-21 00:35:00.000000', '2025-08-21 00:35:00.000000', NULL, 'Bánh hơi mặn, nhưng vẫn ngon.', 4, 2, 24),
+(131, '2025-08-21 00:40:00.000000', '2025-08-21 00:40:00.000000', NULL, 'Bánh Lays ngon, nhưng hơi ngấy.', 3, 3, 24),
+(132, '2025-08-21 00:45:00.000000', '2025-08-21 00:45:00.000000', NULL, 'Bánh giòn, nhưng không đủ hương vị.', 2, 4, 24),
+(133, '2025-08-21 00:50:00.000000', '2025-08-21 00:50:00.000000', NULL, 'Bánh Lays rất ngon, tôi sẽ mua lại.', 5, 5, 24),
+(134, '2025-08-21 00:55:00.000000', '2025-08-21 00:55:00.000000', NULL, 'Pepsi Max rất ngon, ít calo, giải khát tuyệt vời.', 5, 1, 25),
+(135, '2025-08-21 01:00:00.000000', '2025-08-21 01:00:00.000000', NULL, 'Pepsi Max khá ngon, nhưng tôi thích Pepsi thường hơn.', 4, 2, 25),
+(136, '2025-08-21 01:05:00.000000', '2025-08-21 01:05:00.000000', NULL, 'Nước ngọt ngon nhưng hơi ngọt.', 3, 3, 25),
+(137, '2025-08-21 01:10:00.000000', '2025-08-21 01:10:00.000000', NULL, 'Pepsi Max không phải là sở thích của tôi, quá ngọt.', 2, 4, 25),
+(138, '2025-08-21 01:15:00.000000', '2025-08-21 01:15:00.000000', NULL, 'Pepsi Max là một lựa chọn tuyệt vời cho những ai giảm cân.', 5, 5, 25),
+(139, '2025-08-21 01:20:00.000000', '2025-08-21 01:20:00.000000', NULL, 'Red Bull Sugarfree rất ngon, giúp tăng cường năng lượng.', 5, 1, 26),
+(140, '2025-08-21 01:25:00.000000', '2025-08-21 01:25:00.000000', NULL, 'Red Bull rất mạnh, giúp tôi tỉnh táo.', 4, 2, 26),
+(141, '2025-08-21 01:30:00.000000', '2025-08-21 01:30:00.000000', NULL, 'Red Bull có vị hơi nồng, nhưng khá hiệu quả.', 3, 3, 26),
+(142, '2025-08-21 01:35:00.000000', '2025-08-21 01:35:00.000000', NULL, 'Red Bull quá ngọt, tôi không thích.', 2, 4, 26),
+(143, '2025-08-21 01:40:00.000000', '2025-08-21 01:40:00.000000', NULL, 'Red Bull Sugarfree giúp tôi tỉnh táo, nhưng tôi thích loại khác hơn.', 4, 5, 26),
+(144, '2025-08-21 01:45:00.000000', '2025-08-21 01:45:00.000000', NULL, 'Milo rất ngon, bổ dưỡng và giàu năng lượng.', 5, 1, 27),
+(145, '2025-08-21 01:50:00.000000', '2025-08-21 01:50:00.000000', NULL, 'Milo có vị ngọt, rất thích hợp cho trẻ em.', 4, 2, 27),
+(146, '2025-08-21 01:55:00.000000', '2025-08-21 01:55:00.000000', NULL, 'Milo rất ngon, nhưng tôi thích loại khác hơn.', 3, 3, 27),
+(147, '2025-08-21 02:00:00.000000', '2025-08-21 02:00:00.000000', NULL, 'Milo ngon, nhưng hơi ngọt với tôi.', 4, 4, 27),
+(148, '2025-08-21 02:05:00.000000', '2025-08-21 02:05:00.000000', NULL, 'Milo rất bổ dưỡng, tôi sẽ mua lại.', 5, 5, 27),
+(149, '2025-08-21 02:10:00.000000', '2025-08-21 02:10:00.000000', NULL, 'Nước ép táo rất ngon và tươi mát.', 5, 1, 28),
+(150, '2025-08-21 02:15:00.000000', '2025-08-21 02:15:00.000000', NULL, 'Nước ép táo có vị hơi chua, không hợp khẩu vị của tôi.', 2, 2, 28),
+(151, '2025-08-21 02:20:00.000000', '2025-08-21 02:20:00.000000', NULL, 'Nước ép táo khá ngọt, uống rất dễ chịu.', 4, 3, 28),
+(152, '2025-08-21 02:25:00.000000', '2025-08-21 02:25:00.000000', NULL, 'Nước táo ngọt quá, tôi không thích.', 3, 4, 28),
+(153, '2025-08-21 02:30:00.000000', '2025-08-21 02:30:00.000000', NULL, 'Nước ép táo tuyệt vời, tôi sẽ mua lại.', 5, 5, 28),
+(154, '2025-08-21 10:00:00.000000', '2025-08-21 10:00:00.000000', NULL, 'Nước cam rất ngon, tươi mát.', 5, 1, 30),
+(155, '2025-08-21 10:05:00.000000', '2025-08-21 10:05:00.000000', NULL, 'Nước cam ngọt, nhưng hơi chua đối với tôi.', 4, 2, 30),
+(156, '2025-08-21 10:10:00.000000', '2025-08-21 10:10:00.000000', NULL, 'Nước cam quá ngọt, không thích hợp cho tôi.', 3, 3, 30),
+(157, '2025-08-21 10:15:00.000000', '2025-08-21 10:15:00.000000', NULL, 'Nước cam rất tươi, tôi sẽ tiếp tục mua.', 5, 4, 30),
+(158, '2025-08-21 10:20:00.000000', '2025-08-21 10:20:00.000000', NULL, 'Nước cam tươi ngon, nhưng hơi ngọt.', 4, 5, 30),
+(159, '2025-08-21 10:25:00.000000', '2025-08-21 10:25:00.000000', NULL, 'Coca-Cola Zero rất ngon, giải khát tuyệt vời.', 5, 1, 31),
+(160, '2025-08-21 10:30:00.000000', '2025-08-21 10:30:00.000000', NULL, 'Coca-Cola Zero khá ngọt, nhưng vẫn chấp nhận được.', 4, 2, 31),
+(161, '2025-08-21 10:35:00.000000', '2025-08-21 10:35:00.000000', NULL, 'Nước ngọt khá ngon, nhưng hơi ngọt với tôi.', 3, 3, 31),
+(162, '2025-08-21 10:40:00.000000', '2025-08-21 10:40:00.000000', NULL, 'Coca-Cola Zero giúp tôi giải khát, nhưng không phải là lựa chọn tốt nhất.', 2, 4, 31),
+(163, '2025-08-21 10:45:00.000000', '2025-08-21 10:45:00.000000', NULL, 'Coca-Cola Zero rất tươi mát, tôi rất thích.', 5, 5, 31),
+(164, '2025-08-21 10:50:00.000000', '2025-08-21 10:50:00.000000', NULL, 'Sô cô la Mars rất ngon, ngọt ngào.', 5, 1, 32),
+(165, '2025-08-21 10:55:00.000000', '2025-08-21 10:55:00.000000', NULL, 'Sô cô la khá ngọt, nhưng tôi thích.', 4, 2, 32),
+(166, '2025-08-21 11:00:00.000000', '2025-08-21 11:00:00.000000', NULL, 'Sô cô la Mars quá ngọt, nhưng vẫn ngon.', 3, 3, 32),
+(167, '2025-08-21 11:05:00.000000', '2025-08-21 11:05:00.000000', NULL, 'Sô cô la rất ngon, nhưng hơi ngọt với tôi.', 4, 4, 32),
+(168, '2025-08-21 11:10:00.000000', '2025-08-21 11:10:00.000000', NULL, 'Sô cô la Mars tuyệt vời, tôi sẽ mua lại.', 5, 5, 32),
+(169, '2025-08-21 11:15:00.000000', '2025-08-21 11:15:00.000000', NULL, 'Gạo Vega rất thơm, chất lượng tuyệt vời.', 5, 1, 33),
+(170, '2025-08-21 11:20:00.000000', '2025-08-21 11:20:00.000000', NULL, 'Gạo có mùi hơi khó chịu, nhưng khá ngon.', 4, 2, 33),
+(171, '2025-08-21 11:25:00.000000', '2025-08-21 11:25:00.000000', NULL, 'Gạo khá ngon, nhưng giá hơi cao.', 3, 3, 33),
+(172, '2025-08-21 11:30:00.000000', '2025-08-21 11:30:00.000000', NULL, 'Gạo Vega khá ngon, nhưng vẫn có thể cải thiện.', 4, 4, 33),
+(173, '2025-08-21 11:35:00.000000', '2025-08-21 11:35:00.000000', NULL, 'Gạo rất ngon, tôi sẽ mua lại.', 5, 5, 33),
+(174, '2025-08-21 11:40:00.000000', '2025-08-21 11:40:00.000000', NULL, 'Fanta Orange rất ngon, giải khát tuyệt vời.', 5, 1, 34),
+(175, '2025-08-21 11:45:00.000000', '2025-08-21 11:45:00.000000', NULL, 'Fanta quá ngọt, tôi không thích.', 2, 2, 34),
+(176, '2025-08-21 11:50:00.000000', '2025-08-21 11:50:00.000000', NULL, 'Fanta hương cam rất mát, nhưng có vị hơi ngọt.', 4, 3, 34),
+(177, '2025-08-21 11:55:00.000000', '2025-08-21 11:55:00.000000', NULL, 'Fanta quá ngọt, không phải là lựa chọn của tôi.', 2, 4, 34),
+(178, '2025-08-21 12:00:00.000000', '2025-08-21 12:00:00.000000', NULL, 'Fanta hương cam rất ngon, tôi sẽ mua lại.', 5, 5, 34),
+(179, '2025-08-21 12:05:00.000000', '2025-08-21 12:05:00.000000', NULL, 'Nước ép cà chua rất bổ dưỡng, tốt cho sức khỏe.', 5, 1, 35),
+(180, '2025-08-21 12:10:00.000000', '2025-08-21 12:10:00.000000', NULL, 'Cà chua ép khá ngọt, nhưng hơi chua đối với tôi.', 3, 2, 35),
+(181, '2025-08-21 12:15:00.000000', '2025-08-21 12:15:00.000000', NULL, 'Nước cà chua rất ngon, tươi mát.', 5, 3, 35),
+(182, '2025-08-21 12:20:00.000000', '2025-08-21 12:20:00.000000', NULL, 'Nước ép cà chua có vị hơi lạ, nhưng vẫn uống được.', 4, 4, 35),
+(183, '2025-08-21 12:25:00.000000', '2025-08-21 12:25:00.000000', NULL, 'Nước ép cà chua tuyệt vời, sẽ mua lại.', 5, 5, 35),
+(184, '2025-08-21 12:30:00.000000', '2025-08-21 12:30:00.000000', NULL, 'Sữa Nestle rất bổ dưỡng, thích hợp cho mọi gia đình.', 5, 1, 36),
+(185, '2025-08-21 12:35:00.000000', '2025-08-21 12:35:00.000000', NULL, 'Sữa hơi ngọt, nhưng chất lượng rất tốt.', 4, 2, 36),
+(186, '2025-08-21 12:40:00.000000', '2025-08-21 12:40:00.000000', NULL, 'Sữa Nestle khá ngon, nhưng tôi không thích sữa quá ngọt.', 3, 3, 36),
+(187, '2025-08-21 12:45:00.000000', '2025-08-21 12:45:00.000000', NULL, 'Sữa chất lượng tốt, nhưng tôi thích loại ít ngọt hơn.', 4, 4, 36),
+(188, '2025-08-21 12:50:00.000000', '2025-08-21 12:50:00.000000', NULL, 'Sữa Nestle rất ngon, sẽ tiếp tục mua.', 5, 5, 36),
+(189, '2025-08-21 12:55:00.000000', '2025-08-21 12:55:00.000000', NULL, 'Fanta Suntory rất ngon, hương vị thơm mát.', 5, 1, 37),
+(190, '2025-08-21 13:00:00.000000', '2025-08-21 13:00:00.000000', NULL, 'Fanta hơi ngọt, nhưng vẫn rất ngon.', 4, 2, 37),
+(191, '2025-08-21 13:05:00.000000', '2025-08-21 13:05:00.000000', NULL, 'Nước ngọt Fanta hơi quá ngọt với tôi.', 3, 3, 37),
+(192, '2025-08-21 13:10:00.000000', '2025-08-21 13:10:00.000000', NULL, 'Fanta rất ngon, giải khát tốt trong mùa hè.', 5, 4, 37),
+(193, '2025-08-21 13:15:00.000000', '2025-08-21 13:15:00.000000', NULL, 'Fanta quá ngọt, tôi không thích hương vị này.', 2, 5, 37),
+(194, '2025-08-21 13:20:00.000000', '2025-08-21 13:20:00.000000', NULL, 'Gạo Vega rất ngon, thích hợp cho bữa cơm gia đình.', 5, 1, 38),
+(195, '2025-08-21 13:25:00.000000', '2025-08-21 13:25:00.000000', NULL, 'Gạo hơi khô, nhưng chất lượng khá tốt.', 3, 2, 38),
+(196, '2025-08-21 13:30:00.000000', '2025-08-21 13:30:00.000000', NULL, 'Gạo Vega rất thơm và mềm, tôi thích.', 5, 3, 38),
+(197, '2025-08-21 13:35:00.000000', '2025-08-21 13:35:00.000000', NULL, 'Gạo khá ngon, nhưng giá hơi cao.', 4, 4, 38),
+(198, '2025-08-21 13:40:00.000000', '2025-08-21 13:40:00.000000', NULL, 'Gạo ngon, nhưng cần cải thiện độ dẻo.', 3, 5, 38),
+(199, '2025-08-21 13:45:00.000000', '2025-08-21 13:45:00.000000', NULL, 'Blackmores rất bổ dưỡng, hiệu quả tốt.', 5, 1, 39),
+(200, '2025-08-21 13:50:00.000000', '2025-08-21 13:50:00.000000', NULL, 'Viên uống hơi đắng, nhưng có hiệu quả.', 4, 2, 39),
+(201, '2025-08-21 13:55:00.000000', '2025-08-21 13:55:00.000000', NULL, 'Viên uống có tác dụng, nhưng tôi không thích vị.', 3, 3, 39),
+(202, '2025-08-21 14:00:00.000000', '2025-08-21 14:00:00.000000', NULL, 'Blackmores tốt, giúp cải thiện sức khỏe.', 5, 4, 39),
+(203, '2025-08-21 14:05:00.000000', '2025-08-21 14:05:00.000000', NULL, 'Viên uống bổ dưỡng, tuy nhiên vị hơi khó uống.', 4, 5, 39),
+(204, '2025-08-21 14:10:00.000000', '2025-08-21 14:10:00.000000', NULL, 'Amway rất hiệu quả, dễ sử dụng và tiện lợi.', 5, 1, 40),
+(205, '2025-08-21 14:15:00.000000', '2025-08-21 14:15:00.000000', NULL, 'Sản phẩm Amway khá tốt, nhưng tôi cảm thấy không thích hợp với tôi.', 3, 2, 40),
+(206, '2025-08-21 14:20:00.000000', '2025-08-21 14:20:00.000000', NULL, 'Amway mang lại hiệu quả tốt, nhưng hơi đắt.', 4, 3, 40),
+(207, '2025-08-21 14:25:00.000000', '2025-08-21 14:25:00.000000', NULL, 'Sản phẩm Amway khá đắt nhưng hiệu quả.', 4, 4, 40),
+(208, '2025-08-21 14:30:00.000000', '2025-08-21 14:30:00.000000', NULL, 'Amway rất hiệu quả, giá cả hợp lý.', 5, 5, 40);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `token`
+--
+
+CREATE TABLE `token` (
+  `id` int(11) NOT NULL,
+  `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `deletedAt` datetime(6) DEFAULT NULL,
+  `access_token` varchar(255) NOT NULL,
+  `refresh_token` varchar(255) NOT NULL,
+  `logintype` enum('GOOGLE','EMAIL') NOT NULL DEFAULT 'EMAIL',
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -591,26 +933,27 @@ CREATE TABLE `rating` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
-  `phone` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
-  `role` varchar(255) NOT NULL,
+  `role` enum('ADMIN','USER') NOT NULL DEFAULT 'USER',
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `password` varchar(255) NOT NULL,
+  `token_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `phone`, `image`, `role`, `email`, `password`) VALUES
-(101, '2025-06-01 08:00:00.000000', '2025-06-01 08:00:00.000000', NULL, 'Minh Lê', '0901234567', 'user101.jpg', 'customer', 'minh.le101@example.com', 'hashed_password_101'),
-(102, '2025-06-02 09:00:00.000000', '2025-06-02 09:00:00.000000', NULL, 'An Nguyễn', '0902234567', 'user102.jpg', 'customer', 'an.nguyen102@example.com', 'hashed_password_102'),
-(103, '2025-06-03 10:30:00.000000', '2025-06-03 10:30:00.000000', NULL, 'Bình Trần', '0903234567', 'user103.jpg', 'customer', 'binh.tran103@example.com', 'hashed_password_103'),
-(104, '2025-06-04 11:15:00.000000', '2025-06-04 11:15:00.000000', NULL, 'Hà Phạm', '0904234567', 'user104.jpg', 'customer', 'ha.pham104@example.com', 'hashed_password_104'),
-(105, '2025-06-05 14:45:00.000000', '2025-06-05 14:45:00.000000', NULL, 'Linh Đặng', '0905234567', 'user105.jpg', 'customer', 'linh.dang105@example.com', 'hashed_password_105');
+INSERT INTO `users` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `phone`, `image`, `role`, `email`, `password`, `token_id`) VALUES
+(1, '2025-08-20 10:00:00.000000', '2025-08-20 10:00:00.000000', NULL, 'Nguyễn Văn A', '0901234567', 'client/images/user-1.png', 'ADMIN', 'nguyenvana@example.com', 'password123', NULL),
+(2, '2025-08-20 10:05:00.000000', '2025-08-20 10:05:00.000000', NULL, 'Trần Thị B', '0902345678', 'client/images/user-2.png', 'USER', 'tranthib@example.com', 'password123', NULL),
+(3, '2025-08-20 10:10:00.000000', '2025-08-20 10:10:00.000000', NULL, 'Lê Văn C', '0903456789', 'client/images/user-3.png', 'USER', 'levanc@example.com', 'password123', NULL),
+(4, '2025-08-20 10:15:00.000000', '2025-08-20 10:15:00.000000', NULL, 'Phạm Thị D', '0904567890', 'client/images/user-4.png', 'ADMIN', 'phamthid@example.com', 'password123', NULL),
+(5, '2025-08-20 10:20:00.000000', '2025-08-20 10:20:00.000000', NULL, 'Hoàng Minh E', '0905678901', 'client/images/user-5.png', 'USER', 'hoangminhe@example.com', 'password123', NULL);
 
 -- --------------------------------------------------------
 
@@ -621,7 +964,7 @@ INSERT INTO `users` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `name`, `phone
 CREATE TABLE `voucher` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
   `code` varchar(255) NOT NULL,
   `max_discount` int(11) NOT NULL,
@@ -630,25 +973,30 @@ CREATE TABLE `voucher` (
   `is_used` tinyint(4) NOT NULL,
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
-  `usersId` int(11) DEFAULT NULL,
-  `orderId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `user_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `voucher`
 --
 
-INSERT INTO `voucher` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `code`, `max_discount`, `min_order_value`, `quantity`, `is_used`, `start_date`, `end_date`, `usersId`, `orderId`) VALUES
-(1, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'GIAM10K', 10000, 50000, 100, 0, '2025-06-01 00:00:00', '2025-07-01 00:00:00', NULL, NULL),
-(2, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'GIAM20K', 20000, 80000, 50, 0, '2025-06-01 00:00:00', '2025-07-15 00:00:00', NULL, NULL),
-(3, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'SUMMER30', 30000, 100000, 30, 0, '2025-06-10 00:00:00', '2025-07-20 00:00:00', NULL, NULL),
-(4, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'FREESHIP', 15000, 30000, 150, 0, '2025-06-05 00:00:00', '2025-07-05 00:00:00', NULL, NULL),
-(5, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'VIP50K', 50000, 150000, 10, 0, '2025-06-01 00:00:00', '2025-07-01 00:00:00', NULL, NULL),
-(6, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'HELLO25', 25000, 75000, 80, 0, '2025-06-01 00:00:00', '2025-07-10 00:00:00', NULL, NULL),
-(7, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'HAPPYFOOD', 20000, 60000, 60, 0, '2025-06-01 00:00:00', '2025-06-30 00:00:00', NULL, NULL),
-(8, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'NEWUSER', 30000, 90000, 90, 0, '2025-06-01 00:00:00', '2025-08-01 00:00:00', NULL, NULL),
-(9, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'HOTDEAL', 45000, 120000, 20, 0, '2025-06-15 00:00:00', '2025-07-31 00:00:00', NULL, NULL),
-(10, '2025-06-18 14:47:06.000000', '2025-06-18 14:47:06.000000', NULL, 'SAVE100K', 100000, 300000, 5, 0, '2025-06-01 00:00:00', '2025-06-30 00:00:00', NULL, NULL);
+INSERT INTO `voucher` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `code`, `max_discount`, `min_order_value`, `quantity`, `is_used`, `start_date`, `end_date`, `user_id`, `order_id`) VALUES
+(1, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'FREESHIP01', 50000, 0, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(2, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'FREESHIP02', 50000, 0, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(3, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'FREESHIP03', 50000, 0, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(4, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'FREESHIP04', 50000, 0, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(5, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'FREESHIP05', 50000, 0, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(6, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA50K', 50000, 500000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(7, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA100K', 100000, 1000000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(8, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA200K', 200000, 1500000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(9, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA400K', 400000, 2000000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(10, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA500K', 500000, 2500000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(11, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA10P', 10, 300000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(12, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA20P', 20, 400000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(13, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA30P', 30, 500000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(14, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA50P', 50, 600000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL),
+(15, '2025-08-20 12:00:00.000000', '2025-08-20 12:00:00.000000', NULL, 'GIA100P', 100, 1000000, 100, 0, '2025-08-20 00:00:00', '2025-09-20 00:00:00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -659,11 +1007,11 @@ INSERT INTO `voucher` (`id`, `createdAt`, `updatedAt`, `deletedAt`, `code`, `max
 CREATE TABLE `wishlist` (
   `id` int(11) NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   `deletedAt` datetime(6) DEFAULT NULL,
-  `usersId` int(11) DEFAULT NULL,
-  `productId` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `user_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables
@@ -674,7 +1022,7 @@ CREATE TABLE `wishlist` (
 --
 ALTER TABLE `address`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_cc9b2ed4ab9debaf6cb78bd0330` (`usersId`);
+  ADD KEY `FK_35cd6c3fafec0bb5d072e24ea20` (`user_id`);
 
 --
 -- Indexes for table `brand`
@@ -687,15 +1035,15 @@ ALTER TABLE `brand`
 --
 ALTER TABLE `cart`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_588be05d18b7e4427a06e219528` (`usersId`);
+  ADD KEY `FK_f091e86a234693a49084b4c2c86` (`user_id`);
 
 --
 -- Indexes for table `cart_item`
 --
 ALTER TABLE `cart_item`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_75db0de134fe0f9fe9e4591b7bf` (`productId`),
-  ADD KEY `FK_29e590514f9941296f3a2440d39` (`cartId`);
+  ADD KEY `FK_67a2e8406e01ffa24ff9026944e` (`product_id`),
+  ADD KEY `FK_b6b2a4f1f533d89d218e70db941` (`cart_id`);
 
 --
 -- Indexes for table `category`
@@ -704,34 +1052,34 @@ ALTER TABLE `category`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `delivery`
+-- Indexes for table `migrations`
 --
-ALTER TABLE `delivery`
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `news`
+--
+ALTER TABLE `news`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_b37d51328f9ca210b573b19372c` (`orderId`);
+  ADD KEY `fk_news_author` (`author_id`),
+  ADD KEY `fk_news_category` (`category_id`);
 
 --
 -- Indexes for table `order`
 --
 ALTER TABLE `order`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_15d817ff19ae88ce95bb0bb2ce5` (`usersId`);
+  ADD KEY `FK_199e32a02ddc0f47cd93181d8fd` (`user_id`);
 
 --
 -- Indexes for table `order_item`
 --
 ALTER TABLE `order_item`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_904370c093ceea4369659a3c810` (`productId`),
-  ADD KEY `FK_646bf9ece6f45dbe41c203e06e0` (`orderId`);
-
---
--- Indexes for table `payment`
---
-ALTER TABLE `payment`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_d09d285fe1645cd2f0db811e293` (`orderId`),
-  ADD KEY `FK_d9a09e0b9cbbbc3ef5532a282e1` (`usersId`);
+  ADD KEY `FK_5e17c017aa3f5164cb2da5b1c6b` (`product_id`),
+  ADD KEY `FK_e9674a6053adbaa1057848cddfa` (`order_id`),
+  ADD KEY `FK_76becd2a6886dc29cb8202b650b` (`productVariant_id`);
 
 --
 -- Indexes for table `product`
@@ -739,8 +1087,8 @@ ALTER TABLE `payment`
 ALTER TABLE `product`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `IDX_7ac18742b02b8af41afdaa3b9a` (`barcode`),
-  ADD KEY `FK_ff0c0301a95e517153df97f6812` (`categoryId`),
-  ADD KEY `FK_bb7d3d9dc1fae40293795ae39d6` (`brandId`);
+  ADD KEY `FK_0dce9bc93c2d2c399982d04bef1` (`category_id`),
+  ADD KEY `FK_2eb5ce4324613b4b457c364f4a2` (`brand_id`);
 
 --
 -- Indexes for table `product_images`
@@ -754,38 +1102,46 @@ ALTER TABLE `product_images`
 --
 ALTER TABLE `product_variant`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_6e420052844edf3a5506d863ce6` (`productId`);
+  ADD KEY `FK_ca67dd080aac5ecf99609960cd2` (`product_id`);
 
 --
 -- Indexes for table `rating`
 --
 ALTER TABLE `rating`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_1b56a1a54de7bb0d0904c909870` (`orderId`),
-  ADD KEY `FK_588f0e7159a3cd99b8a7333aa2b` (`usersId`),
-  ADD KEY `FK_1fdf6f092aa907177771948f6a1` (`productId`);
+  ADD KEY `FK_17618c8d69b7e2e287bf9f8fbb3` (`user_id`),
+  ADD KEY `FK_2432a0d3bcc975f29eb1e43456b` (`product_id`);
+
+--
+-- Indexes for table `token`
+--
+ALTER TABLE `token`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `REL_e50ca89d635960fda2ffeb1763` (`user_id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `IDX_97672ac88f789774dd47f7c8be` (`email`),
+  ADD UNIQUE KEY `REL_e03e90fb544adefa10a6c20218` (`token_id`);
 
 --
 -- Indexes for table `voucher`
 --
 ALTER TABLE `voucher`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_11c6babba3c49d229e56a6f3e70` (`usersId`),
-  ADD KEY `FK_ede99a601dc036467bb80321579` (`orderId`);
+  ADD KEY `FK_90c55a3063ce5d49ea567a9a9a6` (`user_id`),
+  ADD KEY `FK_6007bc31bfbf3a897c62328066b` (`order_id`);
 
 --
 -- Indexes for table `wishlist`
 --
 ALTER TABLE `wishlist`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FK_ec4c67d98bba94d01c12108b2f9` (`usersId`),
-  ADD KEY `FK_17e00e49d77ccaf7ff0e14de37b` (`productId`);
+  ADD KEY `FK_512bf776587ad5fc4f804277d76` (`user_id`),
+  ADD KEY `FK_16f64e06715ce4fea8257cc42c5` (`product_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -801,13 +1157,13 @@ ALTER TABLE `address`
 -- AUTO_INCREMENT for table `brand`
 --
 ALTER TABLE `brand`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `cart_item`
@@ -819,12 +1175,18 @@ ALTER TABLE `cart_item`
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT for table `delivery`
+-- AUTO_INCREMENT for table `migrations`
 --
-ALTER TABLE `delivery`
+ALTER TABLE `migrations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `news`
+--
+ALTER TABLE `news`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -840,16 +1202,10 @@ ALTER TABLE `order_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `payment`
---
-ALTER TABLE `payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT for table `product_images`
@@ -861,25 +1217,31 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT for table `product_variant`
 --
 ALTER TABLE `product_variant`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
 
 --
 -- AUTO_INCREMENT for table `rating`
 --
 ALTER TABLE `rating`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
+
+--
+-- AUTO_INCREMENT for table `token`
+--
+ALTER TABLE `token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `voucher`
 --
 ALTER TABLE `voucher`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
@@ -895,53 +1257,48 @@ ALTER TABLE `wishlist`
 -- Constraints for table `address`
 --
 ALTER TABLE `address`
-  ADD CONSTRAINT `FK_cc9b2ed4ab9debaf6cb78bd0330` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_35cd6c3fafec0bb5d072e24ea20` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `cart`
 --
 ALTER TABLE `cart`
-  ADD CONSTRAINT `FK_588be05d18b7e4427a06e219528` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_f091e86a234693a49084b4c2c86` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `cart_item`
 --
 ALTER TABLE `cart_item`
-  ADD CONSTRAINT `FK_29e590514f9941296f3a2440d39` FOREIGN KEY (`cartId`) REFERENCES `cart` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_75db0de134fe0f9fe9e4591b7bf` FOREIGN KEY (`productId`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_67a2e8406e01ffa24ff9026944e` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_b6b2a4f1f533d89d218e70db941` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
--- Constraints for table `delivery`
+-- Constraints for table `news`
 --
-ALTER TABLE `delivery`
-  ADD CONSTRAINT `FK_b37d51328f9ca210b573b19372c` FOREIGN KEY (`orderId`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `news`
+  ADD CONSTRAINT `fk_news_author` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_news_category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `order`
 --
 ALTER TABLE `order`
-  ADD CONSTRAINT `FK_15d817ff19ae88ce95bb0bb2ce5` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_199e32a02ddc0f47cd93181d8fd` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `order_item`
 --
 ALTER TABLE `order_item`
-  ADD CONSTRAINT `FK_646bf9ece6f45dbe41c203e06e0` FOREIGN KEY (`orderId`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_904370c093ceea4369659a3c810` FOREIGN KEY (`productId`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Constraints for table `payment`
---
-ALTER TABLE `payment`
-  ADD CONSTRAINT `FK_d09d285fe1645cd2f0db811e293` FOREIGN KEY (`orderId`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_d9a09e0b9cbbbc3ef5532a282e1` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_5e17c017aa3f5164cb2da5b1c6b` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_76becd2a6886dc29cb8202b650b` FOREIGN KEY (`productVariant_id`) REFERENCES `product_variant` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_e9674a6053adbaa1057848cddfa` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `product`
 --
 ALTER TABLE `product`
-  ADD CONSTRAINT `FK_bb7d3d9dc1fae40293795ae39d6` FOREIGN KEY (`brandId`) REFERENCES `brand` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_ff0c0301a95e517153df97f6812` FOREIGN KEY (`categoryId`) REFERENCES `category` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_0dce9bc93c2d2c399982d04bef1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_2eb5ce4324613b4b457c364f4a2` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `product_images`
@@ -953,29 +1310,40 @@ ALTER TABLE `product_images`
 -- Constraints for table `product_variant`
 --
 ALTER TABLE `product_variant`
-  ADD CONSTRAINT `FK_6e420052844edf3a5506d863ce6` FOREIGN KEY (`productId`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_ca67dd080aac5ecf99609960cd2` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `rating`
 --
 ALTER TABLE `rating`
-  ADD CONSTRAINT `FK_1b56a1a54de7bb0d0904c909870` FOREIGN KEY (`orderId`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_1fdf6f092aa907177771948f6a1` FOREIGN KEY (`productId`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_588f0e7159a3cd99b8a7333aa2b` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_17618c8d69b7e2e287bf9f8fbb3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_2432a0d3bcc975f29eb1e43456b` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `token`
+--
+ALTER TABLE `token`
+  ADD CONSTRAINT `FK_e50ca89d635960fda2ffeb17639` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `FK_e03e90fb544adefa10a6c202188` FOREIGN KEY (`token_id`) REFERENCES `token` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `voucher`
 --
 ALTER TABLE `voucher`
-  ADD CONSTRAINT `FK_11c6babba3c49d229e56a6f3e70` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_ede99a601dc036467bb80321579` FOREIGN KEY (`orderId`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_6007bc31bfbf3a897c62328066b` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_90c55a3063ce5d49ea567a9a9a6` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  ADD CONSTRAINT `FK_17e00e49d77ccaf7ff0e14de37b` FOREIGN KEY (`productId`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK_ec4c67d98bba94d01c12108b2f9` FOREIGN KEY (`usersId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `FK_16f64e06715ce4fea8257cc42c5` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `FK_512bf776587ad5fc4f804277d76` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
