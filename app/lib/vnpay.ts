@@ -14,8 +14,8 @@ export interface VNPayPaymentRequest {
   amount: number;
   orderId: string;
   orderInfo: string;
-  customerEmail?: string;
-  customerPhone?: string;
+  ?: string;
+  ?: string;
 }
 
 export function createVNPayUrl(paymentData: VNPayPaymentRequest): string {
@@ -24,10 +24,10 @@ export function createVNPayUrl(paymentData: VNPayPaymentRequest): string {
   
   const txnRef = `TX_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
-  const vnpParams: any = {
+  const vnpParams: unknown = {
     vnp_Version: '2.1.0',
     vnp_Command: 'pay',
-    vnp_TmnCode: VNPAY_CONFIG.TMN_CODE,
+    : VNPAY_CONFIG.TMN_CODE,
     vnp_Amount: paymentData.amount * 100, // VNPAY yêu cầu số tiền nhân 100
     vnp_CurrCode: VNPAY_CONFIG.CURRENCY,
     vnp_BankCode: '',
@@ -43,16 +43,16 @@ export function createVNPayUrl(paymentData: VNPayPaymentRequest): string {
 
   // Thêm thông tin khách hàng nếu có
   if (paymentData.customerEmail) {
-    vnpParams.vnp_Email = paymentData.customerEmail;
+    vnpParams.vnp_Email = paymentData.;
   }
   if (paymentData.customerPhone) {
-    vnpParams.vnp_Phone = paymentData.customerPhone;
+    vnpParams.vnp_Phone = paymentData.;
   }
 
   // Sắp xếp các tham số theo thứ tự alphabet
   const sortedParams = Object.keys(vnpParams)
     .sort()
-    .reduce((result: any, key) => {
+    .reduce((result: unknown, key) => {
       result[key] = vnpParams[key];
       return result;
     }, {});
@@ -73,17 +73,17 @@ export function createVNPayUrl(paymentData: VNPayPaymentRequest): string {
   return vnpUrl;
 }
 
-export function verifyVNPayResponse(queryParams: any): boolean {
+export function verifyVNPayResponse(queryParams: unknown): boolean {
   const secureHash = queryParams['vnp_SecureHash'];
   
   // Loại bỏ vnp_SecureHash và vnp_SecureHashType khỏi params
-  delete queryParams['vnp_SecureHash'];
+  delete queryParams[''];
   delete queryParams['vnp_SecureHashType'];
 
   // Sắp xếp các tham số theo thứ tự alphabet
   const sortedParams = Object.keys(queryParams)
     .sort()
-    .reduce((result: any, key) => {
+    .reduce((result: unknown, key) => {
       result[key] = queryParams[key];
       return result;
     }, {});

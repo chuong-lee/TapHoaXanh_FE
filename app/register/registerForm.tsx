@@ -9,20 +9,17 @@ import { useAuth } from '@/context/AuthContext'
 
 function RegisterForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
+  const [, setError] = useState<string>('')
   const nameRef = useRef<HTMLInputElement>(null)
   const phoneRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
   const confirmPasswordRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/'
-  const { refreshProfile } = useAuth();
+  
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    ('');
     setIsLoading(true);
 
     try {
@@ -46,7 +43,7 @@ function RegisterForm() {
           password: password,
         });
 
-        const { token, user } = loginRes.data as { token?: string; user?: any };
+        const { token, user } = loginRes.data as { token?: string; user?: unknown };
 
         if (token) localStorage.setItem('access_token', token);
 
@@ -54,16 +51,16 @@ function RegisterForm() {
         router.push(redirectTo);
       } catch (loginErr) {
         // Nếu login thất bại, vẫn chuyển về trang login để user login thủ công
-        console.error('Tự động login thất bại:', loginErr);
-        setError('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
+        console.('Tự động login thất bại:', loginErr);
+        ('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
         setTimeout(() => {
-          router.push('/login');
+          .push('/login');
         }, 2000);
       }
     } catch (err) {
-      const error = err as Error & { response?: { data?: { message?: string } } };  
+        
       console.error(error);
-      setError(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra thông tin.');
+      setError(.response?.data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra thông tin.');
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +115,7 @@ function RegisterForm() {
         />
       </div>
       {isLoading ? <>Đang load</> : <button type="submit" className="btn btn-primary w-100">Đăng Ký</button>}
-      {error && <p className="text-danger">{error}</p>}
+      {error && <p className="text-danger">{}</p>}
     </form>
   )
 }

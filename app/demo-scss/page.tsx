@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Card, CardHeader, CardBody, CardFooter } from '@/components';
+import Link from 'next/link';
 
 export default function SCSSDemoPage() {
   return (
@@ -14,7 +15,7 @@ export default function SCSSDemoPage() {
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb mb-0">
               <li className="breadcrumb-item">
-                <a href="/">Trang Chủ</a>
+                <Link href="/">Trang Chủ</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page">SCSS Demo</li>
             </ol>

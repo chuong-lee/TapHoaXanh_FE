@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { , useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -17,209 +17,7 @@ type News = {
 }
 
 // Hàm helper để xử lý URL hình ảnh
-const processImageUrl = (imageData: unknown): string => {
-  if (!imageData) return '/images/hinh1.jpg'
-  
-  // Nếu là array, lấy phần tử đầu tiên
-  if (Array.isArray(imageData)) {
-    return imageData.length > 0 ? imageData[0] : '/images/hinh1.jpg'
-  }
-  
-  // Nếu là string
-  if (typeof imageData === 'string') {
-    // Kiểm tra nếu là JSON array trong string
-    try {
-      const parsed = JSON.parse(imageData)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed[0]
-      }
-    } catch {
-      // Nếu không parse được, sử dụng string gốc
-      return imageData
-    }
-    return imageData
-  }
-  
-  return '/images/hinh1.jpg'
-}
 
-export default function NewsDetailPage() {
-  const { id } = useParams()
-  const [news, setNews] = useState<News | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    // Thử endpoint posts trước, nếu không có thì thử news
-    const fetchNewsDetail = async () => {
-      try {
-        console.log('Fetching news detail for ID:', id)
-        
-        // Gọi local API posts
-        let response = await fetch(`/api/posts/${id}`)
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        
-        const apiResponse = await response.json()
-        console.log('API response:', apiResponse)
-        
-        // Lấy data từ response
-        const newsItem = apiResponse.data
-        
-        // Xử lý dữ liệu từ API
-        const newsData = {
-          id: newsItem.id,
-          title: newsItem.title || 'Tiêu đề bài viết',
-          image: newsItem.image || '/images/hinh1.jpg',
-          date: newsItem.createdAt ? new Date(newsItem.createdAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN'),
-          views: newsItem.views || Math.floor(Math.random() * 1000) + 100,
-          readTime: newsItem.readTime || '5 phút',
-          description: newsItem.description || 'Nội dung bài viết đang được cập nhật...',
-          category: newsItem.category || getRandomCategory(),
-          content: newsItem.content || newsItem.description || 'Nội dung chi tiết đang được cập nhật...'
-        }
-        
-        console.log('Processed news data:', newsData)
-        setNews(newsData)
-        setIsLoading(false)
-      } catch (error) {
-        console.error('Lỗi khi tải chi tiết bài viết:', error)
-        setIsLoading(false)
-      }
-    }
-    
-    if (id) {
-      fetchNewsDetail()
-    }
-  }, [id])
-
-  const getRandomCategory = () => {
-    const categories = ['Tin Khuyến Mãi', 'Sản Phẩm Mới', 'Sức Khỏe', 'Ẩm Thực', 'Lifestyle']
-    return categories[Math.floor(Math.random() * categories.length)]
-  }
-
-  if (isLoading) {
-    return (
-      <main className="main-content">
-        <div className="container py-4">
-          <div className="text-center">
-            <div className="spinner-border text-success" role="status">
-              <span className="visually-hidden">Đang tải...</span>
-            </div>
-            <p className="mt-3">Đang tải bài viết...</p>
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  if (!news) {
-    return (
-      
-        <div className="container py-4">
-          <div className="text-center">
-            <h3 className="text-danger">Không tìm thấy bài viết</h3>
-            <Link href="/news" className="btn btn-success mt-3">
-              Quay lại trang tin tức
-            </Link>
-          </div>
-        </div>
-      
-    )
-  }
-
-  return (
-    <>
-      {/* Breadcrumb Section */}
-      <div className="breadcrumb-section">
-        <div className="container">
-          <h3 className="text-center">Chi Tiết Tin Tức</h3>
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb mb-0">
-              <li className="breadcrumb-item">
-                <Link href="/">Trang Chủ</Link>
-              </li>
-              <li className="breadcrumb-item">
-                <Link href="/news">Tin Tức</Link>
-              </li>
-              <li className="breadcrumb-item active" aria-current="page">Chi Tiết</li>
-            </ol>
-          </nav>
-        </div>
-      </div>
-
-      <main className="main-content">
-        <div className="container py-4">
-          <div style={{display: 'flex', gap: 32}}>
-            {/* Main content */}
-            <div style={{flex: 3}}>
-              <div style={{
-                background: '#fff',
-                borderRadius: 16,
-                padding: 32,
-                boxShadow: '0 2px 12px rgba(34,197,94,0.10)',
-                border: '1.5px solid #e0fbe2'
-              }}>
-                {/* Breadcrumb */}
-                <div style={{marginBottom: 24}}>
-                  <Link href="/news" style={{color: '#22c55e', textDecoration: 'none'}}>
-                    ← Quay lại Tin Tức
-                  </Link>
-                </div>
-
-                {/* Category badge */}
-                <div style={{marginBottom: 16}}>
-                  <span style={{
-                    background: '#e0fbe2',
-                    color: '#22c55e',
-                    borderRadius: 8,
-                    padding: '6px 16px',
-                    fontSize: 14,
-                    fontWeight: 600
-                  }}>
-                    {news.category}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h1 style={{
-                  fontWeight: 700,
-                  fontSize: '2.5rem',
-                  marginBottom: 16,
-                  color: '#222',
-                  lineHeight: 1.3
-                }}>
-                  {news.title}
-                </h1>
-
-                {/* Meta info */}
-                <div style={{
-                  color: '#666',
-                  fontSize: 16,
-                  marginBottom: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16
-                }}>
-                  <span>📅 {news.date}</span>
-                  <span>👁️ {news.views} lượt xem</span>
-                  <span>⏱️ {news.readTime}</span>
-                </div>
-
-                {/* Featured image */}
-                <div style={{ position: 'relative', width: '100%', height: '400px', marginBottom: 32 }}>
-                  <Image 
-                    src={news.image} 
-                    alt={news.title} 
-                    fill
-                    style={{
-                      objectFit: 'cover',
-                      borderRadius: 16
-                    }}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
                       target.src = '/images/hinh1.jpg';
                     }}
                   />
@@ -429,7 +227,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
   const [related, setRelated] = useState<News[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
+  (() => {
     const fetchRelatedPosts = async () => {
       try {
         console.log('Fetching related posts...')
@@ -438,7 +236,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
         let response = await fetch('/api/posts')
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP ! status: ${response.status}`)
         }
         
         const apiResponse = await response.json()
@@ -472,7 +270,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
         setRelated(mapped)
         setIsLoading(false)
       } catch (error) {
-        console.error('Lỗi khi tải bài viết liên quan:', error)
+        console.error('Lỗi khi tải bài viết liên quan:', )
         setIsLoading(false)
       }
     }

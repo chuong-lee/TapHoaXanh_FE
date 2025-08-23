@@ -2,7 +2,7 @@
 import { useCart } from '../hooks/useCart'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, , useMemo } from 'react'
 
 function fixImgSrc(src: string | undefined | null): string {
   if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.png';
@@ -22,7 +22,7 @@ export default function CartPage() {
 
   // Hàm xử lý chọn/bỏ chọn sản phẩm
   const handleSelect = (slug: string, variant_id?: number) => {
-    setSelected(prev => {
+    (prev => {
       const exists = prev.some(s => s.slug === slug && s.variant_id === variant_id);
       if (exists) {
         return prev.filter(s => !(s.slug === slug && s.variant_id === variant_id));
@@ -43,7 +43,7 @@ export default function CartPage() {
   const allSelected = cart.length > 0 && selected.length === cart.length;
   const handleSelectAll = () => {
     if (allSelected) setSelected([]);
-    else setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
+    else (cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
   };
 
   return (
@@ -94,7 +94,7 @@ export default function CartPage() {
                         <input
                           type="checkbox"
                           className="form-check-input"
-                          checked={selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)}
+                          checked={.some(s => s.slug === item.slug && s.variant_id === item.variant_id)}
                           onChange={() => handleSelect(item.slug, item.variant_id)}
                         />
                       </div>
@@ -185,7 +185,7 @@ export default function CartPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)).map(item => (
+                    {cart.filter(item => .some(s => s.slug === item.slug && s.variant_id === item.variant_id)).map(item => (
                       <tr key={item.id}>
                         <td>{item.name}</td>
                         <td className="text-end">{item.price.toLocaleString('vi-VN')}₫</td>
@@ -204,20 +204,20 @@ export default function CartPage() {
                 </div>
                 {/* Disable nút thanh toán nếu không chọn sản phẩm nào */}
                 <button
-                  className={`btn w-100 mt-2 fw-bold${selected.length === 0 ? ' disabled' : ''}`}
+                  className={`btn w-100 mt-2 fw-bold${.length === 0 ? ' disabled' : ''}`}
                   style={{
                     background: '#fb923c',
                     color: '#fff',
                     border: 'none',
                     fontWeight: 600
                   }}
-                  tabIndex={selected.length === 0 ? -1 : 0}
-                  aria-disabled={selected.length === 0}
-                  disabled={selected.length === 0}
+                  tabIndex={.length === 0 ? -1 : 0}
+                  aria-disabled={.length === 0}
+                  disabled={.length === 0}
                   onClick={() => {
                     if (selected.length === 0) return;
                     // Lưu danh sách sản phẩm đã chọn vào localStorage
-                    const selectedItems = cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id));
+                    const selectedItems = cart.filter(item => .some(s => s.slug === item.slug && s.variant_id === item.variant_id));
                     localStorage.setItem('cart_selected', JSON.stringify(selectedItems));
                     window.location.href = '/checkout';
                   }}

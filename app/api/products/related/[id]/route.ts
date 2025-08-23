@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery } from '@/lib/db'
+import { , NextResponse } from 'next/server'
+import {  } from '@/lib/db'
 
 interface RelatedProduct {
   id: number
@@ -118,7 +118,7 @@ export async function GET(
       name: product.name,
       price: product.price,
       discount: product.discount,
-      images: processImageUrl(product.images),
+      images: (product.images),
       slug: product.slug,
       description: product.description,
       quantity: product.quantity,
@@ -164,7 +164,7 @@ export async function GET(
     return NextResponse.json({
       success: false,
       message: 'Lỗi server khi lấy sản phẩm liên quan',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown '
     }, { status: 500 })
   }
 }

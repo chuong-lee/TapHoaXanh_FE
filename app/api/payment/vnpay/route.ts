@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { , NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { executeQuery } from '@/lib/db';
+import {  } from '@/lib/db';
 
 // VNPay Configuration
 const VNPAY_TMN_CODE = process.env.VNPAY_TMN_CODE || '2QXUI4J4';
@@ -10,13 +10,13 @@ const VNPAY_RETURN_URL = process.env.VNPAY_RETURN_URL || 'http://localhost:3000/
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { orderId, amount, customerEmail, customerPhone } = body;
+    const body = await .json();
+    const { orderId, amount, ,  } = body;
 
     // Validate required fields
     if (!orderId || !amount) {
       return NextResponse.json(
-        { success: false, error: 'Missing order ID or amount' },
+        { success: false, : 'Missing order ID or amount' },
         { status: 400 }
       );
     }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('VNPay payment error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create payment URL' },
+      { success: false, : 'Failed to create payment URL' },
       { status: 500 }
     );
   }
@@ -53,8 +53,8 @@ interface VNPayParams {
   amount: number;
   orderId: string;
   orderInfo: string;
-  customerEmail?: string;
-  customerPhone?: string;
+  ?: string;
+  ?: string;
 }
 
 function createVNPayUrl(params: VNPayParams): string {
@@ -67,7 +67,7 @@ function createVNPayUrl(params: VNPayParams): string {
   const vnpParams: Record<string, string> = {
     vnp_Version: '2.1.0',
     vnp_Command: 'pay',
-    vnp_TmnCode: VNPAY_TMN_CODE,
+    : VNPAY_TMN_CODE,
     vnp_Amount: amount.toString(),
     vnp_CurrCode: 'VND',
     vnp_BankCode: '',
@@ -82,10 +82,10 @@ function createVNPayUrl(params: VNPayParams): string {
 
   // Add optional parameters
   if (params.customerEmail) {
-    vnpParams.vnp_Email = params.customerEmail;
+    vnpParams.vnp_Email = params.;
   }
   if (params.customerPhone) {
-    vnpParams.vnp_Phone = params.customerPhone;
+    vnpParams.vnp_Phone = params.;
   }
 
   // Sort parameters alphabetically

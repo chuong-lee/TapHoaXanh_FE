@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.84.2",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.7",
     "critters": "^0.0.23",

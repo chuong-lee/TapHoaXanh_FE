@@ -1,7 +1,8 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState,  } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PaymentGateway from '../components/payment/PaymentGateway';
+import Link from 'next/link';
 
 interface OrderData {
   id: string;
@@ -17,17 +18,17 @@ interface OrderData {
 }
 
 export default function PaymentPage() {
-  const router = useRouter();
+  
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  (() => {
     if (!orderId) {
-      setError('Không tìm thấy mã đơn hàng');
+      ('Không tìm thấy mã đơn hàng');
       setLoading(false);
       return;
     }
@@ -46,8 +47,8 @@ export default function PaymentPage() {
 
       setOrderData(result.data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
-      setError(errorMessage);
+      const errorMessage = err instanceof Error ? .message : 'Lỗi không xác định';
+      (errorMessage);
     } finally {
       setLoading(false);
     }
@@ -55,12 +56,12 @@ export default function PaymentPage() {
 
   const handlePaymentSuccess = (transactionId: string) => {
     // Redirect to success page
-    router.push(`/payment/success?transactionId=${transactionId}&orderId=${orderId}`);
+    .push(`/payment/success?transactionId=${transactionId}&orderId=${orderId}`);
   };
 
   const handlePaymentError = (error: string) => {
     // Redirect to error page
-    router.push(`/payment/error?error=${encodeURIComponent(error)}&orderId=${orderId}`);
+    .push(`/payment/error?error=${encodeURIComponent()}&orderId=${orderId}`);
   };
 
   if (loading) {
@@ -91,10 +92,10 @@ export default function PaymentPage() {
               <div className="card-body text-center">
                 <i className="fa fa-exclamation-triangle text-danger" style={{ fontSize: '3rem' }}></i>
                 <h4 className="mt-3">Lỗi</h4>
-                <p className="text-muted">{error || 'Không thể tải thông tin đơn hàng'}</p>
+                <p className="text-muted">{ || 'Không thể tải thông tin đơn hàng'}</p>
                 <button 
                   className="btn btn-primary"
-                  onClick={() => router.push('/')}
+                  onClick={() => .push('/')}
                 >
                   <i className="fa fa-home me-2"></i>
                   Về trang chủ

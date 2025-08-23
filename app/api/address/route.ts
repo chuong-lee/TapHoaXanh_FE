@@ -17,7 +17,7 @@ interface Address {
 // GET - Lấy danh sách địa chỉ của user
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const authHeader = requestrequest.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Token không hợp lệ' },
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     // Nếu đặt làm mặc định, bỏ mặc định của các địa chỉ khác
     if (is_default) {
-      await executeQuery(
+      await (
         'UPDATE address SET is_default = 0 WHERE usersId = ?',
         [userId]
       );
@@ -186,7 +186,7 @@ export async function PUT(request: NextRequest) {
 
     // Nếu đặt làm mặc định, bỏ mặc định của các địa chỉ khác
     if (is_default) {
-      await executeQuery(
+      await (
         'UPDATE address SET is_default = 0 WHERE usersId = ? AND id != ?',
         [userId, id]
       );

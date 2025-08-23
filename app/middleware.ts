@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import type {  } from 'next/server'
 
 // Protected routes that require authentication
 const protectedRoutes = [
@@ -42,37 +42,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith(route)
   )
   
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  )
-
-  // Redirect to login if accessing protected route without token
-  if (isProtectedRoute && !token) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // For admin routes, we'll need to verify admin role
-  // This is a basic check - in production you'd decode and verify the JWT
-  if (isAdminRoute && !token) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // Redirect authenticated users away from login/register pages
-  if (token && (pathname === '/login' || pathname === '/register')) {
-    const redirectPath = request.nextUrl.searchParams.get('redirect') || '/'
-    return NextResponse.redirect(new URL(redirectPath, request.url))
-  }
-
-  // Add security headers
-  const response = NextResponse.next()
-  
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
+   mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   
   return response
@@ -82,7 +52,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match all  paths except for the ones starting with:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)

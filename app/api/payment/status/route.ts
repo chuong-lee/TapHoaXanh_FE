@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 
 // GET - Lấy trạng thái thanh toán của đơn hàng
 export async function GET(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     if (!orderId) {
       return NextResponse.json(
-        { success: false, error: 'Order ID is required' },
+        { success: false, : 'Order ID is required' },
         { status: 400 }
       );
     }
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     if (!orderRows || (orderRows as any[]).length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Order not found' },
+        { success: false, : 'Order not found' },
         { status: 404 }
       );
     }
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching payment status:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Internal server ' },
       { status: 500 }
     );
   }
@@ -57,12 +57,12 @@ export async function GET(request: NextRequest) {
 // POST - Cập nhật trạng thái thanh toán
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await .json();
     const { orderId, paymentStatus, paymentMethod, amount, failureReason } = body;
 
     if (!orderId || !paymentStatus) {
       return NextResponse.json(
-        { success: false, error: 'Order ID and payment status are required' },
+        { success: false, : 'Order ID and payment status are required' },
         { status: 400 }
       );
     }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     if (!orderRows || (orderRows as any[]).length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Order not found' },
+        { success: false, : 'Order not found' },
         { status: 404 }
       );
     }
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     if ((existingPayment as any[]).length > 0) {
       // Cập nhật payment hiện có
-      await executeQuery(
+      await (
         `UPDATE payments 
          SET status = ?, method = ?, amount = ?, failure_reason = ?, updated_at = NOW()
          WHERE order_id = ?`,
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       );
     } else {
       // Tạo payment record mới
-      await executeQuery(
+      await (
         `INSERT INTO payments (order_id, status, method, amount, failure_reason, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
         [orderId, paymentStatus, paymentMethod, amount, failureReason]
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error updating payment status:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Internal server ' },
       { status: 500 }
     );
   }
@@ -138,12 +138,12 @@ export async function POST(request: NextRequest) {
 // PUT - Xử lý thanh toán thất bại do số dư không đủ
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await .json();
     const { orderId, paymentMethod, amount, bankAccount } = body;
 
     if (!orderId || !paymentMethod || !amount) {
       return NextResponse.json(
-        { success: false, error: 'Order ID, payment method and amount are required' },
+        { success: false, : 'Order ID, payment method and amount are required' },
         { status: 400 }
       );
     }
@@ -225,7 +225,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error processing payment:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Internal server ' },
       { status: 500 }
     );
   }

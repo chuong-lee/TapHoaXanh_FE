@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AboutUsPage() {
   return (
@@ -26,10 +27,12 @@ export default function AboutUsPage() {
           <div className="row align-items-start mb-4">
             <div className="col-lg-5 mb-4 mb-lg-0">
               <div className="abouts-img">
-                <img
+                <Image
                   className="rounded shadow hero-image"
                   src="/client/images/build.png"
                   alt="Building"
+                  width={500}
+                  height={300}
                 />
               </div>
             </div>
@@ -49,27 +52,35 @@ export default function AboutUsPage() {
               </p>
               <div className="row g-3 mb-5">
                 <div className="col-3 hvr-float">
-                  <img
+                  <Image alt=""
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
                     src="/client/images/gallery-1.png"
+                    width={150}
+                    height={150}
                   />
                 </div>
                 <div className="col-3 hvr-float">
-                  <img
+                  <Image alt=""
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
                     src="/client/images/gallery-2.png"
+                    width={150}
+                    height={150}
                   />
                 </div>
                 <div className="col-3 hvr-float">
-                  <img
+                  <Image alt=""
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
                     src="/client/images/gallery-3.png"
+                    width={150}
+                    height={150}
                   />
                 </div>
                 <div className="col-3 hvr-float">
-                  <img
+                  <Image alt=""
                     className="img-fluid rounded shadow-sm w-100 gallery-thumbnail"
                     src="/client/images/gallery-4.png"
+                    width={150}
+                    height={150}
                   />
                 </div>
               </div>
@@ -81,10 +92,12 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-1.png"
                     alt="Best Prices"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">
@@ -100,9 +113,11 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image alt=""
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-2.png"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">Đa dạng sản phẩm</h5>
@@ -116,9 +131,11 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image alt=""
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-3.png"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">Giao hàng miễn phí</h5>
@@ -134,9 +151,11 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image alt=""
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-4.png"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">Đổi trả dễ dàng</h5>
@@ -150,9 +169,11 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image alt=""
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-5.png"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">100% hài lòng</h5>
@@ -166,9 +187,11 @@ export default function AboutUsPage() {
             <div className="col-md-4">
               <div className="p-4 rounded text-center shadow-sm provide-box">
                 <div className="provide-box-img">
-                  <img
+                  <Image alt=""
                     className="mb-3 provide-box-img-icon"
                     src="/client/images/icon-6.png"
+                    width={64}
+                    height={64}
                   />
                 </div>
                 <h5 className="text-about mb-2">Khuyến mãi hằng ngày</h5>
@@ -185,17 +208,21 @@ export default function AboutUsPage() {
             <div className="col-md-5 performance-images">
               <div className="row g-3">
                 <div className="col-6">
-                  <img
+                  <Image
                     className="img-fluid rounded shadow-sm"
                     src="performance1.jpg"
                     alt="Performance 1"
+                    width={300}
+                    height={200}
                   />
                 </div>
                 <div className="col-6">
-                  <img
+                  <Image
                     className="img-fluid rounded shadow-sm"
                     src="performance2.jpg"
                     alt="Performance 2"
+                    width={300}
+                    height={200}
                   />
                 </div>
               </div>

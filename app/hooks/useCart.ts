@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useRef } from "react"
+import { , useState, useRef } from "react"
 import api from "../lib/axios"
 
 export type CartItem = {
@@ -18,7 +18,7 @@ export type CartItem = {
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
+  const [, ] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
   const prevCartLength = useRef(cart.length);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function useCart() {
 
   useEffect(() => {
     if (cart.length !== prevCartLength.current) {
-      setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
+      (cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
       prevCartLength.current = cart.length;
     }
   }, [cart]);
@@ -88,7 +88,7 @@ export function useCart() {
       await api.post("/api/cart/sync", cart)
       localStorage.removeItem("cart_local")
     } catch (error) {
-      console.error("Sync giỏ hàng thất bại:", error)
+      console.error("Sync giỏ hàng thất bại:", )
     }
   }
 

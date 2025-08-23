@@ -1,7 +1,5 @@
 // components/CategoryFilter.tsx
 'use client'
-import { useState, useRef } from 'react'
-
 interface FilterProps {
   onFilter: (filters: { name: string; min: string; max: string; sort: string }) => void
 }

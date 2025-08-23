@@ -36,12 +36,12 @@ export function getPool(): mysql.Pool {
     })
 
     pool.on('error', (err) => {
-      console.error('Database pool error:', err)
-      if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      console.error('Database pool :', err)
+      if (.code === 'PROTOCOL_CONNECTION_LOST') {
         // Recreate pool if connection is lost
         pool = mysql.createPool(dbConfig)
       } else {
-        throw err
+        throw 
       }
     })
   }
@@ -52,7 +52,7 @@ export function getPool(): mysql.Pool {
 // Execute query with connection pool
 export async function executeQuery<T>(
   query: string, 
-  params: any[] = []
+  params: unknown[] = []
 ): Promise<T> {
   const pool = getPool()
   
@@ -63,7 +63,7 @@ export async function executeQuery<T>(
     console.error('Database query error:', error)
     console.error('Query:', query)
     console.error('Params:', params)
-    throw error
+    throw 
   }
 }
 
@@ -83,7 +83,7 @@ export async function closePool(): Promise<void> {
 
 export default {
   getPool,
-  executeQuery,
+  ,
   getConnection,
   closePool
 }

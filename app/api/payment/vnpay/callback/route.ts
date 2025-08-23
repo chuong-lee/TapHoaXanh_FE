@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { , NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { executeQuery } from '@/lib/db';
+import {  } from '@/lib/db';
 
 const VNPAY_HASH_SECRET = process.env.VNPAY_HASH_SECRET || 'KASJHDFKASJHFKASJHFKASJHF';
 
@@ -20,15 +20,15 @@ export async function GET(request: NextRequest) {
     const {
       vnp_Amount,
       vnp_BankCode,
-      vnp_BankTranNo,
-      vnp_CardType,
+      ,
+      ,
       vnp_OrderInfo,
       vnp_PayDate,
       vnp_ResponseCode,
-      vnp_TmnCode,
+      ,
       vnp_TransactionNo,
       vnp_TxnRef,
-      vnp_SecureHash
+      
     } = vnpParams;
 
     // Verify secure hash
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     
     if (!isValidSignature) {
       console.error('VNPay signature verification failed');
-      return NextResponse.redirect(new URL('/payment/failed?error=invalid_signature', request.url));
+      return NextResponse.redirect(new URL('/payment/failed?=invalid_signature', .url));
     }
 
     // Check response code
@@ -80,14 +80,14 @@ export async function GET(request: NextRequest) {
           payDate: vnp_PayDate
         });
       } catch (dbError) {
-        console.error('Failed to update order status:', dbError);
+        console.('Failed to update order status:', dbError);
       }
 
       // Redirect to success page
       return NextResponse.redirect(new URL(`/payment/success?orderId=${vnp_TxnRef}&transactionId=${vnp_TransactionNo}`, request.url));
     } else {
       // Payment failed
-      console.error('VNPay payment failed:', {
+      console.('VNPay payment failed:', {
         orderId: vnp_TxnRef,
         responseCode: vnp_ResponseCode,
         orderInfo: vnp_OrderInfo
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
         const gatewayResponse = JSON.stringify({
           responseCode: vnp_ResponseCode,
           orderInfo: vnp_OrderInfo,
-          error: 'Payment failed'
+          : 'Payment failed'
         });
 
         await executeQuery(updateOrderQuery, [
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
           vnp_TxnRef
         ]);
       } catch (dbError) {
-        console.error('Failed to update order status:', dbError);
+        console.('Failed to update order status:', dbError);
       }
 
       // Redirect to failed page
@@ -124,14 +124,14 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('VNPay callback error:', error);
-    return NextResponse.redirect(new URL('/payment/failed?error=callback_error', request.url));
+    return NextResponse.redirect(new URL('/payment/failed?=callback_error', .url));
   }
 }
 
 function verifyVNPaySignature(params: Record<string, string>, secureHash: string): boolean {
   try {
     // Remove vnp_SecureHash from parameters
-    const { vnp_SecureHash, ...otherParams } = params;
+    const { , ...otherParams } = params;
     
     // Sort parameters alphabetically
     const sortedParams = Object.keys(otherParams)
@@ -152,7 +152,7 @@ function verifyVNPaySignature(params: Record<string, string>, secureHash: string
 
     return calculatedHash === secureHash;
   } catch (error) {
-    console.error('VNPay signature verification error:', error);
+    console.error('VNPay signature verification error:', );
     return false;
   }
 }

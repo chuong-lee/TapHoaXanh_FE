@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState,  } from 'react';
 import { useParams } from 'next/navigation';
 import api from '@/lib/axios';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface OrderItem {
   id: number;
@@ -21,7 +23,7 @@ interface Order {
   deliveryDate: string;
   items: OrderItem[];
   address: string;
-  user: any;
+  user: unknown;
   quantity: number;
   comment: string;
 }
@@ -32,15 +34,15 @@ export default function InvoicePage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  (() => {
     const fetchOrder = async () => {
       try {
         const response = await api.get(`/order/${orderId}`);
         if (response.data?.success) {
           setOrder(response.data.data);
         }
-      } catch (error) {
-        console.error('Error fetching order:', error);
+      } catch {
+        console.error('Error fetching order');
       } finally {
         setLoading(false);
       }
@@ -188,10 +190,12 @@ export default function InvoicePage() {
                     <tr key={index}>
                       <td style={{ padding: '12px', border: '1px solid #e9ecef' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <img 
+                          <Image 
                             src={item.images} 
                             alt={item.name}
-                            style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }}
+                            width={50}
+                            height={50}
+                            style={{ objectFit: 'cover', borderRadius: '4px' }}
                           />
                           <span>{item.name}</span>
                         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState,  } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -31,7 +31,7 @@ interface Order {
   deliveryDate: string;
   items: OrderItem[];
   address: string;
-  user: any;
+  user: unknown;
   quantity: number;
   comment: string;
 }
@@ -77,7 +77,7 @@ export default function ProfilePage() {
       const response = await api.get('/order');
       const apiOrders = response.data?.data || response.data || [];
       
-      const mappedOrders = apiOrders.map((order: any) => ({
+      const mappedOrders = apiOrders.map((order: unknown) => ({
         id: order.id,
         createdAt: order.createdAt || new Date().toISOString(),
         price: order.price || order.payment_amount || 0,
@@ -93,8 +93,8 @@ export default function ProfilePage() {
       }));
       
       setOrders(mappedOrders);
-    } catch (error: any) {
-      console.error('Error fetching orders:', error);
+    } catch (error: unknown) {
+      console.error('Error fetching orders:', );
       setOrders([]);
     } finally {
       setOrdersLoading(false);
@@ -214,8 +214,8 @@ export default function ProfilePage() {
       });
       alert('Đơn hàng đã được hủy thành công');
       fetchOrders(); // Reload orders
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra khi hủy đơn hàng';
+    } catch (error: unknown) {
+      const errorMessage = error.response?.data?. || 'Có lỗi xảy ra khi hủy đơn hàng';
       alert(errorMessage);
     }
   };
@@ -230,7 +230,7 @@ export default function ProfilePage() {
         setSelectedOrder(orderDetail);
         setShowOrderDetailModal(true);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       alert('Không thể tải chi tiết đơn hàng');
     }
   };

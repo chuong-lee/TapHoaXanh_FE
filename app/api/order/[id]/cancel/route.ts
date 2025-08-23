@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 
 export async function PUT(
@@ -7,10 +7,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const authHeader = .headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ' },
+        { : 'Token không hợp lệ' },
         { status: 401 }
       );
     }
@@ -21,7 +21,7 @@ export async function PUT(
       decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key') as any;
     } catch (jwtError) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ hoặc đã hết hạn' },
+        { : 'Token không hợp lệ hoặc đã hết hạn' },
         { status: 401 }
       );
     }
@@ -39,7 +39,7 @@ export async function PUT(
     
     if (!order || order.length === 0) {
       return NextResponse.json(
-        { error: 'Đơn hàng không tồn tại' },
+        { : 'Đơn hàng không tồn tại' },
         { status: 404 }
       );
     }
@@ -49,7 +49,7 @@ export async function PUT(
     // Chỉ cho phép hủy đơn hàng ở trạng thái pending hoặc confirmed
     if (!['pending', 'confirmed'].includes(currentStatus)) {
       return NextResponse.json(
-        { error: 'Không thể hủy đơn hàng ở trạng thái này' },
+        { : 'Không thể hủy đơn hàng ở trạng thái này' },
         { status: 400 }
       );
     }
@@ -71,7 +71,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error cancelling order:', error);
     return NextResponse.json(
-      { error: 'Không thể hủy đơn hàng' },
+      { : 'Không thể hủy đơn hàng' },
       { status: 500 }
     );
   }

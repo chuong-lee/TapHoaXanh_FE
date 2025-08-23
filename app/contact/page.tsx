@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
+
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ContactUs() {
   return (
@@ -104,13 +105,15 @@ export default function ContactUs() {
                 </div>
               </form>
             </div>
-            {/* Image*/}
+            {/* */}
             <div className="col-lg-6 d-none d-lg-block">
               <div className="contact-image">
-                <img
+                <Image
                   className="img-fluid rounded"
                   src="/images/contact-illustration.png"
                   alt="Contact Illustration"
+                  width={500}
+                  height={400}
                 />
               </div>
             </div>
@@ -121,23 +124,22 @@ export default function ContactUs() {
           <div className="row text-center">
             <div className="col-md-4">
               <div className="info-box">
-                <img className="icon" src="/icons/address.svg" alt="Address" />
+                <Image className="icon" src="/icons/address.svg" alt="Address" width={32} height={32} />
                 <div className="info-title">Address</div>
                 <div className="info-text">
-                  8502 Preston Rd. Inlewood, Maine 98380
-                </div>
+                  37 đường số 9 phường 17 quận gò vấp 
               </div>
             </div>
             <div className="col-md-4">
               <div className="info-box">
-                <img className="icon" src="/icons/phone.svg" alt="Phone" />
+                <Image className="icon" src="/icons/phone.svg" alt="Phone" width={32} height={32} />
                 <div className="info-title">Phone</div>
-                <div className="info-text">+0123-456-789</div>
+                <div className="info-text">+84344712604</div>
               </div>
             </div>
             <div className="col-md-4">
               <div className="info-box">
-                <img className="icon" src="/icons/email.svg" alt="Email" />
+                <Image className="icon" src="/icons/email.svg" alt="Email" width={32} height={32} />
                 <div className="info-title">Email</div>
                 <div className="info-text">BRC@gmail.com</div>
               </div>

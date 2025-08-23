@@ -1,6 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/db';
 
+interface OrderRow {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  quantity: number;
+  images: string;
+  comment: string;
+  usersId: number;
+  currency: string;
+  payment_description: string;
+  transaction_id: string;
+  gateway_response: string;
+  payment_amount: number;
+  payment_method: string;
+  payment_status: string;
+  discount: number;
+  freeship: boolean;
+  shipping_fee: number;
+  voucherId: number | null;
+  price: number;
+}
+
+interface OrderItemRow {
+  id: number;
+  quantity: number;
+  images: string;
+  unit_price: number;
+  productId: number;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -35,7 +66,7 @@ export async function GET(
       WHERE id = ? AND deletedAt IS NULL
     `;
     
-    const orderResult = await executeQuery<any[]>(orderQuery, [orderId]);
+    const orderResult = await executeQuery<OrderRow[]>(orderQuery, [orderId]);
     
     if (!orderResult || orderResult.length === 0) {
       return NextResponse.json(
@@ -58,7 +89,7 @@ export async function GET(
       WHERE oi.orderId = ?
     `;
     
-    const itemsResult = await executeQuery<any[]>(itemsQuery, [orderId]);
+    const itemsResult = await executeQuery<OrderItemRow[]>(itemsQuery, [orderId]);
     
     // Map dữ liệu
     const orderData = {

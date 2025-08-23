@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 
 interface UserRow {
@@ -17,10 +17,10 @@ interface UserRow {
 export async function GET(request: NextRequest) {
   try {
     // Get token from Authorization header
-    const authHeader = request.headers.get('authorization');
+    const authHeader = .headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ' },
+        { : 'Token không hợp lệ' },
         { status: 401 }
       );
     }
@@ -28,12 +28,12 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify JWT token
-    let decoded: any;
+    let decoded: unknown;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
     } catch (jwtError) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ hoặc đã hết hạn' },
+        { : 'Token không hợp lệ hoặc đã hết hạn' },
         { status: 401 }
       );
     }
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
     if (!users || users.length === 0) {
       return NextResponse.json(
-        { error: 'Không tìm thấy người dùng' },
+        { : 'Không tìm thấy người dùng' },
         { status: 404 }
       );
     }
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error in profile API:', error);
     return NextResponse.json(
-      { error: 'Lỗi server, vui lòng thử lại sau' },
+      { : 'Lỗi server, vui lòng thử lại sau' },
       { status: 500 }
     );
   }
@@ -82,10 +82,10 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Get token from Authorization header
-    const authHeader = request.headers.get('authorization');
+    const authHeader = .headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ' },
+        { : 'Token không hợp lệ' },
         { status: 401 }
       );
     }
@@ -93,12 +93,12 @@ export async function PUT(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify JWT token
-    let decoded: any;
+    let decoded: unknown;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key');
     } catch (jwtError) {
       return NextResponse.json(
-        { error: 'Token không hợp lệ hoặc đã hết hạn' },
+        { : 'Token không hợp lệ hoặc đã hết hạn' },
         { status: 401 }
       );
     }
@@ -127,7 +127,7 @@ export async function PUT(request: NextRequest) {
 
     if (!users || users.length === 0) {
       return NextResponse.json(
-        { error: 'Không tìm thấy người dùng' },
+        { : 'Không tìm thấy người dùng' },
         { status: 404 }
       );
     }
@@ -152,7 +152,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error in profile update API:', error);
     return NextResponse.json(
-      { error: 'Lỗi server, vui lòng thử lại sau' },
+      { : 'Lỗi server, vui lòng thử lại sau' },
       { status: 500 }
     );
   }

@@ -12,7 +12,7 @@ export const PaymentStatusTester: React.FC<PaymentStatusTesterProps> = ({ orderI
   const [paymentMethod, setPaymentMethod] = useState('Thẻ tín dụng');
   const [amount, setAmount] = useState(150000);
   const [showDetails, setShowDetails] = useState(true);
-  const [testResult, setTestResult] = useState<any>(null);
+  const [testResult, setTestResult] = useState<unknown>(null);
 
   const statusOptions = [
     { value: 'payment_pending', label: 'Chưa thanh toán' },
@@ -56,7 +56,7 @@ export const PaymentStatusTester: React.FC<PaymentStatusTesterProps> = ({ orderI
       setTestResult(result);
     } catch (error) {
       console.error('Error testing payment status:', error);
-      setTestResult({ success: false, error: 'Network error' });
+      setTestResult({ success: false, error: 'Network ' });
     }
   };
 
@@ -79,7 +79,7 @@ export const PaymentStatusTester: React.FC<PaymentStatusTesterProps> = ({ orderI
       setTestResult(result);
     } catch (error) {
       console.error('Error testing bank payment:', error);
-      setTestResult({ success: false, error: 'Network error' });
+      setTestResult({ success: false, error: 'Network ' });
     }
   };
 

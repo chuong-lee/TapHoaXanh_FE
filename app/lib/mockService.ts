@@ -1,4 +1,4 @@
-import { Product, Category } from './productService'
+import { ,  } from './productService'
 
 // Mock data cho testing
 export const mockProducts: Product[] = [
@@ -259,7 +259,7 @@ class MockProductService {
 }
 
 class MockCategoryService {
-  async getAllCategories(): Promise<Category[]> {
+  async getAllCategories(): Promise<[]> {
     await new Promise(resolve => setTimeout(resolve, 300))
     return [...mockCategories]
   }

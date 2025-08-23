@@ -64,7 +64,7 @@ const ORDER_STATUS_CONFIG = {
 export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
   const isLoadingRef = useRef(false);
   const [showDetails, setShowDetails] = useState(false);
-  const router = useRouter();
+  
 
   const statusConfig = ORDER_STATUS_CONFIG[order.status as keyof typeof ORDER_STATUS_CONFIG] || {
     label: 'Không xác định',
@@ -86,8 +86,8 @@ export default function OrderCard({ order, onOrderCancelled }: OrderCardProps) {
       await api.put(`/order/${order.id}/cancel`);
       alert('Đơn hàng đã được hủy thành công');
       onOrderCancelled();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra khi hủy đơn hàng';
+    } catch (error: unknown) {
+      const errorMessage = error.response?.data?. || 'Có lỗi xảy ra khi hủy đơn hàng';
       alert(errorMessage);
     } finally {
       isLoadingRef.current = false;

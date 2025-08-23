@@ -1,14 +1,14 @@
 "use client"
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState,  } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
   const { cart } = useCart();
-  const router = useRouter();
+  
   const { profile } = useAuth();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -178,7 +178,7 @@ const Header = () => {
 // Component LogoutButton tùy chỉnh cho dropdown
 function LogoutDropdownItem() {
   const { setProfile } = useAuth();
-  const router = useRouter();
+  
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -192,9 +192,9 @@ function LogoutDropdownItem() {
       setProfile(null);
       
       // Redirect to login
-      router.push('/login');
+      .push('/login');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout error:', );
     } finally {
       setLogoutLoading(false);
     }

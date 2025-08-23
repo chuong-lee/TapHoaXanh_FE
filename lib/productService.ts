@@ -41,7 +41,7 @@ export interface ProductFilters {
 }
 
 export const categoryService = {
-  getAllCategories: async (withCount: boolean = false): Promise<Category[]> => {
+  getAllCategories: async (withCount: boolean = false): Promise<[]> => {
     try {
       const url = withCount ? `${API_BASE_URL}/category?withCount=true` : `${API_BASE_URL}/categories`;
       const response = await fetch(url);
@@ -62,7 +62,7 @@ export const categoryService = {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Error fetching categories:', );
       return []; // Return empty array instead of throwing
     }
   },
@@ -84,7 +84,7 @@ export const productService = {
         throw new Error('Failed to fetch products');
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       // Xử lý các format response khác nhau từ API
       if (Array.isArray(data)) {
@@ -97,7 +97,7 @@ export const productService = {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching products:', );
       return [];
     }
   },
@@ -110,7 +110,7 @@ export const productService = {
       }
       return response.json();
     } catch (error) {
-      console.error('Error fetching product by id:', error);
+      console.error('Error fetching product by id:', );
       return null;
     }
   },
@@ -123,7 +123,7 @@ export const productService = {
       }
       return response.json();
     } catch (error) {
-      console.error('Error fetching product by slug:', error);
+      console.error('Error fetching product by slug:', );
       return null;
     }
   },
@@ -148,7 +148,7 @@ export const productService = {
         throw new Error(`Failed to fetch products by category: ${response.status} ${response.statusText}`);
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
@@ -161,7 +161,7 @@ export const productService = {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching products by category:', error);
+      console.error('Error fetching products by category:', );
       return [];
     }
   },
@@ -178,7 +178,7 @@ export const productService = {
         return productService.getAllProducts({ search: query, limit: 1000 });
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
@@ -190,7 +190,7 @@ export const productService = {
         return [];
       }
     } catch (error) {
-      console.error('Error searching products:', error);
+      console.error('Error searching products:', );
       return [];
     }
   },
@@ -207,7 +207,7 @@ export const productService = {
         return products.slice(0, limit);
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
@@ -219,13 +219,13 @@ export const productService = {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching featured products:', error);
+      console.error('Error fetching featured products:', );
       // Fallback: lấy sản phẩm thường
       try {
         const products = await productService.getAllProducts({ limit });
         return products;
       } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
+        console.('Fallback also failed:', fallbackError);
         return [];
       }
     }
@@ -243,7 +243,7 @@ export const productService = {
         return products;
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
@@ -255,13 +255,13 @@ export const productService = {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching best selling products:', error);
+      console.error('Error fetching best selling products:', );
       // Fallback: lấy sản phẩm thường
       try {
         const products = await productService.getAllProducts({ limit });
         return products;
       } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
+        console.('Fallback also failed:', fallbackError);
         return [];
       }
     }

@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       VALUES (?, ?, ?, ?, 'USER', NOW(), NOW())
     `;
 
-    const result = await executeQuery<any>(
+    const result = await executeQuery<{ insertId: number }>(
       insertQuery,
       [name, email, hashedPassword, phone || null]
     );

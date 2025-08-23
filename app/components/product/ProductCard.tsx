@@ -14,7 +14,7 @@ interface ProductCardProps {
     images: string;
     description: string;
   };
-  onAddToCart: (product: any) => void;
+  onAddToCart: (product: unknown) => void;
   onToggleWishlist: (productId: number) => void;
   isWishlisted: boolean;
 }

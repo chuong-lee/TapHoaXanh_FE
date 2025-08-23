@@ -64,12 +64,12 @@ class ProductService {
         delete queryParams.limit;
       }
       const response = await api.get('/products', { params: queryParams });
-      let data: any = response.data;
+      let data: unknown = response.data;
       if (typeof data === 'string') {
         try {
           data = JSON.parse(data);
         } catch (e) {
-          console.error('API trả về không phải JSON:', data);
+          console.('API trả về không phải JSON:', data);
           return [];
         }
       }
@@ -85,7 +85,7 @@ class ProductService {
       }
 
       // Đảm bảo mỗi sản phẩm đều có slug, nếu không thì tạo slug từ name hoặc id
-      products = products.map((p: any) => {
+      products = products.map((p: unknown) => {
         if (!p.slug) {
           // Tạo slug từ name (loại bỏ dấu, khoảng trắng, ký tự đặc biệt)
           const name = p.name || '';
@@ -107,7 +107,7 @@ class ProductService {
       console.warn('Unexpected API response format:', data)
       return []
     } catch (error) {
-      console.error('Error fetching products, falling back to mock data:', error)
+      console.error('Error fetching products, falling back to mock data:', )
       // Fallback to mock data if API fails
       return mockProductService.getAllProducts(params)
     }
@@ -121,17 +121,17 @@ class ProductService {
 
     try {
       const response = await api.get(`/products/${id}`)
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && data.data) {
         return data.data
       } else if (data) {
-        return data as Product
+        return data as 
       }
       
       return null
     } catch (error) {
-      console.error('Error fetching product by ID:', error)
+      console.error('Error fetching product by ID:', )
       return mockProductService.getProductById(id)
     }
   }
@@ -144,17 +144,17 @@ class ProductService {
 
     try {
       const response = await api.get(`/products/${slug}`)
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && data.data) {
         return data.data
       } else if (data) {
-        return data as Product
+        return data as 
       }
       
       return null
     } catch (error) {
-      console.error('Error fetching product by slug:', error)
+      console.error('Error fetching product by slug:', )
       return mockProductService.getProductBySlug(slug)
     }
   }
@@ -172,7 +172,7 @@ class ProductService {
 
     try {
       const response = await api.get(`/products/category/${categoryId}`, { params })
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && Array.isArray(data.data)) {
         return data.data
@@ -182,7 +182,7 @@ class ProductService {
       
       return []
     } catch (error) {
-      console.error('Error fetching products by category:', error)
+      console.error('Error fetching products by category:', )
       return mockProductService.getProductsByCategory(categoryId)
     }
   }
@@ -201,7 +201,7 @@ class ProductService {
       const response = await api.get('/products/search', {
         params: { q: query, ...params }
       })
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && Array.isArray(data.data)) {
         return data.data
@@ -211,7 +211,7 @@ class ProductService {
       
       return []
     } catch (error) {
-      console.error('Error searching products:', error)
+      console.error('Error searching products:', )
       return mockProductService.searchProducts(query)
     }
   }
@@ -226,7 +226,7 @@ class ProductService {
       const response = await api.get('/products/featured', {
         params: { limit }
       })
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && Array.isArray(data.data)) {
         return data.data
@@ -236,7 +236,7 @@ class ProductService {
       
       return []
     } catch (error) {
-      console.error('Error fetching featured products:', error)
+      console.error('Error fetching featured products:', )
       return mockProductService.getFeaturedProducts(limit)
     }
   }
@@ -251,7 +251,7 @@ class ProductService {
       const response = await api.get('/products/best-selling', {
         params: { limit }
       })
-      const data: any = response.data
+      const data: unknown = response.data
       
       if (data.success && Array.isArray(data.data)) {
         return data.data
@@ -261,7 +261,7 @@ class ProductService {
       
       return []
     } catch (error) {
-      console.error('Error fetching best selling products:', error)
+      console.error('Error fetching best selling products:', )
       return mockProductService.getBestSellingProducts(limit)
     }
   }
@@ -269,7 +269,7 @@ class ProductService {
 
 class CategoryService {
   // Lấy tất cả danh mục
-  async getAllCategories(withCount: boolean = false): Promise<Category[]> {
+  async getAllCategories(withCount: boolean = false): Promise<[]> {
     if (USE_MOCK_DATA) {
       console.log('🔧 Using mock data for categories')
       return mockCategoryService.getAllCategories()
@@ -283,12 +283,12 @@ class CategoryService {
       if (typeof data === 'object' && data !== null && 'success' in data && Array.isArray((data as any).data)) {
         return (data as any).data
       } else if (Array.isArray(data)) {
-        return data as Category[]
+        return data as []
       }
       
       return []
     } catch (error) {
-      console.error('Error fetching categories, falling back to mock data:', error)
+      console.error('Error fetching categories, falling back to mock data:', )
       return mockCategoryService.getAllCategories()
     }
   }
@@ -306,12 +306,12 @@ class CategoryService {
       if (typeof data === 'object' && data !== null && 'success' in data && (data as any).data) {
         return (data as any).data
       } else if (data) {
-        return data as Category
+        return data as 
       }
       
       return null
     } catch (error) {
-      console.error('Error fetching category by ID:', error)
+      console.error('Error fetching category by ID:', )
       return mockCategoryService.getCategoryById(id)
     }
   }

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const Footer = () => {
   return (
@@ -50,7 +51,7 @@ const Footer = () => {
           </div>
           <div className="d-flex justify-content-between align-items-center" style={{fontSize: 14, color: "#888"}}>
             <span>© Bản quyền thuộc về DalatGap Store</span>
-            <img src="/images/bocongthuong.png" alt="Bộ Công Thương" style={{height: 40}} />
+            <Image src="/images/bocongthuong.png" alt="Bộ Công Thương" width={120} height={40} style={{height: 40}} />
           </div>
         </div>
       </footer>

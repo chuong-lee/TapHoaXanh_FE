@@ -14,7 +14,7 @@ interface Order {
   usersId: number;
   createdAt: string;
   updatedAt: string;
-  items?: any[];
+  items?: unknown[];
 }
 
 interface OrderListProps {
@@ -48,7 +48,7 @@ export default function OrderList({ className = '' }: OrderListProps) {
       } else {
         setOrders([]);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading orders:', error);
       setError('Không thể tải danh sách đơn hàng');
       setOrders([]);

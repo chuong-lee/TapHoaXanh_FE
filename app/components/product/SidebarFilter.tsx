@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { , useState } from 'react'
 import api from '@/lib/axios'
 
 type Category = {
@@ -14,11 +14,11 @@ interface SidebarFilterProps {
 }
 
 export default function SidebarFilter({ onCategoryChange, onPriceChange }: SidebarFilterProps) {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [selected, setSelected] = useState<number | null>(null)
+  const [categories, setCategories] = useState<[]>([])
+  const [, ] = useState<number | null>(null)
   const [price, setPrice] = useState(1000000)
 
-  useEffect(() => {
+  (() => {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/categories')
@@ -31,7 +31,7 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
   }, [])
 
   const handleCategoryChange = (categoryId: number | null) => {
-    setSelected(categoryId)
+    (categoryId)
     if (onCategoryChange) {
       onCategoryChange(categoryId)
     }
@@ -54,7 +54,7 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
             type="radio"
             name="category"
             id="cat-all"
-            checked={selected === null}
+            checked={ === null}
             onChange={() => handleCategoryChange(null)}
             style={{accentColor: '#22c55e'}}
           />
@@ -69,7 +69,7 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
               type="radio"
               name="category"
               id={`cat-${cat.id}`}
-              checked={selected === cat.id}
+              checked={ === cat.id}
               onChange={() => handleCategoryChange(cat.id)}
               style={{accentColor: '#22c55e'}}
             />

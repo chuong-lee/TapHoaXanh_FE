@@ -1,23 +1,23 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, , useRef } from 'react';
 import Image from 'next/image';
 
 interface PaymentGatewayProps {
   orderId: string;
   amount: number;
   description: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  : string;
+  : string;
+  : string;
   onPaymentSuccess?: (transactionId: string) => void;
-  onPaymentError?: (error: string) => void;
+  onPaymentError?: (: string) => void;
 }
 
 interface PaymentData {
   transaction_id: string;
   qr_code_url: string;
-  bank_account: string;
-  bank_name: string;
+  : string;
+  : string;
   amount: number;
   description: string;
   expires_at: string;
@@ -27,19 +27,19 @@ export default function PaymentGateway({
   orderId,
   amount,
   description,
-  customerName,
-  customerEmail,
-  customerPhone,
+  ,
+  ,
+  ,
   onPaymentSuccess,
   onPaymentError
 }: PaymentGatewayProps) {
   const [paymentData, setPaymentData] = useState<any>(null);
   const loadingRef = useRef(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const handleCreatePayment = async () => {
     loadingRef.current = true;
-    setError(null);
+    (null);
 
     try {
       const response = await fetch('/api/payment/create', {
@@ -62,11 +62,11 @@ export default function PaymentGateway({
       if (result.success) {
         setPaymentData(result.data);
       } else {
-        setError(result.message || 'Có lỗi xảy ra khi tạo thanh toán');
+        (result.message || 'Có lỗi xảy ra khi tạo thanh toán');
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      setError('Có lỗi xảy ra khi tạo thanh toán');
+      console.error('Payment error:', );
+      ('Có lỗi xảy ra khi tạo thanh toán');
     } finally {
       loadingRef.current = false;
     }
@@ -98,8 +98,8 @@ export default function PaymentGateway({
           <div className="bank-info">
             <h4>Thông Tin Tài Khoản</h4>
             <div className="bank-details">
-              <p><strong>Ngân hàng:</strong> {paymentData.bank_name}</p>
-              <p><strong>Số tài khoản:</strong> {paymentData.bank_account}</p>
+              <p><strong>Ngân hàng:</strong> {paymentData.}</p>
+              <p><strong>Số tài khoản:</strong> {paymentData.}</p>
               <p><strong>Chủ tài khoản:</strong> {paymentData.account_name}</p>
               <p><strong>Chi nhánh:</strong> {paymentData.branch}</p>
               <p><strong>Số tiền:</strong> {paymentData.amount?.toLocaleString('vi-VN')} VNĐ</p>
@@ -132,7 +132,7 @@ export default function PaymentGateway({
 
       {error && (
         <div className="alert alert-danger mt-3">
-          {error}
+          {}
         </div>
       )}
     </div>

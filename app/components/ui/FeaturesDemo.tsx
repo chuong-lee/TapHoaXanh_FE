@@ -8,7 +8,7 @@ import {
   LoadingButton,
   ProfileSkeleton 
 } from './LoadingSkeleton'
-import { useApi, useMutation } from '@/hooks/useApiCache'
+import { useApi,  } from '@/hooks/useApiCache'
 import { usePWA, useServiceWorker, usePushNotifications } from '@/hooks/usePWA'
 
 // Demo component for testing Error Boundary
@@ -17,7 +17,7 @@ const ErrorProneComponent: React.FC = () => {
   const { handleError } = useErrorHandler()
 
   if (shouldError) {
-    throw new Error('This is a test error from ErrorProneComponent!')
+    throw new Error('This is a test  from ErrorProneComponent!')
   }
 
   return (
@@ -35,7 +35,7 @@ const ErrorProneComponent: React.FC = () => {
         </button>
         <button 
           className="btn btn-warning"
-          onClick={() => handleError(new Error('Manual error using useErrorHandler hook'))}
+          onClick={() => handleError(new Error('Manual  using useErrorHandler hook'))}
         >
           Trigger Hook Error
         </button>
@@ -81,7 +81,7 @@ const LoadingStatesDemo: React.FC = () => {
         
         {showSkeleton && (
           <div className="mt-3">
-            <h6>Product List Skeleton:</h6>
+            <h6> List Skeleton:</h6>
             <ProductListSkeleton count={4} />
             
             <h6 className="mt-4">Profile Skeleton:</h6>
@@ -95,29 +95,29 @@ const LoadingStatesDemo: React.FC = () => {
 
 // Demo component for API Caching
 const APICachingDemo: React.FC = () => {
-  const { data: products, loading, error, refetch } = useApi<any[]>('/products', {
+  const { data: products, loading, , refetch } = useApi<any[]>('/products', {
     ttl: 300000, // 5 minutes
     refetchOnWindowFocus: true,
     onSuccess: (data) => console.log('Products loaded:', data?.length),
-    onError: (error) => console.error('Error loading products:', error)
+    onError: (error) => console.error('Error loading products:', )
   })
 
   const { mutate: createProduct, loading: creating } = useMutation(
-    async (productData: any) => {
+    async (productData: unknown) => {
       // Simulate API call
       return new Promise(resolve => 
         setTimeout(() => resolve({ id: Date.now(), ...productData }), 1000)
       )
     },
     {
-      onSuccess: (data) => console.log('Product created:', data),
+      onSuccess: (data) => console.log(' created:', data),
       invalidateKeys: ['products'] // Invalidate products cache
     }
   )
 
   const handleCreateProduct = () => {
     createProduct({ 
-      name: 'Test Product', 
+      name: 'Test ', 
       price: 100, 
       category: 'Electronics' 
     })
@@ -148,7 +148,7 @@ const APICachingDemo: React.FC = () => {
         
         {error && (
           <div className="alert alert-danger">
-            Error: {error.message}
+            Error: {.message}
           </div>
         )}
         

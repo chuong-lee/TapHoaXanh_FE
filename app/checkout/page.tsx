@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState,  } from 'react'
 import Link from 'next/link'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
@@ -28,7 +28,7 @@ const generateBankQR = async (amount: number, orderId: string, bankCode: string)
       throw new Error('Failed to generate QR code');
     }
   } catch (error) {
-    console.error('Error generating bank QR:', error);
+    console.error('Error generating bank QR:', );
     // Fallback to client-side generation if API fails
     return generateClientSideQR(amount, orderId, bankCode);
   }
@@ -177,10 +177,10 @@ function CheckoutPage() {
 
 
   // Voucher states removed - now using useVouchers hook
-  const router = useRouter();
+  
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
-  const { vouchers, loading: vouchersLoading, error: vouchersError } = useVouchers();
+  const { vouchers, loading: vouchersLoading, :  } = useVouchers();
   const [showSuccess, setShowSuccess] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState(false);
@@ -197,14 +197,14 @@ function CheckoutPage() {
   const [selectedWallet, setSelectedWallet] = useState<string>('vnpay');
 
   useEffect(() => {
-    const selected = localStorage.getItem("cart_selected");
-    if (!selected || JSON.parse(selected).length === 0) {
+    
+    if (!selected || JSON.parse().length === 0) {
       window.location.href = "/cart";
     }
     // Ưu tiên lấy sản phẩm đã chọn (cart_selected), nếu không có thì lấy toàn bộ cart_local
     if (selected) {
       try {
-        setCart(JSON.parse(selected));
+        setCart(JSON.parse());
       } catch {
         setCart([]);
       }
@@ -251,7 +251,7 @@ function CheckoutPage() {
 
   // Load danh sách tỉnh/thành phố khi component mount
   useEffect(() => {
-    console.log('🔄 useEffect for provinces triggered');
+    console.log('🔄  for provinces triggered');
     const loadProvinces = async () => {
       console.log('🚀 Starting to load provinces...');
       setLocationLoading(prev => ({ ...prev, provinces: true }));
@@ -262,7 +262,7 @@ function CheckoutPage() {
         setProvinces(provincesData);
         console.log('💾 Provinces state updated');
       } catch (error) {
-        console.error('❌ Error loading provinces:', error);
+        console.error('❌ Error loading provinces:', );
       } finally {
         setLocationLoading(prev => ({ ...prev, provinces: false }));
       }
@@ -285,7 +285,7 @@ function CheckoutPage() {
           setDistricts(districtsData);
           console.log('Loaded districts for province', form.cityCode, ':', districtsData.length);
         } catch (error) {
-          console.error('Error loading districts:', error);
+          console.error('Error loading districts:', );
         } finally {
           setLocationLoading(prev => ({ ...prev, districts: false }));
         }
@@ -311,7 +311,7 @@ function CheckoutPage() {
           setWards(wardsData);
           console.log('Loaded wards for district', form.stateCode, ':', wardsData.length);
         } catch (error) {
-          console.error('Error loading wards:', error);
+          console.error('Error loading wards:', );
         } finally {
           setLocationLoading(prev => ({ ...prev, wards: false }));
         }
@@ -351,7 +351,7 @@ function CheckoutPage() {
           setQrLoading(false);
         })
         .catch(error => {
-          console.error('Error generating QR:', error);
+          console.error('Error generating QR:', );
           setQrLoading(false);
         });
     } else {
@@ -375,7 +375,7 @@ function CheckoutPage() {
     const selectedCode = e.target.value;
     const selectedProvince = provinces.find(p => p.code.toString() === selectedCode);
     
-    console.log('🏙️ Province selected:', selectedCode, selectedProvince?.name);
+    console.log('🏙️ Province :', selectedCode, selectedProvince?.name);
     
     setForm(prev => ({
       ...prev,
@@ -392,7 +392,7 @@ function CheckoutPage() {
     const selectedCode = e.target.value;
     const selectedDistrict = districts.find(d => d.code.toString() === selectedCode);
     
-    console.log('🏘️ District selected:', selectedCode, selectedDistrict?.name);
+    console.log('🏘️ District :', selectedCode, selectedDistrict?.name);
     
     setForm(prev => ({
       ...prev,
@@ -407,7 +407,7 @@ function CheckoutPage() {
     const selectedCode = e.target.value;
     const selectedWard = wards.find(w => w.code.toString() === selectedCode);
     
-    console.log('🏠 Ward selected:', selectedCode, selectedWard?.name);
+    console.log('🏠 Ward :', selectedCode, selectedWard?.name);
     
     setForm(prev => ({
       ...prev,
@@ -460,7 +460,7 @@ function CheckoutPage() {
       pollSepayPaymentStatus(result.data.transaction_id);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? .message : 'Unknown ';
       setSepayError(errorMessage);
     } finally {
       setSepayLoading(false);
@@ -487,7 +487,7 @@ function CheckoutPage() {
           }
         }
       } catch (err) {
-        console.error('Error polling payment status:', err);
+        console.('Error polling payment status:', );
       }
     }, 3000); // Poll every 3 seconds
 
@@ -539,7 +539,7 @@ function CheckoutPage() {
       // Kiểm tra xem user đã đăng nhập chưa
       if (!profile) {
         alert('Vui lòng đăng nhập để đặt hàng');
-        router.push('/login');
+        .push('/login');
         return;
       }
       
@@ -550,7 +550,7 @@ function CheckoutPage() {
       // Kiểm tra xem có token không
       if (!token) {
         alert('Vui lòng đăng nhập để đặt hàng');
-        router.push('/login');
+        .push('/login');
         return;
       }
       
@@ -578,14 +578,14 @@ function CheckoutPage() {
     } catch (err: unknown) {
       console.error('🚨 Order error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Lỗi không xác định';
-      const apiError = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data;
+      const apiError = ( as { response?: { data?: { ?: string; message?: string } } })?.response?.data;
       const statusCode = (err as { response?: { status?: number } })?.response?.status;
       
       console.error('🚨 Error details:', {
         message: errorMessage,
         apiError,
         statusCode,
-        fullError: err
+        fullError: 
       });
       
       alert('Có lỗi khi đặt hàng: ' + (apiError?.error || apiError?.message || errorMessage) + (statusCode ? ` (${statusCode})` : ''));
@@ -593,26 +593,7 @@ function CheckoutPage() {
   };
 
   // Cập nhật danh sách phương thức thanh toán
-  const paymentMethods = [
-    {
-      id: 'cod',
-      name: 'Thanh toán khi nhận hàng (COD)',
-      icon: 'fas fa-money-bill-wave',
-      color: 'primary'
-    },
-    {
-      id: 'bank_transfer',
-      name: 'Chuyển khoản Vietcombank',
-      icon: 'fas fa-university',
-      color: 'success'
-    },
-    {
-      id: 'vnpay',
-      name: 'Thanh toán qua VNPay',
-      icon: 'fab fa-vnpay',
-      color: 'info'
-    }
-  ];
+  
 
   return (
     <>
@@ -1117,8 +1098,8 @@ function CheckoutPage() {
                         <div className="payment-details mb-3">
                           <div className="row">
                             <div className="col-6">
-                              <p><strong>Ngân hàng:</strong> {sepayPaymentData.bank_name}</p>
-                              <p><strong>Số tài khoản:</strong> {sepayPaymentData.bank_account}</p>
+                              <p><strong>Ngân hàng:</strong> {sepayPaymentData.}</p>
+                              <p><strong>Số tài khoản:</strong> {sepayPaymentData.}</p>
                             </div>
                             <div className="col-6">
                               <p><strong>Số tiền:</strong> {total.toLocaleString('vi-VN')}đ</p>

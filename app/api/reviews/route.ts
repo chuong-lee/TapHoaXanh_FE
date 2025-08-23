@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery } from '@/lib/db'
+import { , NextResponse } from 'next/server'
+import {  } from '@/lib/db'
 
 interface ReviewData {
   productId: number
-  customerName: string
+  : string
   rating: number
   comment: string
 }
@@ -11,9 +11,9 @@ interface ReviewData {
 // POST /api/reviews - Thêm đánh giá mới cho sản phẩm
 export async function POST(request: NextRequest) {
   try {
-    const body: ReviewData = await request.json()
+    const body: ReviewData = await .json()
     
-    const { productId, customerName, rating, comment } = body
+    const { productId, , rating, comment } = body
     
     // Validate input
     if (!productId || !customerName || !rating || !comment) {
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         productId,
         rating,
         comment,
-        customerName
+        
       }
     })
     
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       message: 'Lỗi khi lưu đánh giá',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown '
     }, { status: 500 })
   }
 }

@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import { NextRequest, NextResponse } from 'next/server'
-import { executeQuery } from '@/lib/db'
+import { , NextResponse } from 'next/server'
+import {  } from '@/lib/db'
 
 interface HomepageProduct {
   id: number
@@ -92,7 +92,7 @@ export async function GET() {
     // Format product data với xử lý hình ảnh
     const formattedProducts = rows.map(row => ({
       ...row,
-      images: processImageUrl(row.images)
+      images: (row.images)
     }))
 
     // Update cache
@@ -128,7 +128,7 @@ export async function GET() {
         data: homepageCache.data,
         total: homepageCache.data.length,
         cached: true,
-        error: 'Using cached data due to database error'
+        error: 'Using cached data due to database '
       }, {
         headers: {
           'Cache-Control': 'public, s-maxage=300',
@@ -138,7 +138,7 @@ export async function GET() {
     }
     
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Internal server ' },
       { status: 500 }
     )
   }

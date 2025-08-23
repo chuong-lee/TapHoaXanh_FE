@@ -4,8 +4,8 @@ import api from '@/lib/axios';
 interface VNPayPaymentParams {
   orderId: string;
   amount: number;
-  customerEmail?: string;
-  customerPhone?: string;
+  ?: string;
+  ?: string;
 }
 
 interface VNPayPaymentResponse {
@@ -19,11 +19,11 @@ interface VNPayPaymentResponse {
 
 export function useVNPayPayment() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const createPayment = async (params: VNPayPaymentParams): Promise<VNPayPaymentResponse> => {
     setLoading(true);
-    setError(null);
+    (null);
 
     try {
       const response = await api.post('/payment/vnpay', params);
@@ -34,14 +34,14 @@ export function useVNPayPayment() {
           data: response.data.data
         };
       } else {
-        throw new Error(response.data.error || 'Failed to create payment');
+        throw new Error(response.data. || 'Failed to create payment');
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'Payment creation failed';
-      setError(errorMessage);
+    } catch (err: unknown) {
+      const errorMessage = err.response?.data?.error || .message || 'Payment creation failed';
+      (errorMessage);
       return {
         success: false,
-        error: errorMessage
+        : errorMessage
       };
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ export function useVNPayPayment() {
     processPayment,
     redirectToPayment,
     loading,
-    error,
-    clearError: () => setError(null)
+    ,
+    clearError: () => (null)
   };
 }

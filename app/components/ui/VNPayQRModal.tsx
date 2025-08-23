@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useVNPayPayment } from '@/hooks/useVNPayPayment';
+import { useVNPayPayment } from &#39;@/hooks/useVNPayPayment';
 
 interface VNPayQRModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: () =&gt; void;
   orderId: string;
   amount: number;
   customerEmail?: string;
@@ -21,16 +21,16 @@ export default function VNPayQRModal({
   customerPhone 
 }: VNPayQRModalProps) {
   const { createPayment, loading, error } = useVNPayPayment();
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
-  const [paymentUrl, setPaymentUrl] = useState<string>('');
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>(&#39;');
+  const [paymentUrl, setPaymentUrl] = useState<string>(&#39;');
 
-  useEffect(() => {
+  useEffect(() =&gt; {
     if (isOpen && orderId) {
       generatePayment();
     }
   }, [isOpen, orderId]);
 
-  const generatePayment = async () => {
+  const generatePayment = async () =&gt; {
     try {
       const result = await createPayment({
         orderId,
@@ -45,11 +45,11 @@ export default function VNPayQRModal({
         setQrCodeUrl(qrCodeApiUrl);
       }
     } catch (err) {
-      console.error('Failed to generate payment:', err);
+      console.error('Failed to generate payment:&#39;, err);
     }
   };
 
-  const handlePaymentRedirect = () => {
+  const handlePaymentRedirect = () =&gt; {
     if (paymentUrl) {
       window.open(paymentUrl, '_blank');
     }
@@ -58,129 +58,129 @@ export default function VNPayQRModal({
   if (!isOpen) return null;
 
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}>
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">
-              <i className="fas fa-qrcode text-primary me-2"></i>
+    <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}&gt;
+      <div className="modal-dialog modal-dialog-centered"&gt;
+        <div className="modal-content"&gt;
+          <div className="modal-header"&gt;
+            <h5 className="modal-title"&gt;
+              <i className="fas fa-qrcode text-primary me-2"&gt;&lt;/i>
               Thanh toán VNPay
-            </h5>
+            &lt;/h5>
             <button 
               type="button" 
               className="btn-close" 
               onClick={onClose}
               aria-label="Close"
-            ></button>
-          </div>
+            &gt;&lt;/button>
+          &lt;/div>
           
-          <div className="modal-body text-center">
+          <div className="modal-body text-center"&gt;
             {loading ? (
-              <div className="py-5">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-3 text-muted">Đang tạo mã QR...</p>
-              </div>
+              <div className="py-5"&gt;
+                <div className="spinner-border text-primary" role="status"&gt;
+                  <span className="visually-hidden">Loading...&lt;/span>
+                &lt;/div>
+                <p className="mt-3 text-muted"&gt;Đang tạo mã QR...&lt;/p>
+              &lt;/div>
             ) : error ? (
-              <div className="py-4">
-                <div className="text-danger mb-3">
-                  <i className="fas fa-exclamation-triangle fa-2x"></i>
-                </div>
+              <div className="py-4"&gt;
+                <div className="text-danger mb-3"&gt;
+                  <i className="fas fa-exclamation-triangle fa-2x"&gt;&lt;/i>
+                &lt;/div>
                 <h6 className="text-danger">Lỗi tạo thanh toán</h6>
-                <p className="text-muted">{error}</p>
+                <p className="text-muted"&gt;{error}&lt;/p>
                 <button 
                   className="btn btn-primary"
                   onClick={generatePayment}
-                >
-                  <i className="fas fa-redo me-2"></i>
+                &gt;
+                  <i className="fas fa-redo me-2"&gt;&lt;/i>
                   Thử lại
-                </button>
-              </div>
+                &lt;/button>
+              &lt;/div>
             ) : (
-              <>
+              &lt;&gt;
                 {/* Order Info */}
-                <div className="bg-light rounded p-3 mb-4">
-                  <div className="row text-start">
-                    <div className="col-6">
-                      <strong>Mã đơn hàng:</strong>
-                    </div>
-                    <div className="col-6">
-                      <span className="text-primary">#{orderId}</span>
-                    </div>
-                  </div>
-                  <div className="row text-start mt-2">
-                    <div className="col-6">
-                      <strong>Số tiền:</strong>
-                    </div>
-                    <div className="col-6">
-                      <span className="text-success fw-bold">
+                <div className="bg-light rounded p-3 mb-4"&gt;
+                  <div className="row text-start"&gt;
+                    <div className="col-6"&gt;
+                      <strong>Mã đơn hàng:&lt;/strong>
+                    &lt;/div>
+                    <div className="col-6"&gt;
+                      <span className="text-primary"&gt;#{orderId}&lt;/span>
+                    &lt;/div>
+                  &lt;/div>
+                  <div className="row text-start mt-2"&gt;
+                    <div className="col-6"&gt;
+                      <strong>Số tiền:&lt;/strong>
+                    &lt;/div>
+                    <div className="col-6"&gt;
+                      <span className="text-success fw-bold"&gt;
                         {amount.toLocaleString('vi-VN')}₫
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                      &lt;/span>
+                    &lt;/div>
+                  &lt;/div>
+                &lt;/div>
 
                 {/* QR Code */}
-                <div className="mb-4">
+                <div className="mb-4"&gt;
                   <h6 className="mb-3">Quét mã QR để thanh toán</h6>
                   {qrCodeUrl ? (
-                    <div className="border rounded p-3 d-inline-block">
+                    <div className="border rounded p-3 d-inline-block"&gt;
                       <img 
                         src={qrCodeUrl} 
                         alt="VNPay QR Code" 
                         className="img-fluid"
                         style={{ maxWidth: '250px' }}
-                      />
-                    </div>
+                      /&gt;
+                    &lt;/div>
                   ) : (
-                    <div className="border rounded p-5 d-inline-block">
-                      <i className="fas fa-qrcode fa-3x text-muted"></i>
-                    </div>
+                    <div className="border rounded p-5 d-inline-block"&gt;
+                      <i className="fas fa-qrcode fa-3x text-muted"&gt;&lt;/i>
+                    &lt;/div>
                   )}
-                </div>
+                &lt;/div>
 
                 {/* Instructions */}
-                <div className="text-start mb-4">
-                  <h6 className="mb-2">Hướng dẫn thanh toán:</h6>
-                  <ol className="small text-muted">
+                <div className="text-start mb-4"&gt;
+                  <h6 className="mb-2">Hướng dẫn thanh toán:&lt;/h6>
+                  <ol className="small text-muted"&gt;
                     <li>Mở ứng dụng VNPay trên điện thoại</li>
-                    <li>Chọn tính năng "Quét mã QR"</li>
+                    <li>Chọn tính năng "Quét mã QR"&lt;/li>
                     <li>Quét mã QR bên trên</li>
                     <li>Xác nhận thông tin và hoàn tất thanh toán</li>
-                  </ol>
-                </div>
+                  &lt;/ol>
+                &lt;/div>
 
                 {/* Alternative Payment Link */}
-                <div className="mb-3">
-                  <p className="text-muted small mb-2">Hoặc bấm vào link bên dưới:</p>
+                <div className="mb-3"&gt;
+                  <p className="text-muted small mb-2">Hoặc bấm vào link bên dưới:&lt;/p>
                   <button 
                     className="btn btn-outline-primary"
                     onClick={handlePaymentRedirect}
                     disabled={!paymentUrl}
-                  >
-                    <i className="fas fa-external-link-alt me-2"></i>
+                  &gt;
+                    <i className="fas fa-external-link-alt me-2"&gt;&lt;/i>
                     Thanh toán qua VNPay
-                  </button>
-                </div>
-              </>
+                  &lt;/button>
+                &lt;/div>
+              &lt;/&gt;
             )}
-          </div>
+          &lt;/div>
           
-          <div className="modal-footer">
+          <div className="modal-footer"&gt;
             <button 
               type="button" 
               className="btn btn-secondary" 
               onClick={onClose}
-            >
+            &gt;
               Đóng
-            </button>
-          </div>
-        </div>
-      </div>
+            &lt;/button>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
       
       {/* Backdrop */}
-      <div className="modal-backdrop fade show" onClick={onClose}></div>
-    </div>
+      <div className="modal-backdrop fade show" onClick={onClose}&gt;&lt;/div>
+    &lt;/div>
   );
 }

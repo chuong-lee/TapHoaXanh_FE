@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 
 interface PaymentRequest {
   orderId: string;
   amount: number;
   description: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  : string;
+  : string;
+  : string;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body: PaymentRequest = await request.json();
-    const { orderId, amount, description, customerName, customerEmail, customerPhone } = body;
+    const body: PaymentRequest = await .json();
+    const { orderId, amount, description, , ,  } = body;
 
     // Validate input
     if (!orderId || !amount || !description) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const bankInfo = {
       account_number: '1030517435',
       account_name: 'LE TUAN MINH ',
-      bank_name: 'Vietcombank',
+      : 'Vietcombank',
       branch: 'BINH PHUOC - TRU'
     };
 
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
         transaction_id: transactionId,
         order_id: orderId,
         qr_code_url: qrCodeUrl,
-        bank_account: bankInfo.account_number,
-        bank_name: bankInfo.bank_name,
+        : bankInfo.account_number,
+        bank_name: bankInfo.,
         account_name: bankInfo.account_name,
         branch: bankInfo.branch,
         amount: amount,
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       message: 'Internal server error',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown '
     }, { status: 500 });
   }
 }

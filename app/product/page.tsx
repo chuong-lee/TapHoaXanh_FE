@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react'
+import { , useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -46,21 +46,20 @@ function formatPriceVND(price: number): string {
 }
 
 // Component Rating Stars
-const RatingStars = ({ rating = 4.5 }: { rating?: number }) => {
-  const fullStars = Math.floor(rating);
+
   const hasHalfStar = rating % 1 >= 0.5;
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
   return (
     <div className="product-rating d-flex align-items-center">
       <div className="stars">
-        {[...Array(fullStars)].map((_, i) => (
+        {[...Array(fullStars)].map((, i) => (
           <i key={i} className="fas fa-star active" style={{ color: '#FFD700' }}></i>
         ))}
         {hasHalfStar && (
           <i className="fas fa-star-half-alt active" style={{ color: '#FFD700' }}></i>
         )}
-        {[...Array(emptyStars)].map((_, i) => (
+        {[...Array(emptyStars)].map((, i) => (
           <i key={i} className="fas fa-star" style={{ color: '#ddd' }}></i>
         ))}
       </div>
@@ -70,87 +69,7 @@ const RatingStars = ({ rating = 4.5 }: { rating?: number }) => {
 };
 
 export default function ProductListPage() {
-  const router = useRouter()
-  const [products, setProducts] = useState<ProductData[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-  const [maxPrice, setMaxPrice] = useState(79)
-  const [sort, setSort] = useState('default')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(15)
-  const [wishlist, setWishlist] = useState<number[]>([])
-  const [wishlistLoading, setWishlistLoading] = useState<number | null>(null)
-  const [addToCartMessage, setAddToCartMessage] = useState('')
   
-  // Cart functionality
-  const { addToCart } = useCart()
-
-  // Thêm state để theo dõi số lượng sản phẩm theo từng category
-  const [categoryCounts, setCategoryCounts] = useState<{[key: number]: number}>({})
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch products and categories in parallel
-        const [productsResponse, categoriesResponse] = await Promise.all([
-          fetch(`/api/products?limit=100`),
-          fetch(`/api/category?withCount=true`)
-        ])
-        
-        const productsData = await productsResponse.json()
-        const categoriesData = await categoriesResponse.json()
-        
-        // Process products
-        let productArray: ProductData[] = []
-        if (Array.isArray(productsData)) {
-          productArray = productsData
-        } else if (productsData && productsData.data && Array.isArray(productsData.data)) {
-          productArray = productsData.data
-        }
-        
-        // Process categories
-        let categoryArray: Category[] = []
-        if (Array.isArray(categoriesData)) {
-          categoryArray = categoriesData
-        } else if (categoriesData && categoriesData.data && Array.isArray(categoriesData.data)) {
-          categoryArray = categoriesData.data
-        }
-        
-        setCategories(categoryArray)
-        setProducts(productArray)
-        
-        // Tính toán số lượng sản phẩm theo từng category
-        const counts: {[key: number]: number} = {}
-        categoryArray.forEach(category => {
-          counts[category.id] = productArray.filter(product => 
-            product.category?.id === category.id || product.categoryId === category.id
-          ).length
-        })
-        setCategoryCounts(counts)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        setProducts([])
-        setCategories([])
-        setCategoryCounts({})
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-  // Cập nhật hàm lọc sản phẩm
-  const filterProductsByCategory = (categoryId: number | null) => {
-    setSelectedCategory(categoryId)
-    setCurrentPage(1) // Reset về trang đầu khi thay đổi filter
-  }
-
-  // Xử lý thêm vào giỏ hàng
-  const handleAddToCart = (product: ProductData) => {
-    const finalPrice = product.price - product.discount;
     addToCart({
       ...product,
       price: finalPrice,
@@ -177,7 +96,7 @@ export default function ProductListPage() {
         setWishlist(prev => [...prev, productId]);
       }
     } catch (error) {
-      console.error('Error toggling wishlist:', error);
+      console.error('Error toggling wishlist:', );
     } finally {
       setWishlistLoading(null);
     }
@@ -185,7 +104,7 @@ export default function ProductListPage() {
 
   // Xử lý xem chi tiết sản phẩm
   const handleViewDetail = (product: ProductData) => {
-    router.push(`/product/${product.slug}`);
+    .push(`/product/${product.slug}`);
   };
 
   // Lọc và sắp xếp sản phẩm
@@ -407,7 +326,7 @@ export default function ProductListPage() {
               </div>
                   </div>
                   
-                  {/* Product Grid */}
+                  {/*  Grid */}
                   <div className="product-list">
                     <div className="row row-cols-2 row-cols-lg-3 g-3 g-lg-4 mt-2">
                       {loading ? (

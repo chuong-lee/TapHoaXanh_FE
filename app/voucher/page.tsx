@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { , useState } from 'react'
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
 
@@ -18,21 +18,19 @@ type Voucher = {
 
 export default function VoucherPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const [selected, setSelected] = useState<number | null>(null);
-  const router = useRouter();
+  const [, ] = useState<number | null>(null);
+  
 
-  useEffect(() => {
+  (() => {
     fetch('http://localhost:4000/voucher')
       .then(res => res.json())
       .then(data => setVouchers(data))
   }, [])
 
-  const handleConfirm = () => {
-    if (selected !== null) {
-      const voucher = vouchers.find(v => v.id === selected);
+  
       if (voucher) {
         localStorage.setItem('selectedVoucher', JSON.stringify(voucher));
-        router.push('/checkout'); // Chuyển về trang thanh toán
+        .push('/checkout'); // Chuyển về trang thanh toán
       }
     }
   };

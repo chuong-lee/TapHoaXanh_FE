@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 
 interface OrderRow {
@@ -34,7 +34,7 @@ interface OrderRow {
 export async function GET(request: NextRequest) {
   try {
     // Get token from Authorization header
-    const authHeader = request.headers.get('authorization');
+    const authHeader = .headers.get('authorization');
     let userId = null;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key') as any;
         userId = decoded.userId;
       } catch (jwtError) {
-        console.log('JWT verification failed:', jwtError);
+        console.log('JWT verification failed:', );
       }
     }
 
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         WHERE o.deletedAt IS NULL
       `;
       
-      const params: any[] = [];
+      const params: unknown[] = [];
 
       // Filter by user if authenticated - TEMPORARILY DISABLED for testing
       // if (userId) {
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       console.log('Database query successful, found:', dbOrders?.length || 0, 'orders');
       
       if (dbOrders && dbOrders.length > 0) {
-        orders = dbOrders.map((row: any) => ({
+        orders = dbOrders.map((row: unknown) => ({
           id: row.id,
           price: row.price,
           quantity: row.quantity || 1,
@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
         console.log('No orders found in database');
       }
     } catch (dbError) {
-      console.error('Database query failed:', dbError);
+      console.('Database query failed:', dbError);
       orders = [];
     }
 
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         success: false,
-        error: 'Lỗi server, vui lòng thử lại sau',
+        : 'Lỗi server, vui lòng thử lại sau',
         data: [],
         total: 0 
       },
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
     let userId = 1; // User mặc định cho testing
     
     // Kiểm tra token nếu có
-    const authHeader = request.headers.get('authorization');
+    const authHeader = .headers.get('authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
@@ -206,8 +206,8 @@ export async function POST(request: NextRequest) {
         console.log('🔍 JWT decoded successfully:', { userId: decoded.userId, email: decoded.email });
         userId = decoded.userId;
       } catch (jwtError) {
-        console.error('🔍 JWT verification failed:', jwtError);
-        // Không return error, tiếp tục với userId mặc định
+        console.error('🔍 JWT verification failed:', );
+        // Không return , tiếp tục với userId mặc định
       }
     }
     console.log('🔍 User ID from token:', userId);
@@ -227,20 +227,20 @@ export async function POST(request: NextRequest) {
     
     if (!totalPrice) {
       return NextResponse.json(
-        { error: 'Thiếu thông tin đơn hàng' },
+        { : 'Thiếu thông tin đơn hàng' },
         { status: 400 }
       );
     }
     
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
-        { error: 'Giỏ hàng trống' },
+        { : 'Giỏ hàng trống' },
         { status: 400 }
       );
     }
 
     // Calculate total quantity
-    const totalQuantity = items ? items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) : 1;
+    const totalQuantity = items ? items.reduce((sum: number, item: unknown) => sum + (item.quantity || 1), 0) : 1;
 
     // Try to create order in database với schema mới
     try {
@@ -316,7 +316,7 @@ export async function POST(request: NextRequest) {
             );
             console.log('🔍 Item inserted successfully');
           } catch (itemError) {
-            console.error('🔍 Order item insert failed:', itemError);
+            console.('🔍 Order item insert failed:', itemError);
           }
         }
       }
@@ -325,7 +325,7 @@ export async function POST(request: NextRequest) {
       try {
         const deliveryDate = new Date();
         deliveryDate.setDate(deliveryDate.getDate() + 3);
-        await executeQuery(
+        await (
           'INSERT INTO delivery (orderId, estimated_date, status, createdAt, updatedAt) VALUES (?, ?, ?, NOW(), NOW())',
           [orderId, deliveryDate.toISOString().split('T')[0], 'pending']
         );
@@ -336,7 +336,7 @@ export async function POST(request: NextRequest) {
       
       // Tạo payment record nếu có bảng payments
       try {
-        await executeQuery(
+        await (
           'INSERT INTO payments (order_id, status, method, amount, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())',
           [orderId, 'payment_pending', paymentMethod || 'COD', totalPrice]
         );
@@ -354,11 +354,11 @@ export async function POST(request: NextRequest) {
     } catch (dbError) {
       console.error('🔍 Database insert failed:', dbError);
       console.error('🔍 Error details:', {
-        message: dbError instanceof Error ? dbError.message : 'Unknown error',
+        message: dbError instanceof Error ? dbError.message : 'Unknown ',
         stack: dbError instanceof Error ? dbError.stack : undefined
       });
       return NextResponse.json(
-        { error: 'Không thể tạo đơn hàng' },
+        { : 'Không thể tạo đơn hàng' },
         { status: 500 }
       );
     }
@@ -367,10 +367,10 @@ export async function POST(request: NextRequest) {
     console.error('🔍 Error in create order API:', error);
     console.error('🔍 Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? .stack : undefined
     });
     return NextResponse.json(
-      { error: 'Lỗi server, vui lòng thử lại sau' },
+      { : 'Lỗi server, vui lòng thử lại sau' },
       { status: 500 }
     );
   }

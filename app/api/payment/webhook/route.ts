@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { , NextResponse } from 'next/server';
+import {  } from '@/lib/db';
 import crypto from 'crypto';
 
 // SePay Configuration
@@ -9,12 +9,12 @@ const SEPAY_CONFIG = {
 
 interface SePayWebhookData {
   transaction_id: string;
-  sepay_transaction_id: string;
+  : string;
   amount: number;
   status: 'success' | 'failed' | 'pending';
-  bank_account: string;
-  bank_name: string;
-  transaction_date: string;
+  : string;
+  : string;
+  : string;
   description: string;
   signature: string;
 }
@@ -22,7 +22,7 @@ interface SePayWebhookData {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
-    const signature = request.headers.get('x-sepay-signature');
+    const signature = .headers.get('x-sepay-signature');
     
     // Verify webhook signature
     const expectedSignature = crypto
@@ -32,18 +32,18 @@ export async function POST(request: NextRequest) {
     
     if (signature !== expectedSignature) {
       console.error('Invalid webhook signature');
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      return NextResponse.json({ : 'Invalid signature' }, { status: 401 });
     }
 
     const webhookData: SePayWebhookData = JSON.parse(body);
     const { 
       transaction_id, 
-      sepay_transaction_id, 
+      , 
       amount, 
       status, 
-      bank_account, 
-      bank_name, 
-      transaction_date,
+      , 
+      , 
+      ,
       description 
     } = webhookData;
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     // If payment is successful, mark order as paid
     if (status === 'success') {
-      await executeQuery(`
+      await (`
         UPDATE \`order\` 
         SET 
           payment_status = 'completed',
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     console.error('Webhook processing error:', error);
     return NextResponse.json({ 
       error: 'Webhook processing failed',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown '
     }, { status: 500 });
   }
 }
