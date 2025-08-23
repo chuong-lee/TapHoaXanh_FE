@@ -5,11 +5,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
-import Pagination from '@/components/Pagination'
 import Marquee from './components/Marquee';
 
 function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.png';
+  if (!img) return '/images/placeholder.jpg';
   if (img.startsWith('http')) return img;
   if (img.startsWith('/')) return img;
   if (img.startsWith('client/images/')) return '/' + img;
@@ -36,10 +35,10 @@ interface Product {
 
 export default function HomePage() {
   const router = useRouter()
-  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [_allProducts, setAllProducts] = useState<Product[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, _setCurrentPage] = useState(1)
   const itemsPerPage = 20
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -63,7 +62,7 @@ export default function HomePage() {
         console.log('Products loaded:', productList)
         setAllProducts(productList)
         setProducts(productList)
-      } catch (err: unknown) {
+      } catch  {
         setAllProducts([])
         setProducts([])
       } finally {
@@ -77,7 +76,7 @@ export default function HomePage() {
       try {
         const res = await api.get('/categories');
         setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
-      } catch (err) {
+      } catch {
         setCategories([]);
       }
     };
@@ -154,7 +153,7 @@ export default function HomePage() {
                 </div>
                 <div className="col-lg-5 text-center d-flex justify-content-end align-items-end" style={{height: '100%'}}>
                   <Image
-                    src="/client/images/banner.png"
+                    src="/client/images/banner.jpg"
                     alt="Tạp Hóa Xanh"
                     width={1000}
                     height={800}
@@ -176,7 +175,7 @@ export default function HomePage() {
           <section className="container mb-5">
             <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Danh mục nổi bật</h2>
             <div className="categories-scroll d-flex flex-nowrap gap-3">
-              {categories.map((cat, idx) => (
+              {categories.map((cat) => (
                 <div
                   className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
                   key={cat.name}
@@ -274,7 +273,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="product-list-grid">
-                {currentProducts.map((product, idx) => (
+                {currentProducts.map((product) => (
                   <div className="custom-product-card d-flex flex-column h-100 position-relative" key={product.id}>
                     {product.discount > 0 && (
                       <span
@@ -342,7 +341,7 @@ export default function HomePage() {
                 <div
                   className="double-banner-card left-banner d-flex flex-column justify-content-center align-items-start p-5"
                   style={{
-                    backgroundImage: 'url(/client/images/water.png)',
+                    backgroundImage: 'url(/client/images/water.jpg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     borderRadius: 32,
@@ -380,7 +379,7 @@ export default function HomePage() {
                 <div
                   className="double-banner-card right-banner d-flex flex-column justify-content-center align-items-start p-5"
                   style={{
-                    background: "#ffd43b url('/client/images/coffe.png') no-repeat right bottom / contain",
+                    background: "#ffd43b url('/client/images/coffe.jpg') no-repeat right bottom / contain",
                     borderRadius: 32,
                     minHeight: 340,
                     position: 'relative',
@@ -412,17 +411,17 @@ export default function HomePage() {
               <div className="featured-product-list">
                 {/* Banner ngoài cùng bên trái */}
                 <div className="featured-product-card banner-in-grid">
-                  <img
-                    src="/client/images/banne-milk.png"
+                  <Image
+                    src="/client/images/banne-milk.jpg"
                     alt="Banner"
                     className="banner-img-in-grid"
                   />
                 </div>
                 {/* Các sản phẩm còn lại */}
-                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product, idx) => (
+                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product) => (
                   <div className="featured-product-card" key={product.id}>
                     <div className="featured-product-image">
-                      <img
+                      <Image
                         src={fixImgSrc(product.images)}
                         alt={product.name}
                         style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
@@ -517,8 +516,8 @@ export default function HomePage() {
                 </form>
               </div>
               <div className="col-md-5 text-center">
-                <img
-                  src="/images/girl-red-hoodie.png"
+                <Image
+                  src="/images/girl-red-hoodie.jpg"
                   alt="Cô gái áo đỏ"
                   style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
                 />

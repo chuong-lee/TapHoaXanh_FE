@@ -1,17 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { News } from '@/types'
+import Image from 'next/image'
 
-type News = {
-  id: number
-  title: string
-  image: string
-  date: string
-  views: number
-  readTime: string
-  description: string
-  category: string
-}
+
 
 export default function PostPage() {
   const [news, setNews] = useState<News[]>([])
@@ -22,10 +15,10 @@ export default function PostPage() {
       .then(res => res.json())
       .then(data => {
         // Map lại dữ liệu cho đúng với type News ở FE
-        const mapped = data.map((item: any) => ({
+        const mapped = data.map((item:News) => ({
           id: item.id,
-          title: item.name, // name -> title
-          image: item.images, // images -> image
+          title: item.title, 
+          image: item.image, 
           date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '', // format ngày Việt Nam
           views: Math.floor(Math.random() * 1000) + 100, // Random views cho demo
           readTime: Math.floor(Math.random() * 10) + 3 + ' phút', // Random thời gian đọc
@@ -96,7 +89,7 @@ export default function PostPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = '0 2px 12px rgba(34,197,94,0.10)';
                   }}>
-                    <img 
+                    <Image 
                       src={item.image} 
                       alt={item.title} 
                       style={{

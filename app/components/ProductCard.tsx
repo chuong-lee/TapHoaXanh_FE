@@ -19,7 +19,7 @@ type Product = {
 }
 
 function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.png';
+  if (!img) return '/images/placeholder.jpg';
   if (img.startsWith('http')) return img;
   if (img.startsWith('/')) return img;
   if (img.startsWith('client/images/')) return '/' + img;

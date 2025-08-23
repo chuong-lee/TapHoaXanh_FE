@@ -2,17 +2,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { News } from '@/types'
+import Image from 'next/image'
 
-type News = {
-  id: number
-  title: string
-  image: string
-  date: string
-  views: number
-  readTime: string
-  description: string
-  category: string
-}
+
 
 export default function NewsDetailPage() {
   const { id } = useParams()
@@ -20,18 +13,19 @@ export default function NewsDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:5000/news/${id}`)
+    fetch(`http://localhost:5000/news/${id}`) /// <======== ?????????????????
       .then(res => res.json())
       .then(item => {
         setNews({
           id: item.id,
-          title: item.name,
-          image: item.images,
+          title: item.title,
+          image: item.image,
           date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
           views: Math.floor(Math.random() * 1000) + 100,
           readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
           description: item.description,
           category: getRandomCategory(),
+          createdAt: item.createdAt || null, 
         })
         setIsLoading(false)
       })
@@ -136,7 +130,7 @@ export default function NewsDetailPage() {
               </div>
 
               {/* Featured image */}
-              <img 
+              <Image
                 src={news.image} 
                 alt={news.title} 
                 style={{
@@ -322,7 +316,7 @@ export default function NewsDetailPage() {
 }
 
 // Component hiển thị bài viết liên quan
-function RelatedPosts({ currentId }: { currentId: number }) {
+function RelatedPosts({ currentId }: { currentId: string }) {
   const [related, setRelated] = useState<News[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -331,11 +325,11 @@ function RelatedPosts({ currentId }: { currentId: number }) {
       .then(res => res.json())
       .then(data => {
         const mapped = data
-          .filter((item: any) => item.id !== currentId)
-          .map((item: any) => ({
+          .filter((item: News) => item.id !== currentId)
+          .map((item: News) => ({
             id: item.id,
-            title: item.name,
-            image: item.images,
+            title: item.title,
+            image: item.image,
             date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
             views: Math.floor(Math.random() * 1000) + 100,
             readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
@@ -406,7 +400,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <img 
+            <Image
               src={item.image} 
               alt={item.title} 
               style={{

@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
+import { Order } from "@/types";
 
 const STATUS_LABELS = [
   { key: "pending", label: "Chờ vận chuyển" },
@@ -11,7 +12,7 @@ const STATUS_LABELS = [
 ];
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [tab, setTab] = useState("pending");
   const [loading, setLoading] = useState(true);
 

@@ -1,6 +1,7 @@
 'use client'
 
-import Image from 'next/image'
+import Image from "next/image"
+
 
 export default function ContactUs() {
   return (
@@ -52,21 +53,21 @@ export default function ContactUs() {
         <div className="row text-center mt-5">
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
-              <img src="/images/address-icon.png" alt="Địa chỉ" width={50} className="mb-3" />
+              <Image src="/images/address-icon.jpg" alt="Địa chỉ" height={50} width={50} className="mb-3" />
               <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Địa Chỉ</div>
               <div className="text-muted">123 Đường ABC, Quận 1, TP.HCM</div>
             </div>
           </div>
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
-              <img src="/images/phone-icon.png" alt="Điện thoại" width={50} className="mb-3" />
+              <Image src="/images/phone-icon.jpg" alt="Điện thoại" width={50} className="mb-3" />
               <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Điện Thoại</div>
               <div className="text-muted">+84 123-456-789</div>
             </div>
           </div>
           <div className="col-md-4">
             <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
-              <img src="/images/email-icon.png" alt="Email" width={50} className="mb-3" />
+              <Image src="/images/email-icon.jpg" alt="Email" width={50} className="mb-3" />
               <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Email</div>
               <div className="text-muted">contact@taphoxanh.com</div>
             </div>

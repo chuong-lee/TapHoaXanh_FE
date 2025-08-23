@@ -10,6 +10,7 @@ import "../globals.css"
 import { useAuth } from '../context/AuthContext';
 import LogoutButton from './logout';
 import Avatar from './Avatar';
+import Image from 'next/image'
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -39,8 +40,8 @@ const Header = () => {
             {/* Logo + Tên */}
             <div className="d-flex align-items-center gap-2" style={{minWidth: 220}}>
               <Link className="navbar-brand d-flex align-items-center gap-2 p-0 m-0" href="/" style={{gap: 10}}>
-                <img
-                  src="/client/images/logo.png"
+                <Image
+                  src="/client/images/logo.jpg"
                   alt="Tạp Hóa Xanh Logo"
                   width={48}
                   height={48}
