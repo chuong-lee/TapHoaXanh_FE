@@ -23,3 +23,10 @@ export type Voucher = {
     category: string
     createdAt: string
   }
+
+  export interface Order {
+    id: number;
+    createdAt: string | null; 
+    price: number | null;
+    status: "chờ xử lý" | "đã xác nhận" | "đang giao" | "đã giao" | "đã hủy";
+  }

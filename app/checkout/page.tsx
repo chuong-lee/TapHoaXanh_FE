@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import api from '@/lib/axios'
 import { useRouter } from 'next/navigation'
 import { Voucher } from '@/types';
+import Image from 'next/image';
 
 
 // Tạo mã QR ngân hàng thông qua API backend
@@ -418,7 +419,7 @@ function CheckoutPage() {
                         </>
                       ) : qrCodeUrl ? (
                         <>
-                          <img
+                          <Image
                             src={qrCodeUrl}
                             alt="Mã QR thanh toán động"
                             className="img-fluid"

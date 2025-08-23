@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { News } from '@/types'
+import Image from 'next/image'
 
 
 
@@ -88,7 +89,7 @@ export default function PostPage() {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = '0 2px 12px rgba(34,197,94,0.10)';
                   }}>
-                    <img 
+                    <Image 
                       src={item.image} 
                       alt={item.title} 
                       style={{

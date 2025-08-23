@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { News } from '@/types'
+import Image from 'next/image'
 
 
 
@@ -24,6 +25,7 @@ export default function NewsDetailPage() {
           readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
           description: item.description,
           category: getRandomCategory(),
+          createdAt: item.createdAt || null, 
         })
         setIsLoading(false)
       })
@@ -128,7 +130,7 @@ export default function NewsDetailPage() {
               </div>
 
               {/* Featured image */}
-              <img 
+              <Image
                 src={news.image} 
                 alt={news.title} 
                 style={{
@@ -314,7 +316,7 @@ export default function NewsDetailPage() {
 }
 
 // Component hiển thị bài viết liên quan
-function RelatedPosts({ currentId }: { currentId: number }) {
+function RelatedPosts({ currentId }: { currentId: string }) {
   const [related, setRelated] = useState<News[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -398,7 +400,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
               e.currentTarget.style.background = 'transparent'
             }}
           >
-            <img 
+            <Image
               src={item.image} 
               alt={item.title} 
               style={{

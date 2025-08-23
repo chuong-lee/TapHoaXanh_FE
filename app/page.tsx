@@ -411,17 +411,17 @@ export default function HomePage() {
               <div className="featured-product-list">
                 {/* Banner ngoài cùng bên trái */}
                 <div className="featured-product-card banner-in-grid">
-                  <img
+                  <Image
                     src="/client/images/banne-milk.jpg"
                     alt="Banner"
                     className="banner-img-in-grid"
                   />
                 </div>
                 {/* Các sản phẩm còn lại */}
-                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product, idx) => (
+                {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product) => (
                   <div className="featured-product-card" key={product.id}>
                     <div className="featured-product-image">
-                      <img
+                      <Image
                         src={fixImgSrc(product.images)}
                         alt={product.name}
                         style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
@@ -516,7 +516,7 @@ export default function HomePage() {
                 </form>
               </div>
               <div className="col-md-5 text-center">
-                <img
+                <Image
                   src="/images/girl-red-hoodie.jpg"
                   alt="Cô gái áo đỏ"
                   style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import api from '@/lib/axios'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface ProductVariant {
   id: number;
@@ -55,22 +56,22 @@ export default function ProductDetailPage() {
       try {
         setLoading(true)
         console.log('Đang tìm sản phẩm với slug:', slug);
-        
+
         // Sử dụng API mới để lấy sản phẩm theo slug
         const res = await api.get<Product>(`/products/slug/${slug}`)
         console.log('Sản phẩm tìm thấy:', res.data);
-        
+
         if (res.data) {
           const found = res.data;
           const images: string[] = typeof found.images === 'string'
             ? found.images
-                .split(',')
-                .map(s => s && s.trim())
-                .filter(s => !!s && s !== 'null' && s !== 'undefined')
+              .split(',')
+              .map(s => s && s.trim())
+              .filter(s => !!s && s !== 'null' && s !== 'undefined')
             : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
-          
+
           console.log('Images đã xử lý:', images);
-          
+
           const productWithImagesArray = { ...found, images }
           setProduct(productWithImagesArray as Product)
           setSelectedImage(images[0] || null)
@@ -96,7 +97,7 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch  {
+      } catch {
         setVariants([]);
       }
     };
@@ -112,7 +113,7 @@ export default function ProductDetailPage() {
         // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
         products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
         setRelatedProducts(products);
-      } catch  {
+      } catch {
         setRelatedProducts([]);
       }
     };
@@ -278,12 +279,12 @@ export default function ProductDetailPage() {
                   <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
                 </div>
                 <div className="mt-2 d-flex gap-2">
-                  <a href="#"><img src="/images/social-fb.jpg" alt="fb" width={28} /></a>
-                  <a href="#"><img src="/images/social-ig.jpg" alt="ig" width={28} /></a>
-                  <a href="#"><img src="/images/social-x.jpg" alt="x" width={28} /></a>
-                  <a href="#"><img src="/images/social-yt.jpg" alt="yt" width={28} /></a>
-                  <a href="#"><img src="/images/social-tg.jpg" alt="tg" width={28} /></a>
-                  <a href="#"><img src="/images/social-in.jpg" alt="in" width={28} /></a>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-fb.jpg" /></Link>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-ig.jpg" /></Link>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-x.jpg" /></Link>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-yt.jpg" /></Link>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-tg.jpg" /></Link>
+                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-in.jpg" /></Link>
                 </div>
               </div>
             </div>
@@ -293,7 +294,7 @@ export default function ProductDetailPage() {
                 <div className="d-flex align-items-baseline">
                   <div className="fs-2 fw-bold text-dark">
                     {selectedVariant ? (
-                      <span>{totalPrice.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</span>
+                      <span>{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                     ) : (
                       <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
                     )}
@@ -370,7 +371,7 @@ export default function ProductDetailPage() {
                   <a href="#" className="text-decoration-none text-muted">So sánh</a>
                 </div>
                 <hr />
-                <div className="mb-2"><img src="/images/safe-checkout.jpg" alt="Thanh toán an toàn" style={{ height: 24 }} /></div>
+                <div className="mb-2"><Image src="/images/safe-checkout.jpg" alt="Thanh toán an toàn"  height={24} /></div>
                 <div className="mb-2 fw-bold">Đặt hàng nhanh 24/7<br /><span className="fw-normal">(025) 3886 25 16</span></div>
                 <div className="mb-2"><i className="bi bi-truck"></i> Giao từ <a href="#" className="text-decoration-none">Việt Nam</a></div>
               </div>
@@ -467,51 +468,51 @@ export default function ProductDetailPage() {
             const basePrice = item.price;
             const finalPrice = basePrice - item.discount;
             return (
-            <div className="col-3" key={item.id}>
-              <div className="custom-product-card h-100">
+              <div className="col-3" key={item.id}>
+                <div className="custom-product-card h-100">
                   <span className="badge-hot">
                     -{Math.round((item.discount / item.price) * 100)}%
                   </span>
-                <div className="product-image">
-                  <Image
-                    src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.jpg') : '/images/placeholder.jpg'))}
-                    alt={item.name}
-                    width={140}
-                    height={140}
-                    style={{objectFit: 'contain', width: '100%', height: '140px', background: 'transparent'}}
-                  />
-                </div>
-                <div className="product-info">
-                  <div className="product-type">Đồ ăn vặt</div>
-                  <div className="product-name">{item.name}</div>
-                  <div className="product-brand">Bởi NestFood</div>
-                  <div className="product-price">
+                  <div className="product-image">
+                    <Image
+                      src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.jpg') : '/images/placeholder.jpg'))}
+                      alt={item.name}
+                      width={140}
+                      height={140}
+                      style={{ objectFit: 'contain', width: '100%', height: '140px', background: 'transparent' }}
+                    />
+                  </div>
+                  <div className="product-info">
+                    <div className="product-type">Đồ ăn vặt</div>
+                    <div className="product-name">{item.name}</div>
+                    <div className="product-brand">Bởi NestFood</div>
+                    <div className="product-price">
                       <span className="price-main">{finalPrice.toLocaleString()}₫</span>
                       <span className="price-old">{basePrice.toLocaleString()}₫</span>
+                    </div>
+                    <div className="product-rating">
+                      <span className="star">★</span> <span>4.0</span>
+                    </div>
                   </div>
-                  <div className="product-rating">
-                    <span className="star">★</span> <span>4.0</span>
-                  </div>
+                  <a
+                    href={item.slug ? `/product/${item.slug}` : '#'}
+                    className="btn-add-cart"
+                    style={{
+                      background: '#38bdf8',
+                      color: '#fff',
+                      borderRadius: 999,
+                      fontWeight: 600,
+                      display: 'inline-block',
+                      textAlign: 'center',
+                      padding: '12px 24px',
+                      cursor: item.slug ? 'pointer' : 'not-allowed',
+                      pointerEvents: item.slug ? 'auto' : 'none'
+                    }}
+                  >
+                    Xem chi tiết <i className="fa fa-eye"></i>
+                  </a>
                 </div>
-                <a
-                  href={item.slug ? `/product/${item.slug}` : '#'}
-                  className="btn-add-cart"
-                  style={{
-                    background: '#38bdf8',
-                    color: '#fff',
-                    borderRadius: 999,
-                    fontWeight: 600,
-                    display: 'inline-block',
-                    textAlign: 'center',
-                    padding: '12px 24px',
-                    cursor: item.slug ? 'pointer' : 'not-allowed',
-                    pointerEvents: item.slug ? 'auto' : 'none'
-                  }}
-                >
-                  Xem chi tiết <i className="fa fa-eye"></i>
-                </a>
               </div>
-            </div>
             );
           })}
         </div>

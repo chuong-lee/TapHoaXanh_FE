@@ -1,5 +1,6 @@
 'use client'
 import { Voucher } from '@/types';
+import Image from 'next/image';
 import { useEffect, useState } from 'react'
 
 
@@ -44,7 +45,7 @@ export default function VoucherPage() {
             >
               {/* Hình ảnh bên trái */}
               <div style={{flex: '0 0 80px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <img
+                <Image
                   src={v.image || '/images/voucher-default.jpg'}
                   alt="Hình ảnh voucher"
                   style={{
