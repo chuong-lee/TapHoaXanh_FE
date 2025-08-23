@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useRef ,FormEvent} from 'react'
+import { useState, useRef, FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
 import { useAuth } from '../context/AuthContext';
+
 
 
 function LoginForm() {
@@ -16,32 +17,34 @@ function LoginForm() {
   const redirectTo = searchParams.get('redirect') || '/'
   const { refreshProfile } = useAuth();
 
-  const handleLogin = async (e:FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
-    
-      await api.post('/auth/login', {
+
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const res = await api.post('/auth/login', {
         email: emailRef.current?.value || '',
-        password: passwordRef.current?.value || ''
-      }).then(async res => {
-        console.log(res);
-        // Lưu token vào localStorage
-        const data = res.data as { token?: string; access_token?: string };
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-            } else if (data.access_token) {
-                localStorage.setItem('token', data.access_token);
-            }
-        await refreshProfile();
-        router.push(redirectTo);
-      } ).catch(err => {
-        console.log(err);
-        setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.');
-      } ).finally(() => {
-        setIsLoading(false);
-      })
-  }
+        password: passwordRef.current?.value || '',
+      });
+
+      const { token, user } = res.data as { token?: string; user?: any };
+
+      if (token) localStorage.setItem('access_token', token);
+
+
+      await refreshProfile();
+      router.push(redirectTo);
+    } catch (err) {
+      const error = err as Error & { response?: { data?: { message?: string } } };
+      console.error(error);
+      setError(error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <form onSubmit={handleLogin} className="mx-auto col-md-6 col-lg-5 col-12">
@@ -63,7 +66,7 @@ function LoginForm() {
           required
         />
       </div>
-     {isLoading ? <>dang load</> : <button type="submit" className="btn btn-primary w-100">Đăng nhập</button>} 
+      {isLoading ? <>dang load</> : <button type="submit" className="btn btn-primary w-100">Đăng nhập</button>}
       {error && <p className="text-danger">{error}</p>}
     </form>
   )

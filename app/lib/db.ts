@@ -3,9 +3,9 @@ import mysql from 'mysql2/promise'
 // Database connection pool configuration
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '8889'),
+  port: parseInt(process.env.DB_PORT || '3306'),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'root',
+  password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'tap_hoa_xanh',
   waitForConnections: true,
   connectionLimit: 10,
@@ -21,6 +21,13 @@ let pool: mysql.Pool | null = null
 
 export function getPool(): mysql.Pool {
   if (!pool) {
+    console.log('Creating database pool with config:', {
+      host: dbConfig.host,
+      port: dbConfig.port,
+      user: dbConfig.user,
+      database: dbConfig.database
+    })
+    
     pool = mysql.createPool(dbConfig)
     
     // Handle pool events

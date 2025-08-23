@@ -45,10 +45,25 @@ export function useHomepageProducts(): UseHomepageProductsReturn {
         return;
       }
 
+      console.log('Fetching homepage products...');
       const response = await api.get('/products/homepage');
+      console.log('Homepage products response:', response.data);
       
-      if (response.data.success) {
+      console.log('Processing homepage response:', response.data);
+      
+      if (response.data && response.data.success && Array.isArray(response.data.data)) {
         const newProducts = response.data.data;
+        console.log('Setting homepage products:', newProducts.length);
+        setProducts(newProducts);
+        
+        // Update cache
+        homepageCache = {
+          data: newProducts,
+          timestamp: Date.now()
+        };
+      } else if (response.data && Array.isArray(response.data.data)) {
+        const newProducts = response.data.data;
+        console.log('Setting homepage products (no success field):', newProducts.length);
         setProducts(newProducts);
         
         // Update cache
@@ -57,6 +72,7 @@ export function useHomepageProducts(): UseHomepageProductsReturn {
           timestamp: Date.now()
         };
       } else {
+        console.error('Invalid homepage response format:', response.data);
         throw new Error('Failed to fetch products');
       }
       

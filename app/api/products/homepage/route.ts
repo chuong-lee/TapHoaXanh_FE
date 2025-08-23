@@ -53,16 +53,21 @@ export async function GET() {
         p.quantity,
         c.name as category
       FROM product p
-      LEFT JOIN category c ON p.categoryId = c.id
+      LEFT JOIN category c ON p.category_id = c.id
       WHERE p.quantity > 0
       ORDER BY p.id DESC
       LIMIT 20
     `)
 
+    console.log('Homepage products query result:', {
+      rowsCount: rows.length,
+      sampleProduct: rows[0]
+    })
+
     // Function để xử lý URL hình ảnh
     function processImageUrl(imagePath: string | null): string {
       if (!imagePath) {
-        return '/client/images/product.png'
+        return '/client/images/product-placeholder-1.png'
       }
       
       // Nếu là URL đầy đủ (từ database)
@@ -95,6 +100,11 @@ export async function GET() {
       data: formattedProducts,
       timestamp: Date.now()
     };
+
+    console.log('Returning homepage products:', {
+      count: formattedProducts.length,
+      sampleProduct: formattedProducts[0]
+    });
 
     return NextResponse.json({
       success: true,

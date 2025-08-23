@@ -16,6 +16,7 @@ export default function LogoutButton() {
     try {
       await profileService.logout();
       setProfile(null);
+      localStorage.removeItem('token');
       router.push('/login');
     } catch {
       setLogoutError('Đăng xuất thất bại. Vui lòng thử lại!');

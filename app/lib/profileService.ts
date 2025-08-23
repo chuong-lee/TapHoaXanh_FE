@@ -22,7 +22,7 @@ export const profileService = {
   },
   logout: async () => {
     // Remove token from localStorage
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     return { success: true };
   },
 };

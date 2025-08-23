@@ -81,8 +81,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Check password - handle both hashed and plain text passwords
+    let isPasswordValid = false;
+    
+    // First try bcrypt compare (for hashed passwords)
+    try {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } catch (bcryptError) {
+      console.log('Bcrypt compare failed, trying plain text comparison');
+    }
+    
+    // If bcrypt fails, try plain text comparison (for demo data)
+    if (!isPasswordValid) {
+      isPasswordValid = password === user.password;
+    }
     
     if (!isPasswordValid) {
       return NextResponse.json(
