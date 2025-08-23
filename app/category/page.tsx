@@ -102,7 +102,7 @@ export default function CategoryPage() {
   }
 
   const filteredProducts = getFilteredProducts()
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const _totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const currentProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage)
 

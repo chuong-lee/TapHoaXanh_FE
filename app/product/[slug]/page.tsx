@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
       try {
         const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
         setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch (e) {
+      } catch  {
         setVariants([]);
       }
     };
@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
         // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
         products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
         setRelatedProducts(products);
-      } catch (e) {
+      } catch  {
         setRelatedProducts([]);
       }
     };
@@ -134,7 +134,7 @@ export default function ProductDetailPage() {
     const finalPrice = basePrice - product.discount;
 
     // Phần trăm giảm giá (nếu muốn hiển thị badge)
-    const percent = Math.round((product.discount / basePrice) * 100);
+    const _percent = Math.round((product.discount / basePrice) * 100);
     return finalPrice;
   };
   const totalPrice = getSelectedPrice() * quantity;
@@ -334,7 +334,7 @@ export default function ProductDetailPage() {
                         const finalPrice = basePrice - product.discount;
 
                         // Phần trăm giảm giá (nếu muốn hiển thị badge)
-                        const percent = Math.round((product.discount / basePrice) * 100);
+                        const _percent = Math.round((product.discount / basePrice) * 100);
                         addToCart({
                           ...product,
                           variant_id: variant?.id,
@@ -463,7 +463,7 @@ export default function ProductDetailPage() {
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
         <div className="row g-3">
-          {relatedProducts.map((item, i) => {
+          {relatedProducts.map((item) => {
             const basePrice = item.price;
             const finalPrice = basePrice - item.discount;
             return (

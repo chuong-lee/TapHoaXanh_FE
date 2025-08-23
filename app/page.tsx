@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
-import Pagination from '@/components/Pagination'
 import Marquee from './components/Marquee';
 
 function fixImgSrc(img: string) {
@@ -36,10 +35,10 @@ interface Product {
 
 export default function HomePage() {
   const router = useRouter()
-  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [_allProducts, setAllProducts] = useState<Product[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, _setCurrentPage] = useState(1)
   const itemsPerPage = 20
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -63,7 +62,7 @@ export default function HomePage() {
         console.log('Products loaded:', productList)
         setAllProducts(productList)
         setProducts(productList)
-      } catch (err: unknown) {
+      } catch  {
         setAllProducts([])
         setProducts([])
       } finally {
@@ -77,7 +76,7 @@ export default function HomePage() {
       try {
         const res = await api.get('/categories');
         setCategories(res.data as Category[]); // Đảm bảo API trả về đúng format
-      } catch (err) {
+      } catch {
         setCategories([]);
       }
     };
@@ -176,7 +175,7 @@ export default function HomePage() {
           <section className="container mb-5">
             <h2 className="fw-bold mb-4" style={{fontSize: '2rem'}}>Danh mục nổi bật</h2>
             <div className="categories-scroll d-flex flex-nowrap gap-3">
-              {categories.map((cat, idx) => (
+              {categories.map((cat) => (
                 <div
                   className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
                   key={cat.name}
@@ -274,7 +273,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="product-list-grid">
-                {currentProducts.map((product, idx) => (
+                {currentProducts.map((product) => (
                   <div className="custom-product-card d-flex flex-column h-100 position-relative" key={product.id}>
                     {product.discount > 0 && (
                       <span

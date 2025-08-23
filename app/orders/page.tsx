@@ -11,7 +11,7 @@ const STATUS_LABELS = [
 ];
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState([]);
   const [tab, setTab] = useState("pending");
   const [loading, setLoading] = useState(true);
 

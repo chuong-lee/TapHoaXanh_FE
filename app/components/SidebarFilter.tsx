@@ -23,7 +23,7 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
       try {
         const res = await api.get('/categories')
         setCategories(Array.isArray(res.data) ? res.data : [])
-      } catch (err) {
+      } catch {
         setCategories([])
       }
     }

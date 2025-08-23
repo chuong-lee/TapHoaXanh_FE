@@ -18,7 +18,7 @@ export type CartItem = {
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
+  const [_selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
   const prevCartLength = useRef(cart.length);
 
   useEffect(() => {

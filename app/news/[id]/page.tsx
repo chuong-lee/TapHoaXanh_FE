@@ -2,17 +2,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { News } from '@/types'
 
-type News = {
-  id: number
-  title: string
-  image: string
-  date: string
-  views: number
-  readTime: string
-  description: string
-  category: string
-}
+
 
 export default function NewsDetailPage() {
   const { id } = useParams()
@@ -20,13 +12,13 @@ export default function NewsDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`http://localhost:5000/news/${id}`)
+    fetch(`http://localhost:5000/news/${id}`) /// <======== ?????????????????
       .then(res => res.json())
       .then(item => {
         setNews({
           id: item.id,
-          title: item.name,
-          image: item.images,
+          title: item.title,
+          image: item.image,
           date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
           views: Math.floor(Math.random() * 1000) + 100,
           readTime: Math.floor(Math.random() * 10) + 3 + ' phút',
@@ -331,11 +323,11 @@ function RelatedPosts({ currentId }: { currentId: number }) {
       .then(res => res.json())
       .then(data => {
         const mapped = data
-          .filter((item: any) => item.id !== currentId)
-          .map((item: any) => ({
+          .filter((item: News) => item.id !== currentId)
+          .map((item: News) => ({
             id: item.id,
-            title: item.name,
-            image: item.images,
+            title: item.title,
+            image: item.image,
             date: item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : '',
             views: Math.floor(Math.random() * 1000) + 100,
             readTime: Math.floor(Math.random() * 10) + 3 + ' phút',

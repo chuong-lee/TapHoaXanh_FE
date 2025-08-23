@@ -11,26 +11,29 @@ const STATUS_LABELS = [
 ];
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState([]);
   const [tab, setTab] = useState("pending");
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
 
+
   useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await api.get(`/order${tab !== 'all' ? `?status=${tab}` : ''}`);
+        const data = Array.isArray(response.data) ? response.data : [];
+        setOrders(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        setLoading(false);
+      }
+    };
+
     fetchOrders();
   }, [tab]);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await api.get(`/order${tab !== 'all' ? `?status=${tab}` : ''}`);
-      const data = Array.isArray(response.data) ? response.data : [];
-      setOrders(data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      setLoading(false);
-    }
-  };
+  
 
   const updateOrderStatus = async (orderId: number, newStatus: string) => {
     setUpdating(orderId);

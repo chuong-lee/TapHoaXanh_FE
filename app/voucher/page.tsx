@@ -1,40 +1,28 @@
 'use client'
+import { Voucher } from '@/types';
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation';
 
-type Voucher = {
-  id: number;
-  code: string;
-  max_discount: number;
-  min_order_value: number;
-  quantity: number;
-  is_used: number;
-  start_date: string;
-  end_date: string;
-  description?: string;
-  image?: string; // Thêm trường image
-};
+
 
 export default function VoucherPage() {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const [selected, setSelected] = useState<number | null>(null);
-  const router = useRouter();
-
+  // const [selected, setSelected] = useState<number | null>(null);
+  // const router = useRouter();
   useEffect(() => {
     fetch('http://localhost:5000/voucher')
       .then(res => res.json())
       .then(data => setVouchers(data))
   }, [])
 
-  const handleConfirm = () => {
-    if (selected !== null) {
-      const voucher = vouchers.find(v => v.id === selected);
-      if (voucher) {
-        localStorage.setItem('selectedVoucher', JSON.stringify(voucher));
-        router.push('/checkout'); // Chuyển về trang thanh toán
-      }
-    }
-  };
+  // const handleConfirm = () => {
+  //   if (selected !== null) {
+  //     const voucher = vouchers.find(v => v.id === selected);
+  //     if (voucher) {
+  //       localStorage.setItem('selectedVoucher', JSON.stringify(voucher));
+  //       router.push('/checkout'); // Chuyển về trang thanh toán
+  //     }
+  //   }
+  // };
 
   return (
     <main className="main-content">

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import ProductCard from '@/components/ProductCard'
 import api from '@/lib/axios'
 import SidebarFilter from '@/components/SidebarFilter'
-import Pagination from '@/components/Pagination'
 
 type Product = {
   id: number

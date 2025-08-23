@@ -145,7 +145,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     refreshProfile()
-  }, [])
+  }, [refreshProfile])
 
   if (!profile) return <div className="container py-5">Loading...</div>;
 
