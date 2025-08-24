@@ -31,10 +31,11 @@ interface ProductRow {
 // GET /api/products/[id] - Get single product by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const resolvedParams = await params;
+    const id = parseInt(resolvedParams.id)
     
     if (isNaN(id)) {
       return NextResponse.json({
@@ -53,7 +54,7 @@ export async function GET(
         p.images,
         p.discount,
         p.description,
-        p.quantity,
+        0 as quantity,
         p.rating,
         p.createdAt,
         p.updatedAt,

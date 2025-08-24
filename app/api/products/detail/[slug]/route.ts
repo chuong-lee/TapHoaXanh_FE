@@ -27,10 +27,11 @@ interface ProductDetail {
 // GET /api/products/detail/[slug] - Get product detail by slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const slug = decodeURIComponent(params.slug)
+    const resolvedParams = await params;
+    const slug = decodeURIComponent(resolvedParams.slug)
     
     console.log('🔍 Tìm sản phẩm với slug:', slug)
 
@@ -44,7 +45,7 @@ export async function GET(
         p.images,
         p.slug,
         p.description,
-        p.quantity,
+        0 as quantity,
         p.category_id,
         c.name as category_name,
         p.brand_id,

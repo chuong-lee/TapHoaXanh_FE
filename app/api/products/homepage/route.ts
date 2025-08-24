@@ -11,7 +11,6 @@ interface HomepageProduct {
   slug: string
   category: string
   description: string
-  quantity: number
 }
 
 // In-memory cache for homepage products
@@ -50,11 +49,9 @@ export async function GET() {
         p.images,
         p.slug,
         p.description,
-        p.quantity,
         c.name as category
       FROM product p
       LEFT JOIN category c ON p.category_id = c.id
-      WHERE p.quantity > 0
       ORDER BY p.id DESC
       LIMIT 20
     `)

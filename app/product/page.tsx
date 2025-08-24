@@ -154,7 +154,7 @@ export default function ProductListPage() {
     addToCart({
       ...product,
       price: finalPrice,
-      stock: product.quantity || 0,
+              stock: 0,
       images: Array.isArray(product.images) ? product.images.join(',') : product.images,
     }, 1);
     

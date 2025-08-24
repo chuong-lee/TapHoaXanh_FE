@@ -97,7 +97,7 @@ export default function AdminLayout({
                 <ul className="dropdown-menu">
                   <li><a className="dropdown-item" href="#"><i className="fa-solid fa-cog me-2"></i>Cài đặt</a></li>
                   <li><hr className="dropdown-divider" /></li>
-                  <li><a className="dropdown-item" href="/"><i className="fa-solid fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                  <li><Link className="dropdown-item" href="/"><i className="fa-solid fa-sign-out-alt me-2"></i>Đăng xuất</Link></li>
                 </ul>
               </div>
             </div>

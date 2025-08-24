@@ -31,10 +31,11 @@ interface ProductRow {
 // GET /api/products/by-slug/[slug] - Get single product by slug (FAST)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const slug = params.slug
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug
     
     if (!slug) {
       return NextResponse.json({
@@ -64,7 +65,7 @@ export async function GET(
         p.images,
         p.discount,
         p.description,
-        p.quantity,
+        0 as quantity,
         p.rating,
         p.createdAt,
         p.updatedAt,

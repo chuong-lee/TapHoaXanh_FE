@@ -29,9 +29,11 @@ function LoginForm() {
         password: passwordRef.current?.value || '',
       });
 
-      const { token, user } = res.data as { token?: string; user?: any };
+      const { access_token, refresh_token } = res.data as { access_token?: string; refresh_token?: string };
 
-      if (token) localStorage.setItem('access_token', token);
+      if (access_token) localStorage.setItem('access_token', access_token);
+
+      if (refresh_token) localStorage.setItem('refresh_token', refresh_token);
 
 
       await refreshProfile();

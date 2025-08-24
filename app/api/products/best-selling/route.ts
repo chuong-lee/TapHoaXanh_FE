@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
         p.images,
         p.discount,
         p.description,
-        p.quantity as stock,
+        0 as stock,
         p.createdAt as created_at,
         p.updatedAt as updated_at,
         p.barcode,

@@ -20,10 +20,11 @@ interface RelatedProduct {
 // GET /api/products/related/[id] - Get related products
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id)
+    const resolvedParams = await params;
+    const productId = parseInt(resolvedParams.id)
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '12')
 
@@ -56,7 +57,7 @@ export async function GET(
         p.images,
         p.slug,
         p.description,
-        p.quantity,
+        0 as quantity,
         p.category_id,
         c.name as category_name,
         p.brand_id,
@@ -66,7 +67,7 @@ export async function GET(
       LEFT JOIN brand b ON p.brand_id = b.id
       WHERE p.id != ? 
         AND p.deletedAt IS NULL 
-        AND p.quantity > 0
+
         AND (
           p.category_id = ? 
           OR p.brand_id = ? 

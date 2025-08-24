@@ -84,15 +84,15 @@ export const productService = {
         throw new Error('Failed to fetch products');
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       // Xử lý các format response khác nhau từ API
       if (Array.isArray(data)) {
         return data;
-      } else if (data.data && Array.isArray(data.data)) {
-        return data.data;
-      } else if (data.products && Array.isArray(data.products)) {
-        return data.products;
+      } else if (data && typeof data === 'object' && data !== null && 'data' in data && Array.isArray((data as any).data)) {
+        return (data as any).data;
+      } else if (data && typeof data === 'object' && data !== null && 'products' in data && Array.isArray((data as any).products)) {
+        return (data as any).products;
       } else {
         return [];
       }
@@ -148,14 +148,14 @@ export const productService = {
         throw new Error(`Failed to fetch products by category: ${response.status} ${response.statusText}`);
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
-      } else if (data.data && Array.isArray(data.data)) {
-        return data.data;
-      } else if (data.products && Array.isArray(data.products)) {
-        return data.products;
+      } else if (data && typeof data === 'object' && data !== null && 'data' in data && Array.isArray((data as any).data)) {
+        return (data as any).data;
+      } else if (data && typeof data === 'object' && data !== null && 'products' in data && Array.isArray((data as any).products)) {
+        return (data as any).products;
       } else {
         console.warn('Unexpected products by category response format:', data);
         return [];
@@ -178,14 +178,14 @@ export const productService = {
         return productService.getAllProducts({ search: query, limit: 1000 });
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
-      } else if (data.data && Array.isArray(data.data)) {
-        return data.data;
-      } else if (data.products && Array.isArray(data.products)) {
-        return data.products;
+      } else if (data && typeof data === 'object' && data !== null && 'data' in data && Array.isArray((data as any).data)) {
+        return (data as any).data;
+      } else if (data && typeof data === 'object' && data !== null && 'products' in data && Array.isArray((data as any).products)) {
+        return (data as any).products;
       } else {
         return [];
       }
@@ -207,14 +207,14 @@ export const productService = {
         return products.slice(0, limit);
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
-      } else if (data.data && Array.isArray(data.data)) {
-        return data.data;
-      } else if (data.products && Array.isArray(data.products)) {
-        return data.products;
+      } else if (data && typeof data === 'object' && data !== null && 'data' in data && Array.isArray((data as any).data)) {
+        return (data as any).data;
+      } else if (data && typeof data === 'object' && data !== null && 'products' in data && Array.isArray((data as any).products)) {
+        return (data as any).products;
       } else {
         return [];
       }
@@ -243,14 +243,14 @@ export const productService = {
         return products;
       }
       
-      const data: any = await response.json();
+      const data: unknown = await response.json();
       
       if (Array.isArray(data)) {
         return data;
-      } else if (data.data && Array.isArray(data.data)) {
-        return data.data;
-      } else if (data.products && Array.isArray(data.products)) {
-        return data.products;
+      } else if (data && typeof data === 'object' && data !== null && 'data' in data && Array.isArray((data as any).data)) {
+        return (data as any).data;
+      } else if (data && typeof data === 'object' && data !== null && 'products' in data && Array.isArray((data as any).products)) {
+        return (data as any).products;
       } else {
         return [];
       }

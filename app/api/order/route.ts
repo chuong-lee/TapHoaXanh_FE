@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   try {
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
-    let userId = null;
+    let userId: number | null = null;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
     const status = searchParams.get('status');
 
-    let orders = [];
+    let orders: any[] = [];
 
     // Try to fetch from database first
     try {

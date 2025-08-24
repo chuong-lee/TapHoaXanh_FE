@@ -3,13 +3,14 @@ import { executeQuery } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     // Kiểm tra xem id là orderId hay transactionId
-    let result;
+    let result: any;
     
     // Thử tìm theo orderId trước
     result = await executeQuery(`

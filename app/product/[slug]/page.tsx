@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useCart } from '@/hooks/useCart'
 import api from '@/lib/axios'
 import Image from 'next/image'
@@ -40,7 +41,7 @@ export interface Banner {
   link?: string;
 }
 
-export function useProduct(options?: { itemsPerPage?: number }) {
+function useProduct(options?: { itemsPerPage?: number }) {
   const [currentProduct, setCurrentProduct] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const [featuredProduct, setFeaturedProduct] = useState<Product[]>([]);
@@ -140,7 +141,7 @@ function createProductSlug(product: { slug?: string; name?: string; id: number }
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
-  const router = useRouter()
+  // const router = useRouter() // Unused variable
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -150,8 +151,8 @@ export default function ProductDetailPage() {
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null)
   const [relatedproduct, setRelatedproduct] = useState<Product[]>([]);
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
+  // const [canScrollLeft, setCanScrollLeft] = useState(false) // Unused variable
+  // const [canScrollRight, setCanScrollRight] = useState(true) // Unused variable
   
   // Review form state
   const [reviewForm, setReviewForm] = useState({
@@ -181,7 +182,7 @@ export default function ProductDetailPage() {
         variant_id: variant?.id,
         variant_name: variant?.variant_name,
         price: finalPrice,
-        stock: variant?.stock || product.quantity || 0,
+        stock: variant?.stock || 0,
         images: Array.isArray(product.images) ? product.images.join(',') : product.images,
       }
       
@@ -216,19 +217,19 @@ export default function ProductDetailPage() {
     }
   };
 
-  // Function để scroll slider
-  const scrollSlider = (direction: 'left' | 'right') => {
-    const slider = document.getElementById('related-products-slider');
-    if (slider) {
-      const scrollAmount = 270; // width của 1 product + gap
-      slider.scrollBy({ 
-        left: direction === 'left' ? -scrollAmount : scrollAmount, 
-        behavior: 'smooth' 
-      });
-      // Delay check để animation hoàn thành
-      setTimeout(checkScrollButtons, 300);
-    }
-  };
+  // Function để scroll slider - Unused function
+  // const scrollSlider = (direction: 'left' | 'right') => {
+  //   const slider = document.getElementById('related-products-slider');
+  //   if (slider) {
+  //     const scrollAmount = 270; // width của 1 product + gap
+  //     slider.scrollBy({ 
+  //       left: direction === 'left' ? -scrollAmount : scrollAmount, 
+  //       behavior: 'smooth' 
+  //     });
+  //     // Delay check để animation hoàn thành
+  //     setTimeout(checkScrollButtons, 300);
+  //   }
+  // };
 
   // Handle review form changes
   const handleReviewChange = (field: string, value: string | number) => {
@@ -454,7 +455,7 @@ export default function ProductDetailPage() {
       <div className="alert alert-danger">
         <h4>Không tìm thấy sản phẩm</h4>
         <p>Sản phẩm có thể đã bị xóa hoặc URL không chính xác.</p>
-        <a href="/" className="btn btn-primary">Về trang chủ</a>
+        <Link href="/" className="btn btn-primary">Về trang chủ</Link>
       </div>
     </div>
   )
@@ -486,13 +487,13 @@ export default function ProductDetailPage() {
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="/" className="text-decoration-none">
+                    <Link href="/" className="text-decoration-none">
                       <i className="fas fa-home me-1"></i>
                       Trang chủ
-                    </a>
+                    </Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="/product" className="text-decoration-none">Sản phẩm</a>
+                    <Link href="/product" className="text-decoration-none">Sản phẩm</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
                     {product?.name || 'Chi tiết sản phẩm'}
@@ -859,16 +860,14 @@ export default function ProductDetailPage() {
                             <td>{product.specifications.weight_unit}</td>
                           </tr>
                         )}
-                        {product.quantity && (
-                          <tr>
-                            <td className="fw-bold bg-light">Số lượng trong kho:</td>
-                            <td>
-                              <span className={`badge ${product.quantity > 10 ? 'bg-success' : product.quantity > 0 ? 'bg-warning' : 'bg-danger'}`}>
-                                {product.quantity} sản phẩm
-                              </span>
-                            </td>
-                          </tr>
-                        )}
+                        <tr>
+                          <td className="fw-bold bg-light">Tình trạng:</td>
+                          <td>
+                            <span className="badge bg-success">
+                              Có sẵn
+                            </span>
+                          </td>
+                        </tr>
                 </tbody>
               </table>
                   </div>

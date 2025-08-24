@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
         p.images,
         p.discount,
         p.description,
-        p.quantity as stock,
+        0 as stock,
         p.category_id as category_id,
         c.name as category
       FROM product p
