@@ -8,14 +8,7 @@ import { useHomepageProducts } from '@/hooks/useHomepageProducts'
 import ProductSkeleton from '@/components/ui/ProductSkeleton'
 import { useCart } from '@/hooks/useCart'
 import CartNotification from '@/components/ui/CartNotification'
-
-function fixImgSrc(src: string) {
-  if (!src) return "/client/images/product-placeholder-1.png";
-  if (src.startsWith("http")) return src;
-  if (src.startsWith("/")) return src;
-  if (src.startsWith("client/images/")) return "/" + src;
-  return "/client/images/" + src;
-}
+import { getBannerImage, fixImgSrc, handleImageError } from '@/lib/imageUtils'
 
 // Thêm hàm format giá VND
 function formatPriceVND(price: number): string {
@@ -168,6 +161,8 @@ export default function HomePage() {
     const start = (rowIdx - 1) * 4;
     return allProducts.slice(start, start + 4);
   };
+
+
 
   return (
     <div>
@@ -727,7 +722,14 @@ export default function HomePage() {
                       {/* Banner chỉ hiển thị trên desktop */}
                       <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay={`${rowIdx * 0.1}s`} data-wow-duration="0.5s">
                         <div className="promo-banner">
-                          <Image className="img-fluid rounded" src={`/client/images/banner-${rowIdx}.png`} alt={`Banner ${rowIdx}`} width={180} height={418} style={{height: 418}} />
+                          <Image 
+                            className="img-fluid rounded" 
+                            src={getBannerImage(rowIdx)} 
+                            alt={`Banner ${rowIdx}`} 
+                            width={180} 
+                            height={418} 
+                            style={{height: 418}} 
+                          />
                         </div>
                       </div>
                       {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
@@ -747,6 +749,7 @@ export default function HomePage() {
                                     alt={product.name}
                                     title={product.name}
                                     loading="lazy"
+                                    onError={handleImageError}
                                   />
                                 </div>
                                 <div className="product-info">

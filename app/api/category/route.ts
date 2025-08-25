@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeQuery } from '@/lib/db'
+import { getCategoryIcon } from '@/lib/imageUtils'
 import 'dotenv/config'
 
 interface CategoryRow {
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
         name: row.name,
         count: row.count || 0,
         color: getColorForCategory(row.id),
-        icon: `/client/images/category-${row.id}.png`
+        icon: getCategoryIcon(row.id)
       }))
       
       return NextResponse.json({
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
         id: row.id,
         name: row.name,
         color: getColorForCategory(row.id),
-        icon: `/client/images/category-${row.id}.png`
+        icon: getCategoryIcon(row.id)
       }))
       
       return NextResponse.json({
