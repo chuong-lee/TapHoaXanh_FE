@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import WishlistButton from './WishlistButton';
 import styles from './ProductCard.module.scss';
 
 interface ProductCardProps {
@@ -14,30 +15,12 @@ interface ProductCardProps {
     images: string;
     description: string;
   };
-  onAddToCart: (product: any) => void;
-  onToggleWishlist: (productId: number) => void;
-  isWishlisted: boolean;
 }
 
 export default function ProductCard({ 
-  product, 
-  onAddToCart, 
-  onToggleWishlist, 
-  isWishlisted 
+  product
 }: ProductCardProps) {
   const finalPrice = product.price - product.discount;
-  
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onAddToCart(product);
-  };
-  
-  const handleToggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onToggleWishlist(product.id);
-  };
 
   return (
     <div className={styles.productCard}>
@@ -70,23 +53,25 @@ export default function ProductCard({
       </div>
       
       <div className={styles.actions}>
-        <button 
-          className={`${styles.wishlistBtn} ${isWishlisted ? 'active' : ''}`}
-          onClick={handleToggleWishlist}
-        >
-          <i className={`fas fa-heart ${isWishlisted ? 'text-danger' : ''}`}></i>
-        </button>
+        <WishlistButton
+          productId={product.id}
+          productData={{
+            name: product.name,
+            price: finalPrice,
+            image: product.images,
+            slug: product.slug
+          }}
+          size="sm"
+          className={styles.wishlistBtn}
+        />
         
         <Link href={`/product/${product.slug}`} className={styles.quickViewBtn}>
           <i className="fas fa-eye"></i>
         </Link>
         
-        <button 
-          className={styles.addToCartBtn}
-          onClick={handleAddToCart}
-        >
+        <Link href={`/product/${product.slug}`} className={styles.addToCartBtn}>
           Thêm vào giỏ
-        </button>
+        </Link>
       </div>
     </div>
   );

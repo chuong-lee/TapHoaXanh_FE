@@ -7,6 +7,7 @@ import PWAComponents from './components/pwa/PWAComponents';
 import QueryProvider from './providers/QueryProvider';
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     default: 'T.H.X',
     template: '%s | Tạp Hóa Xanh'

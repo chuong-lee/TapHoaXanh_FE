@@ -19,17 +19,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<ProfileDto | null>(null);
   const refreshProfile = async () => {
     try {
+      console.log('AuthContext - Refreshing profile...');
       const data = await profileService.getProfile();
+      console.log('AuthContext - Profile loaded:', data);
       setProfile(data);
-    } catch {
+    } catch (error) {
+      console.error('AuthContext - Error loading profile:', error);
       setProfile(null);
     }
   };
 
   useEffect(() => { 
-    if (localStorage.getItem('access_token') || localStorage.getItem('token')) {
-     refreshProfile()
-    };
+    const authToken = localStorage.getItem('authToken');
+    const accessToken = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
+    
+    console.log('AuthContext - Checking tokens:', { authToken: !!authToken, accessToken: !!accessToken, token: !!token });
+    
+    if (authToken || accessToken || token) {
+      console.log('AuthContext - Token found, refreshing profile...');
+      refreshProfile();
+    } else {
+      console.log('AuthContext - No token found');
+    }
   }, []);
 
   useEffect(() => {

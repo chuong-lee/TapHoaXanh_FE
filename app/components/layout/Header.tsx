@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
+import { useWishlist } from '../../hooks/useWishlist'
 import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
   const { cart } = useCart();
+  const { wishlist } = useWishlist();
   const router = useRouter();
   const { profile } = useAuth();
   const pathname = usePathname();
@@ -15,6 +17,9 @@ const Header = () => {
   
   // Tính tổng số lượng sản phẩm trong giỏ hàng
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  
+  // Tính tổng số lượng sản phẩm trong wishlist
+  const wishlistCount = wishlist.length;
 
   // Theo dõi scroll để thay đổi màu header
   useEffect(() => {
@@ -89,36 +94,66 @@ const Header = () => {
                       Liên hệ
               </Link>
                   </li>
-                  <li className="nav-item">
-                    <Link 
-                      className="nav-link me-lg-2 position-relative" 
-                      href="/cart"
-                title="Giỏ Hàng"
-              >
-                      <i className="fa-solid fa-cart-shopping"></i>
-                {/* Badge số lượng sản phẩm */}
-                {cartItemCount > 0 && (
-                  <span 
-                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                    style={{
-                      backgroundColor: '#e11d48',
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      fontWeight: 'bold',
-                      minWidth: '18px',
-                      height: '18px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transform: 'translate(-50%, -50%)',
-                      border: '2px solid white'
-                    }}
-                  >
-                    {cartItemCount > 99 ? '99+' : cartItemCount}
-                  </span>
-                )}
-                    </Link>
-                  </li>
+                                     <li className="nav-item">
+                     <Link 
+                       className="nav-link me-lg-2 position-relative" 
+                       href="/wishlist"
+                       title="Sản Phẩm Yêu Thích"
+                     >
+                       <i className="fa-solid fa-heart"></i>
+                       {/* Badge số lượng sản phẩm yêu thích */}
+                       {wishlistCount > 0 && (
+                         <span 
+                           className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                           style={{
+                             backgroundColor: '#e11d48',
+                             color: 'white',
+                             fontSize: '0.7rem',
+                             fontWeight: 'bold',
+                             minWidth: '18px',
+                             height: '18px',
+                             display: 'flex',
+                             alignItems: 'center',
+                             justifyContent: 'center',
+                             transform: 'translate(-50%, -50%)',
+                             border: '2px solid white'
+                           }}
+                         >
+                           {wishlistCount > 99 ? '99+' : wishlistCount}
+                         </span>
+                       )}
+                     </Link>
+                   </li>
+                   <li className="nav-item">
+                     <Link 
+                       className="nav-link me-lg-2 position-relative" 
+                       href="/cart"
+                 title="Giỏ Hàng"
+               >
+                       <i className="fa-solid fa-cart-shopping"></i>
+                 {/* Badge số lượng sản phẩm */}
+                 {cartItemCount > 0 && (
+                   <span 
+                     className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                     style={{
+                       backgroundColor: '#e11d48',
+                       color: 'white',
+                       fontSize: '0.7rem',
+                       fontWeight: 'bold',
+                       minWidth: '18px',
+                       height: '18px',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'center',
+                       transform: 'translate(-50%, -50%)',
+                       border: '2px solid white'
+                     }}
+                   >
+                     {cartItemCount > 99 ? '99+' : cartItemCount}
+                   </span>
+                 )}
+                     </Link>
+                   </li>
                 <li className="nav-item dropdown">
                   <a 
                     className="nav-link me-lg-2 dropdown-toggle" 
