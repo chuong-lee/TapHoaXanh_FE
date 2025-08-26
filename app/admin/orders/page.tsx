@@ -1,6 +1,7 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/axios";
+import { Order } from "@/types";
 
 const STATUS_LABELS = [
   { key: "pending", label: "Chờ vận chuyển", color: "warning" },
@@ -11,26 +12,31 @@ const STATUS_LABELS = [
 ];
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [tab, setTab] = useState("pending");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [tab, setTab] = useState("chờ xử lý");
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [tab]);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+const fetchOrders = useCallback(async () => {
+      try {
+        const response = await api.get(`/order${tab !== 'all' ? `?status=${tab}` : ''}`);
+        const data = Array.isArray(response.data) ? response.data : [];
+        setOrders(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        setLoading(false);
+      }
+    }, [tab]);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await api.get(`/order${tab !== 'all' ? `?status=${tab}` : ''}`);
-      const data = Array.isArray(response.data) ? response.data : [];
-      setOrders(data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    
+    
+    fetchOrders();
+  }, [fetchOrders, tab]);
+
+  
 
   const updateOrderStatus = async (orderId: number, newStatus: string) => {
     setUpdating(orderId);
@@ -153,7 +159,7 @@ export default function AdminOrdersPage() {
                 <div className="card-body text-center">
                   <h5 className="card-title">Chờ vận chuyển</h5>
                   <h3 className="mb-0">
-                    {orders.filter(o => o.status === 'pending').length}
+                    {orders.filter(o => o.status === 'chờ xử lý').length}
                   </h3>
                 </div>
               </div>
@@ -163,7 +169,7 @@ export default function AdminOrdersPage() {
                 <div className="card-body text-center">
                   <h5 className="card-title">Đã xác nhận</h5>
                   <h3 className="mb-0">
-                    {orders.filter(o => o.status === 'confirmed').length}
+                    {orders.filter(o => o.status === 'đã xác nhận').length}
                   </h3>
                 </div>
               </div>
@@ -173,7 +179,7 @@ export default function AdminOrdersPage() {
                 <div className="card-body text-center">
                   <h5 className="card-title">Đang vận chuyển</h5>
                   <h3 className="mb-0">
-                    {orders.filter(o => o.status === 'shipping').length}
+                    {orders.filter(o => o.status === 'đang giao').length}  
                   </h3>
                 </div>
               </div>
@@ -183,7 +189,7 @@ export default function AdminOrdersPage() {
                 <div className="card-body text-center">
                   <h5 className="card-title">Đã giao hàng</h5>
                   <h3 className="mb-0">
-                    {orders.filter(o => o.status === 'delivered').length}
+                    {orders.filter(o => o.status === 'đã giao').length}
                   </h3>
                 </div>
               </div>

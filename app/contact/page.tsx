@@ -1,150 +1,79 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import Link from 'next/link';
+import Image from "next/image"
+
 
 export default function ContactUs() {
   return (
-    <section>
-      <div className="contact-page">
-        {/* Breadcrumb Section */}
-        <div className="breadcrumb-section">
-          <div className="container">
-            <h3 className="text-center">Liên Hệ</h3>
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb mb-0">
-                <li className="breadcrumb-item">
-                  <Link href="/">Trang Chủ</Link>
-                </li>
-                <li className="breadcrumb-item active" aria-current="page">Liên Hệ</li>
-              </ol>
-            </nav>
-          </div>
-        </div>
-
-        {/* Main content*/}
-        <div className="contact-main container">
-          <div className="row align-items-start">
-            {/* Form*/}
-            <div className="col-lg-6">
-              <form className="contact-form">
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label" htmlFor="firstName">
-                      First Name*
-                    </label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      id="firstName"
-                      placeholder="Ex. John"
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label" htmlFor="lastName">
-                      Last Name*
-                    </label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      id="lastName"
-                      placeholder="Ex. Doe"
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label" htmlFor="email">
-                      Email*
-                    </label>
-                    <input
-                      className="form-control"
-                      type="email"
-                      id="email"
-                      placeholder="BRC@gmail.com"
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label" htmlFor="phone">
-                      Phone*
-                    </label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      id="phone"
-                      placeholder="Enter phone number"
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label" htmlFor="subject">
-                      Subject*
-                    </label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      id="subject"
-                      placeholder="Enter here.."
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label" htmlFor="message">
-                      Your Message*
-                    </label>
-                    <textarea
-                      className="form-control"
-                      id="message"
-                      rows={4}
-                      placeholder="Enter here.."
-                      defaultValue={""}
-                    />
-                  </div>
-                  <div className="col-12">
-                    <button className="btn-send" type="submit">
-                      Send a Message
-                    </button>
-                  </div>
+    <main className="main-content">
+      <div className="container py-5">
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="text-center mb-5">
+              <h2 className="fw-bold" style={{color: '#22c55e', fontSize: '2.5rem'}}>Liên Hệ Với Chúng Tôi</h2>
+              <p className="text-muted" style={{fontSize: 18}}>Chúng tôi luôn sẵn sàng hỗ trợ bạn</p>
+            </div>
+            <form className="bg-white p-5 rounded-4 shadow" style={{border: '1.5px solid #e0fbe2'}}>
+              <div className="row mb-4">
+                <div className="col-md-6 mb-3 mb-md-0">
+                  <label className="form-label fw-bold">Họ*</label>
+                  <input type="text" className="form-control" placeholder="Ví dụ: Nguyễn" />
                 </div>
-              </form>
-            </div>
-            {/* Image*/}
-            <div className="col-lg-6 d-none d-lg-block">
-              <div className="contact-image">
-                <img
-                  className="img-fluid rounded"
-                  src="/images/contact-illustration.png"
-                  alt="Contact Illustration"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Contact Info*/}
-        <div className="contact-info container mt-5">
-          <div className="row text-center">
-            <div className="col-md-4">
-              <div className="info-box">
-                <img className="icon" src="/icons/address.svg" alt="Address" />
-                <div className="info-title">Address</div>
-                <div className="info-text">
-                  8502 Preston Rd. Inlewood, Maine 98380
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Tên*</label>
+                  <input type="text" className="form-control" placeholder="Ví dụ: Văn A" />
                 </div>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="info-box">
-                <img className="icon" src="/icons/phone.svg" alt="Phone" />
-                <div className="info-title">Phone</div>
-                <div className="info-text">+0123-456-789</div>
+              <div className="row mb-4">
+                <div className="col-md-6 mb-3 mb-md-0">
+                  <label className="form-label fw-bold">Email*</label>
+                  <input type="email" className="form-control" placeholder="example@gmail.com" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-bold">Số điện thoại*</label>
+                  <input type="text" className="form-control" placeholder="Nhập số điện thoại" />
+                </div>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="info-box">
-                <img className="icon" src="/icons/email.svg" alt="Email" />
-                <div className="info-title">Email</div>
-                <div className="info-text">BRC@gmail.com</div>
+              <div className="mb-4">
+                <label className="form-label fw-bold">Tiêu đề*</label>
+                <input type="text" className="form-control" placeholder="Nhập tiêu đề..." />
               </div>
+              <div className="mb-4">
+                <label className="form-label fw-bold">Nội dung tin nhắn*</label>
+                <textarea className="form-control" rows={5} placeholder="Nhập nội dung tin nhắn..." />
+              </div>
+              <div className="text-center">
+                <button type="submit" className="btn btn-warning text-dark fw-bold px-5 py-3 rounded-3" style={{minWidth:200, fontSize: '1.1rem'}}>
+                  Gửi Tin Nhắn
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div className="row text-center mt-5">
+          <div className="col-md-4 mb-4 mb-md-0">
+            <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
+              <Image src="/images/address-icon.jpg" alt="Địa chỉ" height={50} width={50} className="mb-3" />
+              <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Địa Chỉ</div>
+              <div className="text-muted">123 Đường ABC, Quận 1, TP.HCM</div>
+            </div>
+          </div>
+          <div className="col-md-4 mb-4 mb-md-0">
+            <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
+              <Image src="/images/phone-icon.jpg" alt="Điện thoại" width={50} className="mb-3" />
+              <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Điện Thoại</div>
+              <div className="text-muted">+84 123-456-789</div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="p-4 rounded-4" style={{background: '#f0fdf4', border: '1px solid #e0fbe2'}}>
+              <Image src="/images/email-icon.jpg" alt="Email" width={50} className="mb-3" />
+              <div className="fw-bold mb-2" style={{color: '#22c55e'}}>Email</div>
+              <div className="text-muted">contact@taphoxanh.com</div>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </main>
+  )
 }
