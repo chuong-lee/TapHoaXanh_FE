@@ -45,29 +45,7 @@ function formatPriceVND(price: number): string {
   }).format(price);
 }
 
-// Component Rating Stars
-const RatingStars = ({ rating = 4.5 }: { rating?: number }) => {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-  return (
-    <div className="product-rating d-flex align-items-center">
-      <div className="stars">
-        {[...Array(fullStars)].map((_, i) => (
-          <i key={i} className="fas fa-star active" style={{ color: '#FFD700' }}></i>
-        ))}
-        {hasHalfStar && (
-          <i className="fas fa-star-half-alt active" style={{ color: '#FFD700' }}></i>
-        )}
-        {[...Array(emptyStars)].map((_, i) => (
-          <i key={i} className="fas fa-star" style={{ color: '#ddd' }}></i>
-        ))}
-      </div>
-      <span className="rating-text ms-1">{rating.toFixed(1)}</span>
-    </div>
-  );
-};
 
 export default function ProductListPage() {
   const router = useRouter()
@@ -421,9 +399,9 @@ export default function ProductListPage() {
                           <h4 className="text-muted">Không có sản phẩm nào</h4>
                         </div>
                       ) : (
-                        currentProducts.map((product, index) => (
+                        currentProducts.map((product) => (
                           <div className="col" key={product.id}>
-                            <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${index * 0.1}s`} data-wow-duration="0.5s">
+                            <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-duration="0.5s">
                               <div className="product-card">
                                 <div className="product-image-wrapper">
                                   <Image 

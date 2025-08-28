@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent, useRef } from 'react'
+import { FormEvent, useRef } from 'react'
 
 interface SearchFilterProps {
   onFilter: (filters: { search: string; category: string; maxPrice: string }) => void

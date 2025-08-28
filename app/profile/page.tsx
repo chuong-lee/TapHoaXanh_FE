@@ -8,7 +8,6 @@ import { useAuth } from '../context/AuthContext';
 import { profileService } from '../lib/profileService';
 
 import AddressManager from '../components/user/AddressManager';
-import OrderList from '../components/order/OrderList';
 import PaymentStatus from '../components/payment/PaymentStatus';
 import PaymentStatusTester from '../components/payment/PaymentStatusTester';
 import api from '@/lib/axios';
@@ -31,7 +30,7 @@ interface Order {
   deliveryDate: string;
   items: OrderItem[];
   address: string;
-  user: any;
+  user: Record<string, unknown> | null;
   quantity: number;
   comment: string;
 }
@@ -77,7 +76,7 @@ export default function ProfilePage() {
       const response = await api.get('/order');
       const apiOrders = response.data?.data || response.data || [];
       
-      const mappedOrders = apiOrders.map((order: any) => ({
+      const mappedOrders = apiOrders.map((order: Record<string, unknown>) => ({
         id: order.id,
         createdAt: order.createdAt || new Date().toISOString(),
         price: order.price || order.payment_amount || 0,
@@ -230,7 +229,7 @@ export default function ProfilePage() {
         setSelectedOrder(orderDetail);
         setShowOrderDetailModal(true);
       }
-    } catch (error: any) {
+    } catch {
       alert('Không thể tải chi tiết đơn hàng');
     }
   };

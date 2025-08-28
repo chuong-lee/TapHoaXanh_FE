@@ -40,7 +40,7 @@ export interface Banner {
   link?: string;
 }
 
-export function useProduct(options?: { itemsPerPage?: number }) {
+export function useProduct() {
   const [currentProduct, setCurrentProduct] = useState<Product[]>([]);
   const [category, setCategory] = useState<Category[]>([]);
   const [featuredProduct, setFeaturedProduct] = useState<Product[]>([]);
@@ -86,7 +86,7 @@ export function useProduct(options?: { itemsPerPage?: number }) {
 
         // Best selling (ví dụ: sản phẩm có price > 100000)
         setBestSellingProduct(products.filter(p => p.price > 100000).slice(0, 10));
-      } catch (err) {
+      } catch {
         // Có thể log hoặc xử lý error nếu muốn
       }
     };
@@ -113,29 +113,7 @@ function fixImgSrc(src: string | null | undefined): string {
   return '/' + src;
 }
 
-// Helper function để tạo slug consistent
-function createProductSlug(product: { slug?: string; name?: string; id: number }): string {
-  let productSlug = ''
-  
-  if (product.slug) {
-    productSlug = product.slug
-  } else if (product.name) {
-    productSlug = product.name
-  } else {
-    productSlug = `product-${product.id}`
-  }
 
-  // Normalize slug để tương thích URL
-  return productSlug
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐ]/g, 'd')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -150,8 +128,7 @@ export default function ProductDetailPage() {
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [selectedVariant, setSelectedVariant] = useState<number | null>(null)
   const [relatedproduct, setRelatedproduct] = useState<Product[]>([]);
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
+
   
   // Review form state
   const [reviewForm, setReviewForm] = useState({
@@ -454,7 +431,7 @@ export default function ProductDetailPage() {
       <div className="alert alert-danger">
         <h4>Không tìm thấy sản phẩm</h4>
         <p>Sản phẩm có thể đã bị xóa hoặc URL không chính xác.</p>
-        <a href="/" className="btn btn-primary">Về trang chủ</a>
+        <Link href="/" className="btn btn-primary">Về trang chủ</Link>
       </div>
     </div>
   )
@@ -486,13 +463,13 @@ export default function ProductDetailPage() {
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
-                    <a href="/" className="text-decoration-none">
+                    <Link href="/" className="text-decoration-none">
                       <i className="fas fa-home me-1"></i>
                       Trang chủ
-                    </a>
+                    </Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="/product" className="text-decoration-none">Sản phẩm</a>
+                    <Link href="/product" className="text-decoration-none">Sản phẩm</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
                     {product?.name || 'Chi tiết sản phẩm'}
@@ -1010,7 +987,7 @@ export default function ProductDetailPage() {
                               </div>
                             </div>
                             <div className="review-content">
-                              <p className="mb-0 fst-italic">"{review.comment}"</p>
+                              <p className="mb-0 fst-italic">&quot;{review.comment}&quot;</p>
                             </div>
                             <div className="mt-2">
                               <span className="badge bg-success">Đã xác thực mua hàng</span>

@@ -1,12 +1,18 @@
 @import '../../styles/variables';
-@import '../../styles/mixins';
 
 .card {
-  @include card-base;
+  background-color: $bg-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
   padding: $spacing-lg;
   
   &.hover {
-    @include card-hover;
+    &:hover {
+      box-shadow: $shadow;
+      transform: translateY(-2px);
+    }
   }
   
   &.compact {
@@ -19,7 +25,9 @@
 }
 
 .header {
-  @include flex-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: $spacing-md;
   padding-bottom: $spacing-md;
   border-bottom: 1px solid $border-light;
@@ -40,11 +48,13 @@
 
 .body {
   color: $text-primary;
-  line-height: $line-height-normal;
+  line-height: 1.6;
 }
 
 .footer {
-  @include flex-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: $spacing-md;
   padding-top: $spacing-md;
   border-top: 1px solid $border-light;

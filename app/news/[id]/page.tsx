@@ -16,32 +16,7 @@ type News = {
   content?: string
 }
 
-// Hàm helper để xử lý URL hình ảnh
-const processImageUrl = (imageData: unknown): string => {
-  if (!imageData) return '/images/hinh1.jpg'
-  
-  // Nếu là array, lấy phần tử đầu tiên
-  if (Array.isArray(imageData)) {
-    return imageData.length > 0 ? imageData[0] : '/images/hinh1.jpg'
-  }
-  
-  // Nếu là string
-  if (typeof imageData === 'string') {
-    // Kiểm tra nếu là JSON array trong string
-    try {
-      const parsed = JSON.parse(imageData)
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed[0]
-      }
-    } catch {
-      // Nếu không parse được, sử dụng string gốc
-      return imageData
-    }
-    return imageData
-  }
-  
-  return '/images/hinh1.jpg'
-}
+
 
 export default function NewsDetailPage() {
   const { id } = useParams()
@@ -55,7 +30,7 @@ export default function NewsDetailPage() {
         console.log('Fetching news detail for ID:', id)
         
         // Gọi local API posts
-        let response = await fetch(`/api/posts/${id}`)
+        const response = await fetch(`/api/posts/${id}`)
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -435,7 +410,7 @@ function RelatedPosts({ currentId }: { currentId: number }) {
         console.log('Fetching related posts...')
         
         // Gọi local API posts
-        let response = await fetch('/api/posts')
+        const response = await fetch('/api/posts')
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)

@@ -1,28 +1,78 @@
 @import '../../styles/variables';
-@import '../../styles/mixins';
 
 .button {
-  @include button-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: $transition-base;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
   
   // Variants
   &.primary {
-    @include button-variant($primary-color, $primary-color, $text-light);
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: $text-light;
+    
+    &:hover {
+      background-color: darken($primary-color, 10%);
+      border-color: darken($primary-color, 10%);
+    }
   }
   
   &.secondary {
-    @include button-variant($secondary-color, $secondary-color, $text-light);
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    color: $text-light;
+    
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+      border-color: darken($secondary-color, 10%);
+    }
   }
   
   &.success {
-    @include button-variant($success-color, $success-color, $text-light);
+    background-color: $success-color;
+    border-color: $success-color;
+    color: $text-light;
+    
+    &:hover {
+      background-color: darken($success-color, 10%);
+      border-color: darken($success-color, 10%);
+    }
   }
   
   &.warning {
-    @include button-variant($warning-color, $warning-color, $text-light);
+    background-color: $warning-color;
+    border-color: $warning-color;
+    color: $text-primary;
+    
+    &:hover {
+      background-color: darken($warning-color, 10%);
+      border-color: darken($warning-color, 10%);
+    }
   }
   
   &.danger {
-    @include button-variant($danger-color, $danger-color, $text-light);
+    background-color: $danger-color;
+    border-color: $danger-color;
+    color: $text-light;
+    
+    &:hover {
+      background-color: darken($danger-color, 10%);
+      border-color: darken($danger-color, 10%);
+    }
   }
   
   &.outline {

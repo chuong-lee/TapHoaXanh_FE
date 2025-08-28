@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useVNPayPayment } from '@/hooks/useVNPayPayment';
 
 interface VNPayQRModalProps {
@@ -126,9 +127,11 @@ export default function VNPayQRModal({
                   <h6 className="mb-3">Quét mã QR để thanh toán</h6>
                   {qrCodeUrl ? (
                     <div className="border rounded p-3 d-inline-block">
-                      <img 
+                      <Image 
                         src={qrCodeUrl} 
                         alt="VNPay QR Code" 
+                        width={250}
+                        height={250}
                         className="img-fluid"
                         style={{ maxWidth: '250px' }}
                       />

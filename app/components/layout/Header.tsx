@@ -1,14 +1,15 @@
 "use client"
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCart } from '@/hooks/useCart'
 import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
   const { cart } = useCart();
-  const router = useRouter();
+
   const { profile } = useAuth();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,7 +36,7 @@ const Header = () => {
         <div className="nav navbar navbar-expand-lg" id="mainNavbar">
           <div className="container">
             <Link className="navbar-brand" href="/">
-              <img className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh"/>
+              <Image className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh" width={150} height={50}/>
               </Link>
             
             <div className="offcanvas offcanvas-start" id="menu" tabIndex={-1} aria-labelledby="offcanvasNavbarLabel">

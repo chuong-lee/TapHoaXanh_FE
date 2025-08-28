@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useVNPayPayment } from '@/hooks/useVNPayPayment';
 
 interface VNPayQRInlineProps {
@@ -122,9 +123,11 @@ export default function VNPayQRInline({
               </div>
               {qrCodeUrl ? (
                 <div className="bg-light rounded-3 p-3 d-inline-block">
-                  <img 
+                  <Image 
                     src={qrCodeUrl} 
                     alt="VNPay QR Code" 
+                    width={220}
+                    height={220}
                     className="img-fluid"
                     style={{ 
                       maxWidth: '220px',

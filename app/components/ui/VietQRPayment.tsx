@@ -127,9 +127,11 @@ export default function VietQRPayment({
               <h6 className="mb-0 fw-bold">Quét mã QR</h6>
             </div>
             <div className="bg-light rounded-3 p-3 d-inline-block">
-              <img 
+              <Image 
                 src={bankInfo.qrCodeUrl} 
                 alt="VietQR Code" 
+                width={220}
+                height={220}
                 className="img-fluid"
                 style={{ 
                   maxWidth: '220px',
