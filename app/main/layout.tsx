@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import "bootstrap/dist/css/bootstrap.min.css"
 import "../globals.css"
-import Image from 'next/image';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -10,12 +9,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <nav className="navbar navbar-expand-lg">
               <div className="container">
                 <Link className="navbar-brand" href="/home">
-                  <Image className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh Logo" width={80} height={80} />
+                  <img className="img-logo" src="/client/images/logo.png" alt="Tạp Hóa Xanh Logo" width={80} height={80} />
                 </Link>
                 <div className="offcanvas offcanvas-start" id="menu" tabIndex={-1} aria-labelledby="offcanvasNavbarLabel">
                   <div className="offcanvas-header">
                     <h5 className="offcanvas-title">
-                      <Image className="img-logo" src="/client/images/logo.svg" alt="Tạp Hóa Xanh Logo" width={150} height={50} />
+                      <img className="img-logo" src="/client/images/logo.svg" alt="Tạp Hóa Xanh Logo" width={150} height={50} />
                     </h5>
                     <button className="btn p-0 border-0" type="button" data-bs-dismiss="offcanvas" aria-label="Close">
                       <i className="fa-solid fa-xmark text-highline-2 fa-2x"></i>
