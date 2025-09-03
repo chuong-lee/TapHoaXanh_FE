@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value
-  const { pathname } = request.nextUrl
 
-  // Các đường dẫn yêu cầu đăng nhập
-  const protectedRoutes = ['/main/checkout', '/main/user/profile']
-
-  if (protectedRoutes.includes(pathname) && !token) {
-    return NextResponse.redirect(
-      new URL(`/main/login?redirect=${pathname}`, request.url)
-    )
-  }
-
+export function middleware() {
+  
   return NextResponse.next()
 }
 
+// Configure which paths the middleware should run on
 export const config = {
-  matcher: ['/main/checkout', '/main/user/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }

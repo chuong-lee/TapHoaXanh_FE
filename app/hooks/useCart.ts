@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import api from "../lib/axios"
 
 export type CartItem = {
@@ -11,40 +11,77 @@ export type CartItem = {
   images: string
   discount: number
   description: string
+  variant_id?: number
+  variant_name?: string
+  stock?: number
 }
 
 export function useCart() {
-  const [cart, setCart] = useState<CartItem[]>([])
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [_selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
+  const prevCartLength = useRef(cart.length);
 
   useEffect(() => {
     const local = localStorage.getItem("cart_local")
-    if (local) setCart(JSON.parse(local))
+    if (local) {
+      let parsed: CartItem[] = []
+      try {
+        parsed = JSON.parse(local)
+        // Lọc bỏ các sản phẩm mẫu nếu có
+        parsed = parsed.filter(item => item.slug !== 'SPM9' && item.slug !== 'SPM1')
+        setCart(parsed)
+        // Ghi đè lại localStorage nếu có sản phẩm mẫu
+        localStorage.setItem("cart_local", JSON.stringify(parsed))
+      } catch {
+        setCart([])
+        localStorage.removeItem("cart_local")
+      }
+    }
   }, [])
+
+  useEffect(() => {
+    if (cart.length !== prevCartLength.current) {
+      setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
+      prevCartLength.current = cart.length;
+    }
+  }, [cart]);
 
   const saveToLocal = (items: CartItem[]) => {
     localStorage.setItem("cart_local", JSON.stringify(items))
     setCart(items)
   }
 
-  const addToCart = (product: Omit<CartItem, "quantity">) => {
-    const existing = cart.find((item) => item.slug === product.slug)
-    let updatedCart
-
-    if (existing) {
-      updatedCart = cart.map((item) =>
-        item.slug === product.slug ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    } else {
-      updatedCart = [...cart, { ...product, quantity: 1 }]
-    }
-
-    saveToLocal(updatedCart)
+  const addToCart = (product: Omit<CartItem, "quantity">, quantity: number = 1) => {
+    setCart(prevCart => {
+      const existingIndex = prevCart.findIndex(
+        item => item.slug === product.slug && item.variant_id === product.variant_id
+      );
+      let updatedCart;
+      if (existingIndex !== -1) {
+        updatedCart = [...prevCart];
+        updatedCart[existingIndex].quantity += quantity;
+      } else {
+        updatedCart = [...prevCart, { ...product, quantity }];
+      }
+      saveToLocal(updatedCart); // <-- Thêm dòng này
+      return updatedCart;
+    });
   }
 
-  const removeFromCart = (slug: string) => {
-    const updatedCart = cart.filter((item) => item.slug !== slug)
-    saveToLocal(updatedCart)
-  }
+  const removeFromCart = (slug: string, variant_id?: number) => {
+    const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+    saveToLocal(updatedCart);
+  };
+
+  const updateQuantity = (slug: string, variant_id: number | undefined, quantity: number) => {
+    if (quantity < 1) return;
+    const updatedCart = cart.map(item =>
+      item.slug === slug && item.variant_id === variant_id
+        ? { ...item, quantity }
+        : item
+    );
+    saveToLocal(updatedCart);
+  };
 
   const syncWithDatabase = async () => {
     try {
@@ -55,5 +92,5 @@ export function useCart() {
     }
   }
 
-  return { cart, addToCart, removeFromCart, syncWithDatabase }
+  return { cart, addToCart, removeFromCart, updateQuantity, syncWithDatabase }
 }
