@@ -41,7 +41,7 @@ export default function ProductCard({
 
   return (
     <div className={styles.productCard}>
-      <Link href={`/product/${product.slug}`}>
+              <Link href={`/product/${product.id}`}>
         <div className={styles.imageContainer}>
           <Image
             src={product.images || '/client/images/product.png'}
@@ -53,7 +53,7 @@ export default function ProductCard({
       </Link>
       
       <div className={styles.info}>
-        <Link href={`/product/${product.slug}`}>
+        <Link href={`/product/${product.id}`}>
           <h3 className={styles.name}>{product.name}</h3>
         </Link>
         
@@ -77,7 +77,7 @@ export default function ProductCard({
           <i className={`fas fa-heart ${isWishlisted ? 'text-danger' : ''}`}></i>
         </button>
         
-        <Link href={`/product/${product.slug}`} className={styles.quickViewBtn}>
+        <Link href={`/product/${product.id}`} className={styles.quickViewBtn}>
           <i className="fas fa-eye"></i>
         </Link>
         

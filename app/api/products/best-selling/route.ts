@@ -5,7 +5,6 @@ interface ProductRow {
   id: number
   name: string
   price: string
-  slug: string
   images: string
   discount: string
   description: string
@@ -37,7 +36,7 @@ export async function GET(request: NextRequest) {
         p.id,
         p.name,
         p.price,
-        p.slug,
+
         p.images,
         p.discount,
         p.description,
@@ -67,7 +66,7 @@ export async function GET(request: NextRequest) {
       id: row.id,
       name: row.name,
       price: parseFloat(row.price),
-      slug: row.slug,
+
       images: row.images || '/client/images/placeholder.png',
       discount: parseFloat(row.discount || '0'),
       description: row.description,

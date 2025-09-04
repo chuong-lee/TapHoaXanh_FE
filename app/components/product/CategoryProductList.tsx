@@ -36,7 +36,7 @@ export default function CategoryProductList({ products }: Props) {
               <h5 className="card-title">{product.name}</h5>
               <div>{product.price.toLocaleString()}₫</div>
               <p className="card-text">{product.description}</p>
-              <Link href={`/main/product/${product.slug}`} className="btn btn-primary">Xem chi tiết</Link>
+                              <Link href={`/main/product/${product.id}`} className="btn btn-primary">Xem chi tiết</Link>
             </div>
           </div>
         </div>

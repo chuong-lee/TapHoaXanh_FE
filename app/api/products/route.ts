@@ -7,15 +7,14 @@ interface ProductRow {
   id: number
   name: string
   price: string
-  slug: string
   images: string
   discount: string
   description: string
   stock: number
-  created_at: string
-  updated_at: string
   category: string
   category_id: number
+  slug?: string
+  rating?: string
   barcode?: string
   expiry_date?: string
   origin?: string
@@ -24,6 +23,9 @@ interface ProductRow {
   purchase?: number
   category_childId?: number
   brand_name?: string
+  createdAt?: string
+  updatedAt?: string
+  deletedAt?: string | null
 }
 
 interface CountRow {
@@ -74,7 +76,6 @@ export async function GET(request: NextRequest) {
         p.id,
         p.name,
         p.price,
-        p.slug,
         p.images,
         p.discount,
         p.description,
@@ -134,7 +135,6 @@ export async function GET(request: NextRequest) {
       id: row.id,
       name: row.name,
       price: parseFloat(row.price),
-      slug: row.slug,
       images: processImageUrl(row.images),
       discount: parseFloat(row.discount || '0'),
       description: row.description,
@@ -150,8 +150,8 @@ export async function GET(request: NextRequest) {
       brandId: row.brandId,
       stock: row.stock,
       rating: 4.5,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
+      created_at: row.createdAt,
+      updated_at: row.updatedAt,
       barcode: row.barcode,
       expiry_date: row.expiry_date,
       origin: row.origin,

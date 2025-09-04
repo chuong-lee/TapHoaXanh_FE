@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { profileService } from '../lib/profileService';
 import { Tabs, Tab, Form } from 'react-bootstrap';
-import LogoutButton from '../components/logout';
-import Avatar from '../components/Avatar';
+import LogoutButton from '../components/user/logout';
+import Avatar from '../components/ui/Avatar';
 
 export default function ProfilePage() {
   const { profile, setProfile, refreshProfile } = useAuth();

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const withCount = searchParams.get('withCount') === 'true'
     
     if (withCount) {
-      // Get categories with product count (simplified for actual database schema)
+      // Get top 10 categories with product count, ordered by ID for consistent results
       const rows = await executeQuery<CategoryRow[]>(`
         SELECT 
           c.id,
@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
         FROM category c
         LEFT JOIN product p ON c.id = p.category_id AND p.deletedAt IS NULL
         GROUP BY c.id, c.name
-        ORDER BY c.name ASC
+        ORDER BY c.id ASC
+        LIMIT 10
       `)
       
       // Format category data
@@ -43,14 +44,15 @@ export async function GET(request: NextRequest) {
         total: categories.length
       })
     } else {
-             // Get categories without count (faster)
+      // Get top 10 categories without count (faster), ordered by ID for consistent results
        const rows = await executeQuery<CategoryRow[]>(`
          SELECT 
            id,
            name
          FROM category
          WHERE parent_id = 0
-         ORDER BY name ASC
+         ORDER BY id ASC
+         LIMIT 10
        `)
       
       // Format category data

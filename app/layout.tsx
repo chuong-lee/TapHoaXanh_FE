@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         
         {/* Preload critical resources */}
-        <link rel="preload" href="/api/products/homepage" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/api/products" as="fetch" crossOrigin="anonymous" />
         <link rel="preload" href="/api/categories" as="fetch" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="//localhost" />
         

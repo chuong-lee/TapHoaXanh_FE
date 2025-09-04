@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCategoriesQuery } from '@/hooks/useProductsQuery'
-import { useHomepageProducts } from '@/hooks/useHomepageProducts'
 import ProductSkeleton from '@/components/ui/ProductSkeleton'
 import { useCart } from '@/hooks/useCart'
 import CartNotification from '@/components/ui/CartNotification'
+
 
 function fixImgSrc(src: string) {
   if (!src) return "/client/images/product-placeholder-1.png";
@@ -27,15 +27,12 @@ function formatPriceVND(price: number): string {
   }).format(price);
 }
 
-
-
 interface Product {
   id: number
   name: string
   price: number
   discount: number
   images: string
-  slug: string
   description: string
   quantity: number
   categoryId?: number
@@ -85,9 +82,13 @@ export default function HomePage() {
   const [wishlistLoading, setWishlistLoading] = useState<number | null>(null)
   const [addToCartMessage, setAddToCartMessage] = useState('')
 
-  // Sử dụng optimized hooks
-  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategoriesQuery(true)
-  const { products: allProducts, loading: productsLoading, error: productsError } = useHomepageProducts()
+  // Sử dụng hook để lấy danh mục từ API
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategoriesQuery(true)
+
+  // Local state cho products - không sử dụng API nữa
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [productsLoading, setProductsLoading] = useState(false)
+  const [productsError, setProductsError] = useState<string | null>(null)
 
   console.log('Homepage products state:', {
     productsCount: allProducts?.length || 0,
@@ -102,60 +103,64 @@ export default function HomePage() {
       try {
         setWishlist(JSON.parse(savedWishlist));
       } catch (error) {
-        console.error('Error parsing wishlist:', error);
+        console.error('Error parsing wishlist from localStorage:', error);
         setWishlist([]);
       }
     }
   }, []);
 
-  // Lưu wishlist vào localStorage khi có thay đổi
+  // Fetch products từ API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setProductsLoading(true);
+      setProductsError(null);
+      
+      try {
+        const response = await fetch('/api/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        
+        const data = await response.json();
+        console.log('API Response:', data);
+        
+        if (Array.isArray(data)) {
+          setAllProducts(data);
+        } else if (data && Array.isArray(data.products)) {
+          setAllProducts(data.products);
+        } else {
+          setAllProducts([]);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProductsError('Không thể tải danh sách sản phẩm');
+        setAllProducts([]);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Save wishlist to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
-  // Tính toán loading state tổng hợp
-  const isLoading = productsLoading || categoriesLoading;
-
-  const handleAddToCart = (product: Product) => {
-    // Thêm sản phẩm vào giỏ hàng
-    const finalPrice = product.price - product.discount;
-    
-    addToCart({
-      ...product,
-      price: finalPrice,
-      stock: product.quantity || 0,
-      images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-    }, 1); // Thêm 1 sản phẩm
-    
-    // Hiển thị thông báo thành công
-    setAddToCartMessage('✅ Đã thêm vào giỏ hàng thành công!');
-    
-    // Tự động ẩn thông báo sau 3 giây
-    setTimeout(() => {
-      setAddToCartMessage('');
-    }, 3000);
-  };
-
-  const handleViewDetail = (product: Product) => {
-    router.push(`/product/${product.slug}`);
-  };
-
-  // Thêm hàm xử lý wishlist toggle
   const handleToggleWishlist = async (productId: number) => {
     setWishlistLoading(productId);
-    
     try {
-      const isInWishlist = wishlist.includes(productId);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (isInWishlist) {
-        // Xóa khỏi wishlist
-        setWishlist(prev => prev.filter(id => id !== productId));
-        console.log(`Đã bỏ thích sản phẩm ${productId}`);
-      } else {
-        // Thêm vào wishlist
-        setWishlist(prev => [...prev, productId]);
-        console.log(`Đã thích sản phẩm ${productId}`);
-      }
+      setWishlist(prev => {
+        if (prev.includes(productId)) {
+          return prev.filter(id => id !== productId);
+        } else {
+          return [...prev, productId];
+        }
+      });
     } catch (error) {
       console.error('Error toggling wishlist:', error);
     } finally {
@@ -163,38 +168,36 @@ export default function HomePage() {
     }
   };
 
-  // Helper lấy 4 sản phẩm cho mỗi hàng
-  const getRowProducts = (rowIdx: number) => {
-    const start = (rowIdx - 1) * 4;
-    return allProducts.slice(start, start + 4);
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      images: product.images,
+      discount: product.discount
+    });
+    setAddToCartMessage(`${product.name} đã được thêm vào giỏ hàng!`);
+    setTimeout(() => setAddToCartMessage(''), 3000);
+  };
+
+  const handleViewDetail = (product: Product) => {
+    router.push(`/product/${product.id}`);
   };
 
   return (
-    <div>
-      {/* <Marquee /> */}
-      {/* Hiển thị thông báo thêm vào giỏ hàng */}
-      {addToCartMessage && (
-        <CartNotification 
-          message={addToCartMessage}
-          onClose={() => setAddToCartMessage('')}
-          duration={3000}
-        />
-      )}
-      
+    <div className="homepage">
       <section>
         <div className="home">
-         
           <div className="hero-section">
             <div className="hero-background">
-              
               <div className="hero-curve"></div>
             </div>
             <div className="container">
               <div className="row align-items-center">
                 <div className="col-lg-6">
                   <div className="hero-content">
-                    <h1 className="hero-title">Organic Tubers &amp; Fresh Fruits</h1>
-                    <p className="hero-subtitle">Provides us with fiber &amp; nutrition every day</p>
+                    <h1 className="hero-title">Organic Tubers & Fresh Fruits</h1>
+                    <p className="hero-subtitle">Provides us with fiber & nutrition every day</p>
                     <button className="btn btn-primary shop-now-btn">Shop now</button>
                   </div>
                 </div>
@@ -211,6 +214,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
           <div className="promotional-banners">
             <div className="container">
               <div className="row">
@@ -241,15 +245,36 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
           <div className="container">
             <div className="section-featured-categories">
               <div className="featured-categories-header">
                 <h2 className="featured-categories-title">Danh mục nổi bật</h2>
                 <div className="featured-categories-tabs">
-                  {/* Tabs có thể render từ categories nếu muốn filter */}
-                  {categoriesData?.slice(0, 4).map((cat: any, idx: number) => (
-                    <span className={`tab-item${idx === 0 ? ' active' : ''}`} key={cat.id}>{cat.name}</span>
-                  ))}
+                  {categoriesLoading ? (
+                    // Skeleton loading cho tabs
+                    Array.from({ length: 4 }).map((_, index) => (
+                      <span key={index} className="tab-item bg-gray-200 h-6 w-20 rounded animate-pulse"></span>
+                    ))
+                  ) : categories && categories.length > 0 ? (
+                    // Hiển thị 4 danh mục đầu tiên làm tabs
+                    categories.slice(0, 4).map((category, index) => (
+                      <span 
+                        key={category.id} 
+                        className={`tab-item ${index === 0 ? 'active' : ''}`}
+                      >
+                        {category.name}
+                      </span>
+                    ))
+                  ) : (
+                    // Fallback tabs
+                    <>
+                      <span className="tab-item active">Bánh & Sữa</span>
+                      <span className="tab-item">Cà phê & Trà</span>
+                      <span className="tab-item">Thức ăn thú cưng</span>
+                      <span className="tab-item">Rau củ</span>
+                    </>
+                  )}
                 </div>
                 <div className="featured-categories-nav">
                   <button className="nav-btn left"><i className="icon-arrow-left"></i></button>
@@ -258,40 +283,78 @@ export default function HomePage() {
               </div>
               <div className="featured-categories-list">
                 {categoriesLoading ? (
-                  <div>Đang tải danh mục...</div>
-                ) : categoriesError ? (
-                  <div>Lỗi tải danh mục</div>
-                ) : (
-                  categoriesData?.map((cat: any, idx: number) => (
-                    <div className="featured-category-item" style={{ background: cat.color || undefined }} key={cat.id}>
-                      <Image src={cat.icon || '/images/placeholder.jpg'} alt={cat.name} width={80} height={80} />
-                      <div className="category-name">{cat.name}</div>
-                      <div className="category-count">{cat.count ?? 0} sản phẩm</div>
+                  // Hiển thị skeleton loading khi đang tải danh mục (10 danh mục)
+                  Array.from({ length: 10 }).map((_, index) => (
+                    <div key={index} className="featured-category-item bg-yellow">
+                      <div className="w-20 h-20 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="category-name bg-gray-200 h-4 w-20 rounded animate-pulse"></div>
+                      <div className="category-count bg-gray-200 h-3 w-16 rounded animate-pulse"></div>
                     </div>
                   ))
+                ) : categoriesError ? (
+                  // Hiển thị thông báo lỗi
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-red-500">Không thể tải danh mục sản phẩm</p>
+                  </div>
+                ) : categories && categories.length > 0 ? (
+                  // Hiển thị danh mục từ API (API đã trả về tối đa 10 danh mục đầu tiên)
+                  categories.map((category) => (
+                    <div 
+                      key={category.id} 
+                      className="featured-category-item"
+                      style={{ backgroundColor: category.color || '#4CAF50' }}
+                      onClick={() => router.push(`/category?category=${category.name}`)}
+                    >
+                      <Image 
+                        src={category.icon || `/client/images/category-${category.id}.png`} 
+                        alt={category.name} 
+                        width={80} 
+                        height={80}
+                        onError={(e) => {
+                          // Fallback image nếu icon không tồn tại
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/client/images/placeholder.png';
+                        }}
+                      />
+                      <div className="category-name">{category.name}</div>
+                      <div className="category-count">{category.count || 0} sản phẩm</div>
+                    </div>
+                  ))
+                ) : (
+                  // Fallback data nếu không có danh mục nào
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-gray-500">Không có danh mục nào được tìm thấy</p>
+                  </div>
                 )}
               </div>
             </div>
+
             <div className="flash-sale-section">
               <div className="container">
                 <div className="section-header text-center mb-5">
                   <h2 className="section-title">Flash Sale</h2>
-                  <p className="section-subtitle">Limited time offers - Don't miss out!</p>
+                  <p className="section-subtitle">Limited time offers - Don&apos;t miss out!</p>
                 </div>
                 <div className="row g-4">
                   <div className="col-lg-3 col-md-12">
                     <div className="promo-card">
-                      <div className="promo-image">
-                        <Image src="/client/images/flash-banner.jpg" alt="Flash Sale Banner" width={300} height={400} />
-                      </div>
                       <div className="promo-content">
                         <div className="promo-badge">-50% OFF</div>
                         <h3 className="promo-title">Fresh Organic Products</h3>
                         <p className="promo-desc">Limited time offer on selected items</p>
                         <div className="countdown-timer">
-                          <div className="timer-item"><span className="number">02</span><span className="label">Days</span></div>
-                          <div className="timer-item"><span className="number">18</span><span className="label">Hours</span></div>
-                          <div className="timer-item"><span className="number">45</span><span className="label">Min</span></div>
+                          <div className="timer-item">
+                            <span className="number">02</span>
+                            <span className="label">DAYS</span>
+                          </div>
+                          <div className="timer-item">
+                            <span className="number">18</span>
+                            <span className="label">HOURS</span>
+                          </div>
+                          <div className="timer-item">
+                            <span className="number">45</span>
+                            <span className="label">MIN</span>
+                          </div>
                         </div>
                         <button className="btn btn-primary shop-now-btn">Shop Now</button>
                       </div>
@@ -299,73 +362,125 @@ export default function HomePage() {
                   </div>
                   <div className="col-lg-9">
                     <div className="flash-sale-slider">
-                      <button className="slider-nav prev-btn" type="button"><i className="fas fa-chevron-left"></i></button>
-                      <button className="slider-nav next-btn" type="button"><i className="fas fa-chevron-right"></i></button>
                       <div className="slider-container">
                         <div className="slider-track">
-                          {/* Example static flash sale products, replace with dynamic if needed */}
-                          {[1,2,3,4,5,6,7,8].map((item, idx) => (
-                            <div className="slider-item" key={idx}>
-                              <div className="flash-product-card">
-                                <div className="product-badge">{["Hot","New","Sale","Hot","New","Sale","Hot","New"][idx]}</div>
-                                <div className="discount-badge">{["20%","15%","30%","25%","35%","18%","22%","28%"][idx]}</div>
-                                <div className="product-image">
-                                  <Image src={`/client/images/product-${item}.png`} alt={`Product ${item}`} width={150} height={150} />
-                                </div>
-                                <div className="product-info">
-                                  <h4 className="product-name">{["Fresh Organic Tomatoes","Organic Avocados","Fresh Spinach","Organic Carrots","Fresh Broccoli","Organic Bell Peppers","Fresh Cucumbers","Organic Onions"][idx]}</h4>
-                                  <div className="product-rating">
-                                    <RatingStars rating={parseFloat(["4.5","4.8","4.3","4.6","4.7","4.4","4.2","4.6"][idx])} />
+                          {/* Flash sale products - chỉ hiển thị sản phẩm giảm 50% */}
+                          {productsLoading ? (
+                            // Skeleton loading cho flash sale
+                            Array.from({ length: 8 }).map((_, idx) => (
+                              <div className="slider-item" key={`skeleton-${idx}`}>
+                                <div className="flash-product-card skeleton">
+                                  <div className="skeleton-badge"></div>
+                                  <div className="skeleton-image"></div>
+                                  <div className="product-info">
+                                    <div className="skeleton-title"></div>
+                                    <div className="skeleton-rating"></div>
+                                    <div className="skeleton-price"></div>
+                                    <div className="skeleton-button"></div>
                                   </div>
-                                  <div className="product-price">
-                                    <span className="current-price">{formatPriceVND(parseFloat(["12.99","8.99","5.99","6.99","7.99","9.99","4.99","5.99"][idx]) * 1000)}</span>
-                                    <span className="old-price">{formatPriceVND(parseFloat(["16.99","10.99","8.99","9.99","12.99","12.99","6.99","8.99"][idx]) * 1000)}</span>
-                                  </div>
-                                  <button 
-                                    className="add-to-cart-btn" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      // Có thể thêm một sản phẩm mặc định hoặc chuyển đến trang sản phẩm
-                                      router.push('/categories');
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </button>
                                 </div>
                               </div>
+                            ))
+                          ) : productsError ? (
+                            <div className="col-12 text-center">
+                              <div className="alert alert-danger">
+                                {productsError}
+                              </div>
                             </div>
-                          ))}
+                          ) : allProducts && allProducts.length > 0 ? (
+                            // Lọc và hiển thị sản phẩm có discount = 50%
+                            allProducts
+                              .filter((product: Product) => product.discount === 50)
+                              .slice(0, 8)
+                              .map((product: Product) => (
+                              <div className="slider-item" key={product.id}>
+                                <div className="flash-product-card">
+                                  <div className="product-badge">SALE</div>
+                                  <div className="discount-badge">50%</div>
+                                  <div className="product-image">
+                                    <Image 
+                                      src={fixImgSrc(product.images)} 
+                                      alt={product.name} 
+                                      width={150} 
+                                      height={150} 
+                                    />
+                                  </div>
+                                  <div className="product-info">
+                                    <h4 className="product-name">{product.name}</h4>
+                                    <div className="product-rating">
+                                      <RatingStars rating={4.5} />
+                                      <span className="sold-count">(0 sold)</span>
+                                    </div>
+                                    <div className="product-price">
+                                      <span className="current-price">
+                                        {formatPriceVND(product.price * 0.5)}
+                                      </span>
+                                      <span className="old-price">
+                                        {formatPriceVND(product.price)}
+                                      </span>
+                                    </div>
+                                    <div className="product-actions">
+                                      <button 
+                                        className="add-to-cart-btn"
+                                        onClick={() => handleAddToCart({
+                                          ...product,
+                                          description: product.description || ''
+                                        })}
+                                      >
+                                        <i className="fas fa-shopping-cart"></i>
+                                        <span>ADD TO CART</span>
+                                      </button>
+                                      <button 
+                                        className="wishlist-btn"
+                                        onClick={() => handleToggleWishlist(product.id)}
+                                      >
+                                        <i className="far fa-heart"></i>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="col-12 text-center">
+                              <div className="alert alert-info">
+                                Không có sản phẩm giảm 50%
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="slider-dots">
-                        <button className="dot-btn active"></button>
-                        <button className="dot-btn"></button>
+                        <button className="dot-btn active" aria-label="Go to slide 1"></button>
+                        <button className="dot-btn" aria-label="Go to slide 2"></button>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Products Tabs */}
+
             <div className="products w-100 my-1">
               <div className="d-flex justify-content-lg-between align-items-center align-items-center flex-wrap justify-content-center">
                 <h2 className="fresh-products-title">Fresh Products</h2>
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                   <li className="nav-item" role="presentation">
-                    <button className="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-tab-pane" type="button" role="tab" aria-controls="all-tab-pane" aria-selected="true">Tất cả</button>
+                    <button className="nav-link active" id="vegetables-tab" data-bs-toggle="tab" data-bs-target="#vegetables-tab-pane" type="button" role="tab" aria-controls="vegetables-tab-pane" aria-selected="true">Thực phẩm tươi sống</button>
                   </li>
                   <li className="nav-item" role="presentation">
-                    <button className="nav-link" id="drinks-tab" data-bs-toggle="tab" data-bs-target="#drinks-tab-pane" type="button" role="tab" aria-controls="drinks-tab-pane" aria-selected="false">Đồ uống</button>
+                    <button className="nav-link" id="fruits-tab" data-bs-toggle="tab" data-bs-target="#fruits-tab-pane" type="button" role="tab" aria-controls="fruits-tab-pane" aria-selected="false">Thực phẩm đóng hộp và gia vị</button>
                   </li>
                   <li className="nav-item" role="presentation">
-                    <button className="nav-link" id="seafood-tab" data-bs-toggle="tab" data-bs-target="#seafood-tab-pane" type="button" role="tab" aria-controls="seafood-tab-pane" aria-selected="false">Thủy hải sản</button>
+                    <button className="nav-link" id="tubers-tab" data-bs-toggle="tab" data-bs-target="#tubers-tab-pane" type="button" role="tab" aria-controls="tubers-tab-pane" aria-selected="false">Thực phẩm hữu cơ và ăn kiêng</button>
+                  </li>
+                  <li className="nav-item" role="presentation">
+                    <button className="nav-link" id="dairy-tab" data-bs-toggle="tab" data-bs-target="#dairy-tab-pane" type="button" role="tab" aria-controls="dairy-tab-pane" aria-selected="false">Sản phẩm từ sữa và phô mai</button>
                   </li>
                 </ul>
               </div>
               <div className="tab-content" id="myTabContent">
-                {/* All Products Tab */}
-                <div className="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabIndex={0}>
+                {/* Vegetables Tab - lấy sản phẩm category_id = 1 */}
+                <div className="tab-pane fade show active" id="vegetables-tab-pane" role="tabpanel" aria-labelledby="vegetables-tab" tabIndex={0}> 
                   <div className="product-list">
                     <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
                       {productsLoading ? (
@@ -377,264 +492,38 @@ export default function HomePage() {
                           </div>
                         </div>
                       ) : (
-                        allProducts.slice(0, 10).map((product: Product, i: number) => (
-                          <div className="col" key={product.id}>
-                            <div className="product-card wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
-                              <div className="product-image-container">
-                                <img 
-                                  className="product-image" 
-                                  src={fixImgSrc(product.images)} 
-                                  alt={product.name} 
-                                  title={product.name} 
-                                  loading="lazy"
-                                />
-                              </div>
-                              <div className="product-info">
-                                <div className="product-category">
-                                  {typeof (product as any).category === 'string' 
-                                    ? (product as any).category 
-                                    : (product as any).category?.name ?? 'Danh mục'}
-                                </div>
-                                <div className="product-name">{product.name}</div>
-                                <div className="product-price">
-                                  {product.discount > 0 ? (
-                                    <>
-                                      <span className="text-decoration-line-through text-muted me-2">
-                                        {formatPriceVND(product.price)}
-                                      </span>
-                                      <span className="text-danger fw-bold">
-                                        {formatPriceVND(Math.round(product.price * (1 - product.discount / 100)))}
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <span className="fw-bold">{formatPriceVND(product.price)}</span>
-                                  )}
-                                </div>
-                                <RatingStars rating={4.5} />
-                                <div className="product-description">{product.description}</div>
-                              </div>
-                             
-                              <div className="product-actions">
-                                <button 
-                                  className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleToggleWishlist(product.id);
-                                  }}
-                                  disabled={wishlistLoading === product.id}
-                                  title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
-                                >
-                                  {wishlistLoading === product.id ? (
-                                    <i className="fas fa-spinner fa-spin"></i>
-                                  ) : (
-                                    <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
-                                  )}
-                                </button>
-                                <button 
-                                  className="add-to-cart-btn" 
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleAddToCart(product);
-                                  }}
-                                >
-                                  Add to cart
-                                </button>
-                                <button 
-                                  className="quick-view-btn" 
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleViewDetail(product);
-                                  }}
-                                  title="Xem chi tiết"
-                                >
-                                  <i className="fas fa-eye"></i>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                         
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Đồ uống Tab */}
-                <div className="tab-pane fade" id="drinks-tab-pane" role="tabpanel" aria-labelledby="drinks-tab" tabIndex={0}>
-                  <div className="product-list">
-                    <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
-                      {isLoading ? (
-                        <div className="col-12 text-center py-4">
-                          <div className="spinner-border text-success" role="status">
-                            <span className="visually-hidden">Đang tải...</span>
-                          </div>
-                        </div>
-                      ) : (
                         allProducts
-                          .filter((product: Product) => {
-                            const productCategory = typeof (product as any).category === 'string' 
-                              ? (product as any).category 
-                              : (product as any).category?.name;
-                            return productCategory && (
-                              productCategory.toLowerCase().includes('đồ uống') ||
-                              productCategory.toLowerCase().includes('drink') ||
-                              productCategory.toLowerCase().includes('nước') ||
-                              productCategory.toLowerCase().includes('beverage')
-                            );
-                          })
+                          .filter((product: Product) => product.categoryId === 1)
                           .slice(0, 10)
-                          .map((product, i) => (
+                          .map((product: Product, i: number) => (
                             <div className="col" key={product.id}>
-                              <div className="product-card wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
-                                <div className="product-image-container">
-                                  <img 
-                                    className="product-image" 
-                                    src={fixImgSrc(product.images)} 
-                                    alt={product.name} 
-                                    title={product.name} 
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <div className="product-info">
-                                  <div className="product-category">
-                                    {typeof (product as any).category === 'string' 
-                                      ? (product as any).category 
-                                      : (product as any).category?.name ?? 'Danh mục'}
-                                  </div>
-                                  <div className="product-name">{product.name}</div>
-                                  <div className="product-price">
-                                    {product.discount > 0 ? (
-                                      <>
-                                        <span className="text-decoration-line-through text-muted me-2">
-                                          {formatPriceVND(product.price)}
-                                        </span>
-                                        <span className="text-danger fw-bold">
-                                          {formatPriceVND(Math.round(product.price * (1 - product.discount / 100)))}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <span className="fw-bold">{formatPriceVND(product.price)}</span>
-                                    )}
-                                  </div>
-                                  <RatingStars rating={4.3} />
-                                  <div className="product-description">{product.description}</div>
-                                </div>
-                                <div className="product-actions">
-                                  <button 
-                                    className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleToggleWishlist(product.id);
-                                    }}
-                                    disabled={wishlistLoading === product.id}
-                                    title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
-                                  >
-                                    {wishlistLoading === product.id ? (
-                                      <i className="fas fa-spinner fa-spin"></i>
-                                    ) : (
-                                      <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
-                                    )}
-                                  </button>
-                                  <button 
-                                    className="add-to-cart-btn" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleAddToCart(product);
-                                    }}
-                                  >
-                                    Add to cart
-                                  </button>
-                                  <button 
-                                    className="quick-view-btn" 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleViewDetail(product);
-                                    }}
-                                    title="Xem chi tiết"
-                                  >
-                                    <i className="fas fa-eye"></i>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thủy hải sản Tab */}
-                <div className="tab-pane fade" id="seafood-tab-pane" role="tabpanel" aria-labelledby="seafood-tab" tabIndex={0}>
-                  <div className="product-list">
-                    <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
-                      {isLoading ? (
-                        <div className="col-12 text-center py-4">
-                          <div className="spinner-border text-success" role="status">
-                            <span className="visually-hidden">Đang tải...</span>
-                          </div>
-                        </div>
-                      ) : (
-                        allProducts
-                          .filter((product: Product) => {
-                            const productCategory = typeof (product as any).category === 'string' 
-                              ? (product as any).category 
-                              : (product as any).category?.name;
-                            return productCategory && (
-                              productCategory.toLowerCase().includes('thủy hải sản') ||
-                              productCategory.toLowerCase().includes('seafood') ||
-                              productCategory.toLowerCase().includes('cá') ||
-                              productCategory.toLowerCase().includes('tôm') ||
-                              productCategory.toLowerCase().includes('cua') ||
-                              productCategory.toLowerCase().includes('mực')
-                            );
-                          })
-                          .slice(0, 10)
-                          .map((product, i) => (
-                            <div className="col" key={product.id}>
-                          <div className={`p-lg-0 hvr-float wow fadeInLeft`} data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
-                            <div className="product-card">
-                              <div className="product-image-container">
+                              <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
+                                <div className="product-card">
+                                  <div className="product-image-container">
                                     <Image 
                                       className="product-image" 
                                       src={fixImgSrc(product.images)} 
                                       alt={product.name} 
                                       title={product.name} 
-                                      width={300} 
-                                      height={300} 
+                                      width={200}
+                                      height={200}
                                     />
-                              </div>
-                              <div className="product-info">
+                                  </div>
+                                  <div className="product-info">
                                     <div className="product-category">
-                                      {typeof (product as any).category === 'string' 
-                                        ? (product as any).category 
-                                        : (product as any).category?.name ?? 'Danh mục'}
+                                      {typeof product.category === 'string' 
+                                        ? product.category 
+                                        : product.category?.name ?? 'Danh mục'}
                                     </div>
                                     <div className="product-name">{product.name}</div>
-                                    <div className="product-price">
-                                      {product.discount > 0 ? (
-                                        <>
-                                          <span className="text-decoration-line-through text-muted me-2">
-                                            {formatPriceVND(product.price)}
-                                          </span>
-                                          <span className="text-danger fw-bold">
-                                            {formatPriceVND(Math.round(product.price * (1 - product.discount / 100)))}
-                                          </span>
-                                        </>
-                                      ) : (
-                                        <span className="fw-bold">{formatPriceVND(product.price)}</span>
-                                      )}
-                                    </div>
-                                    <RatingStars rating={4.7} />
-                                    <div className="product-description text-truncate">{product.description}</div>
-                              </div>
-                              <div className="product-actions">
+                                    <div className="product-price">{formatPriceVND(product.price)}</div>
+                                    <div className="product-description">{product.description}</div>
+                                  </div>
+                                  <div className="product-actions">
                                     <button 
                                       className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
                                       onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         handleToggleWishlist(product.id);
                                       }}
@@ -660,6 +549,271 @@ export default function HomePage() {
                                     <button 
                                       className="quick-view-btn" 
                                       onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleViewDetail(product);
+                                      }}
+                                      title="Xem chi tiết"
+                                    >
+                                      <i className="fas fa-eye"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Fruits Tab - lấy sản phẩm category_id = 3 */}
+                <div className="tab-pane fade" id="fruits-tab-pane" role="tabpanel" aria-labelledby="fruits-tab" tabIndex={0}> 
+                  <div className="product-list">
+                    <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
+                      {productsLoading ? (
+                        <ProductSkeleton count={10} />
+                      ) : !allProducts || allProducts.length === 0 ? (
+                        <div className="col-12 text-center py-4">
+                          <div className="alert alert-info">
+                            {productsError ? `Lỗi: ${productsError}` : 'Không có sản phẩm'}
+                          </div>
+                        </div>
+                      ) : (
+                        allProducts
+                          .filter((product: Product) => product.categoryId === 3)
+                          .slice(0, 10)
+                          .map((product: Product, i: number) => (
+                            <div className="col" key={product.id}>
+                              <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
+                                <div className="product-card">
+                                  <div className="product-image-container">
+                                    <Image 
+                                      className="product-image" 
+                                      src={fixImgSrc(product.images)} 
+                                      alt={product.name} 
+                                      title={product.name} 
+                                      width={200}
+                                      height={200}
+                                    />
+                                  </div>
+                                  <div className="product-info">
+                                    <div className="product-category">
+                                      {typeof product.category === 'string' 
+                                        ? product.category 
+                                        : product.category?.name ?? 'Danh mục'}
+                                    </div>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-price">{formatPriceVND(product.price)}</div>
+                                    <div className="product-description">{product.description}</div>
+                                  </div>
+                                  <div className="product-actions">
+                                    <button 
+                                      className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleToggleWishlist(product.id);
+                                      }}
+                                      disabled={wishlistLoading === product.id}
+                                      title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
+                                    >
+                                      {wishlistLoading === product.id ? (
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                      ) : (
+                                        <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
+                                      )}
+                                    </button>
+                                    <button 
+                                      className="add-to-cart-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleAddToCart(product);
+                                      }}
+                                    >
+                                      Add to cart
+                                    </button>
+                                    <button 
+                                      className="quick-view-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleViewDetail(product);
+                                      }}
+                                      title="Xem chi tiết"
+                                    >
+                                      <i className="fas fa-eye"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tubers Tab - lấy sản phẩm category_id = 5 */}
+                <div className="tab-pane fade" id="tubers-tab-pane" role="tabpanel" aria-labelledby="tubers-tab" tabIndex={0}> 
+                  <div className="product-list">
+                    <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
+                      {productsLoading ? (
+                        <ProductSkeleton count={10} />
+                      ) : !allProducts || allProducts.length === 0 ? (
+                        <div className="col-12 text-center py-4">
+                          <div className="alert alert-info">
+                            {productsError ? `Lỗi: ${productsError}` : 'Không có sản phẩm'}
+                          </div>
+                        </div>
+                      ) : (
+                        allProducts
+                          .filter((product: Product) => product.categoryId === 5)
+                          .slice(0, 10)
+                          .map((product: Product, i: number) => (
+                            <div className="col" key={product.id}>
+                              <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
+                                <div className="product-card">
+                                  <div className="product-image-container">
+                                    <Image 
+                                      className="product-image" 
+                                      src={fixImgSrc(product.images)} 
+                                      alt={product.name} 
+                                      title={product.name} 
+                                      width={200}
+                                      height={200}
+                                    />
+                                  </div>
+                                  <div className="product-info">
+                                    <div className="product-category">
+                                      {typeof product.category === 'string' 
+                                        ? product.category 
+                                        : product.category?.name ?? 'Danh mục'}
+                                    </div>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-price">{formatPriceVND(product.price)}</div>
+                                    <div className="product-description">{product.description}</div>
+                                  </div>
+                                  <div className="product-actions">
+                                    <button 
+                                      className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleToggleWishlist(product.id);
+                                      }}
+                                      disabled={wishlistLoading === product.id}
+                                      title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
+                                    >
+                                      {wishlistLoading === product.id ? (
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                      ) : (
+                                        <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
+                                      )}
+                                    </button>
+                                    <button 
+                                      className="add-to-cart-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleAddToCart(product);
+                                      }}
+                                    >
+                                      Add to cart
+                                    </button>
+                                    <button 
+                                      className="quick-view-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleViewDetail(product);
+                                      }}
+                                      title="Xem chi tiết"
+                                    >
+                                      <i className="fas fa-eye"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Dairy Tab - lấy sản phẩm category_id = 7 */}
+                <div className="tab-pane fade" id="dairy-tab-pane" role="tabpanel" aria-labelledby="dairy-tab" tabIndex={0}>
+                  <div className="product-list">
+                    <div className="row row-cols-2 row-cols-lg-5 g-3 g-lg-3 mt-2">
+                      {productsLoading ? (
+                        <ProductSkeleton count={10} />
+                      ) : !allProducts || allProducts.length === 0 ? (
+                        <div className="col-12 text-center py-4">
+                          <div className="alert alert-info">
+                            {productsError ? `Lỗi: ${productsError}` : 'Không có sản phẩm'}
+                          </div>
+                        </div>
+                      ) : (
+                        allProducts
+                          .filter((product: Product) => product.categoryId === 7)
+                          .slice(0, 10)
+                          .map((product: Product, i: number) => (
+                            <div className="col" key={product.id}>
+                              <div className="p-lg-0 hvr-float wow fadeInLeft" data-wow-delay={`${i * 0.1}s`} data-wow-duration="0.5s">
+                                <div className="product-card">
+                                  <div className="product-image-container">
+                                    <Image 
+                                      className="product-image" 
+                                      src={fixImgSrc(product.images)} 
+                                      alt={product.name} 
+                                      title={product.name} 
+                                      width={200}
+                                      height={200}
+                                    />
+                                  </div>
+                                  <div className="product-info">
+                                    <div className="product-category">
+                                      {typeof product.category === 'string' 
+                                        ? product.category 
+                                        : product.category?.name ?? 'Danh mục'}
+                                    </div>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-price">{formatPriceVND(product.price)}</div>
+                                    <div className="product-description">{product.description}</div>
+                                  </div>
+                                  <div className="product-actions">
+                                    <button 
+                                      className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleToggleWishlist(product.id);
+                                      }}
+                                      disabled={wishlistLoading === product.id}
+                                      title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
+                                    >
+                                      {wishlistLoading === product.id ? (
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                      ) : (
+                                        <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
+                                      )}
+                                    </button>
+                                    <button 
+                                      className="add-to-cart-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleAddToCart(product);
+                                      }}
+                                    >
+                                      Add to cart
+                                    </button>
+                                    <button 
+                                      className="quick-view-btn" 
+                                      onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         handleViewDetail(product);
                                       }}
@@ -678,19 +832,19 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            {/* Promo Banners */}
+
             <div className="promo-banners my-2">
               <div className="promo-grid">
-                <div className="row">
+                <div className="row"> 
                   <div className="col-lg-6">
                     <div className="promo-banner bg-blue">
                       <div className="promo-content">
                         <div className="promo-badge">Giảm giá 20%</div>
-                        <div className="promo-title my-3">Rau củ tươi ngon<br />hoàn toàn sạch</div>
+                        <div className="promo-title my-3">Rau củ tươi ngon<br/>hoàn toàn sạch</div>
                         <a className="promo-btn" href="#">Mua ngay</a>
                       </div>
                       <div className="promo-image">
-                        <Image className="img-pr" src="/client/images/water.png" alt="Water Bottle" width={360} height={240} />
+                        <Image className="img-pr" src="/client/images/water.png" alt="Water Bottle" width={200} height={200} />
                       </div>
                     </div>
                   </div>
@@ -698,148 +852,211 @@ export default function HomePage() {
                     <div className="promo-banner bg-yellow">
                       <div className="promo-conten-b">
                         <div className="promo-badge">Giảm giá 25%</div>
-                        <div className="promo-title my-3">Trái cây tươi<br />chất lượng cao</div>
+                        <div className="promo-title my-3">Trái cây tươi<br/>chất lượng cao</div>
                         <a className="promo-btn" href="#">Mua ngay</a>
                       </div>
                       <div className="promo-image">
-                        <Image className="img-pr" src="/client/images/coffe.png" alt="Coffee Beans" width={360} height={240} />
+                        <Image className="img-pr" src="/client/images/coffe.png" alt="Coffee Beans" width={200} height={200} />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Section Best Sells */}
+
+            {/* Best sells section */}
             <div className="section-best-sells">
-              {isLoading ? (
-                <div className="text-center py-4">
-                  <div className="spinner-border text-success" role="status">
-                    <span className="visually-hidden">Đang tải...</span>
+              {/* Hàng 1 */}
+              <div className="row g-3 my-4">
+                <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
+                  <div className="promo-banner">
+                    <Image className="img-fluid rounded" src="/client/images/banner-1.png" alt="Banner 1" width={200} height={418} style={{height: '418px'}} />
                   </div>
-                  <p className="mt-2">Đang tải sản phẩm bán chạy...</p>
                 </div>
-              ) : (
-                [1,2,3,4].map((rowIdx) => {
-                  const rowProducts = getRowProducts(rowIdx);
-                  if (rowProducts.length === 0) return null;
-                  return (
-                    <div className="row g-3 my-2" key={rowIdx}>
-                      {/* Banner chỉ hiển thị trên desktop */}
-                      <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay={`${rowIdx * 0.1}s`} data-wow-duration="0.5s">
-                        <div className="promo-banner">
-                          <Image className="img-fluid rounded" src={`/client/images/banner-${rowIdx}.png`} alt={`Banner ${rowIdx}`} width={180} height={418} style={{height: 418}} />
-                        </div>
-                      </div>
-                      {/* Tên danh mục thay thế banner khi ở tablet/mobile */}
-                      <div className="col-12 d-block d-lg-none mb-2">
-                        <h5 className="fw-bold text-success">Danh mục: Sản phẩm dinh dưỡng</h5>
-                      </div>
-                      {/* Dữ liệu sản phẩm */}
-                      <div className="col-12 col-lg-10">
-                        <div className="row">
-                          {rowProducts.map((product, i) => (
-                            <div className="col-12 col-md-6 col-lg-3" key={product.id ?? i}>
-                              <div className="product-card wow fadeInLeft" data-wow-delay={`${i*0.1}s`} data-wow-duration="0.5s">
-                                <div className="product-image-container">
-                                  <img
-                                    className="product-image"
-                                    src={fixImgSrc(product.images)}
-                                    alt={product.name}
-                                    title={product.name}
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <div className="product-info">
-                                  <div className="product-category">
-                                    {(product as any).category?.name || 
-                                     (typeof (product as any).category === 'string' ? (product as any).category : 'Sản phẩm tươi')}
-                                  </div>
-                                  <div className="product-name">{product.name}</div>
-                                  <div className="product-price">
-                                    {product.discount > 0 ? (
-                                      <>
-                                        <span className="text-decoration-line-through text-muted me-2">
-                                          {formatPriceVND(product.price)}
-                                        </span>
-                                        <span className="text-danger fw-bold">
-                                          {formatPriceVND(Math.round(product.price * (1 - product.discount / 100)))}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <span className="fw-bold">{formatPriceVND(product.price)}</span>
-                                    )}
-                                  </div>
-                                  <RatingStars rating={4.2} />
-                                  <div className="product-description">{product.description}</div>
-                                </div>
-                                <div className="product-actions">
-                                  <button 
-                                    className={`wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}`}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleToggleWishlist(product.id);
-                                    }}
-                                    disabled={wishlistLoading === product.id}
-                                    title={wishlist.includes(product.id) ? 'Bỏ thích' : 'Thích'}
-                                  >
-                                    {wishlistLoading === product.id ? (
-                                      <i className="fas fa-spinner fa-spin"></i>
-                                    ) : (
-                                      <i className={`fas fa-heart ${wishlist.includes(product.id) ? 'text-danger' : ''}`}></i>
-                                    )}
-                                  </button>
-                                  <button 
-                                    className="add-to-cart-btn" 
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleAddToCart(product);
-                                    }}
-                                  >
-                                    Add to cart
-                                  </button>
-                                  <button 
-                                    className="quick-view-btn" 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleViewDetail(product);
-                                    }}
-                                    title="Xem chi tiết"
-                                  >
-                                    <i className="fas fa-eye"></i>
-                                  </button>
-                                </div>
-                              </div>
+                <div className="col-12 d-block d-lg-none mb-2">
+                  <h5 className="fw-bold text-success">Danh mục: Sản phẩm dinh dưỡng</h5>
+                </div>
+                <div className="col-12 col-lg-10">
+                  <div className="row">
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={`row1-${idx}`}>
+                        <div className="product-list">
+                          <div className="product-card wow fadeInLeft" data-wow-delay={`${idx * 0.1}s`} data-wow-duration="0.5s">
+                            <div className="product-image-container">
+                              <Image className="product-image" src={`/client/images/pr-${idx + 1}.png`} alt={`Product ${idx + 1}`} title={`Product ${idx + 1}`} width={200} height={200} />
                             </div>
-                          ))}
+                            <div className="product-info">
+                              <div className="product-category">Nutrition</div>
+                              <div className="product-name">Organic Products</div>
+                              <div className="product-price">$25.00</div>
+                              <div className="product-description">Các sản phẩm dinh dưỡng hữu cơ, giàu vitamin và khoáng chất, tốt cho sức khỏe gia đình.</div>
+                            </div>
+                            <div className="product-actions">
+                              <button className="wishlist-btn">
+                                <i className="fas fa-heart"></i>
+                              </button>
+                              <button className="add-to-cart-btn">Add to cart</button>
+                              <button className="quick-view-btn">
+                                <i className="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-            {/* Newsletter Banner */}
-          </div>
-            <div className="newsletter-banner">
-              <div className="container">
-                <div className="row align-items-center">
-                  <div className="col-lg-7 col-md-12">
-                    <div className="newsletter-content">
-                      <h1 className="title">Ở nhà & nhận nhu cầu hàng ngày<br />từ cửa hàng của chúng tôi</h1>
-                      <p className="subtitle">Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span></p>
-                      <form className="newsletter-form">
-                        <div className="input-group">
-                          <span className="input-icon"><i className="fa fa-envelope"></i></span>
-                          <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
-                          <button className="btn-subscribe" type="submit">Đăng ký</button>
-                        </div>
-                      </form>
-                    </div>
+                    ))}
                   </div>
-                  <div className="col-lg-5 col-md-12">
-                    <div className="newsletter-image position-relative">
-                      <Image className="girl-img floating" src="/client/images/girl.png" alt="Girl" width={500} height={400} draggable={false} />
+                </div>
+              </div>
+
+              {/* Hàng 2 */}
+              <div className="row g-3 my-4">
+                <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
+                  <div className="promo-banner">
+                    <Image className="img-fluid rounded" src="/client/images/banner-2.png" alt="Banner 2" width={200} height={418} style={{height: '418px'}} />
+                  </div>
+                </div>
+                <div className="col-12 d-block d-lg-none mb-2">
+                  <h5 className="fw-bold text-success">Danh mục: Sản phẩm gia vị</h5>
+                </div>
+                <div className="col-12 col-lg-10">
+                  <div className="row">
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={`row2-${idx}`}>
+                        <div className="product-list">
+                          <div className="product-card wow fadeInLeft" data-wow-delay={`${idx * 0.1}s`} data-wow-duration="0.5s">
+                            <div className="product-image-container">
+                              <Image className="product-image" src={`/client/images/pr-${idx + 5}.png`} alt={`Product ${idx + 5}`} title={`Product ${idx + 5}`} width={200} height={200} />
+                            </div>
+                            <div className="product-info">
+                              <div className="product-category">Spices</div>
+                              <div className="product-name">Fresh Spices</div>
+                              <div className="product-price">$18.00</div>
+                              <div className="product-description">Các loại gia vị tươi ngon, được chọn lọc kỹ lưỡng, giúp món ăn thêm hương vị đặc biệt.</div>
+                            </div>
+                            <div className="product-actions">
+                              <button className="wishlist-btn">
+                                <i className="fas fa-heart"></i>
+                              </button>
+                              <button className="add-to-cart-btn">Add to cart</button>
+                              <button className="quick-view-btn">
+                                <i className="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Hàng 3 */}
+              <div className="row g-3 my-4">
+                <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
+                  <div className="promo-banner">
+                    <Image className="img-fluid rounded" src="/client/images/banner-3.png" alt="Banner 3" width={200} height={418} style={{height: '418px'}} />
+                  </div>
+                </div>
+                <div className="col-12 d-block d-lg-none mb-2">
+                  <h5 className="fw-bold text-success">Danh mục: Sản phẩm đóng gói</h5>
+                </div>
+                <div className="col-12 col-lg-10">
+                  <div className="row">
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={`row3-${idx}`}>
+                        <div className="product-list">
+                          <div className="product-card wow fadeInLeft" data-wow-delay={`${idx * 0.1}s`} data-wow-duration="0.5s">
+                            <div className="product-image-container">
+                              <Image className="product-image" src={`/client/images/pr-${idx + 9}.png`} alt={`Product ${idx + 9}`} title={`Product ${idx + 9}`} width={200} height={200} />
+                            </div>
+                            <div className="product-info">
+                              <div className="product-category">Packaged Goods</div>
+                              <div className="product-name">Premium Snacks</div>
+                              <div className="product-price">$28.00</div>
+                              <div className="product-description">Các loại snack cao cấp, được chế biến từ nguyên liệu tự nhiên, hương vị đặc biệt và an toàn cho sức khỏe.</div>
+                            </div>
+                            <div className="product-actions">
+                              <button className="wishlist-btn">
+                                <i className="fas fa-heart"></i>
+                              </button>
+                              <button className="add-to-cart-btn">Add to cart</button>
+                              <button className="quick-view-btn">
+                                <i className="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Hàng 4 */}
+              <div className="row g-3 my-4">
+                <div className="col-lg-2 d-none d-lg-block h-100 wow fadeInLeft" data-wow-delay="0.1s" data-wow-duration="0.5s">
+                  <div className="promo-banner">
+                    <Image className="img-fluid rounded" src="/client/images/banner-4.png" alt="Banner 4" width={200} height={418} style={{height: '418px'}} />
+                  </div>
+                </div>
+                <div className="col-12 d-block d-lg-none mb-2">
+                  <h5 className="fw-bold text-success">Danh mục: Sản phẩm đồ uống</h5>
+                </div>
+                <div className="col-12 col-lg-10">
+                  <div className="row">
+                    {Array.from({ length: 4 }).map((_, idx) => (
+                      <div className="col-12 col-md-6 col-lg-3 padd hvr-float" key={`row4-${idx}`}>
+                        <div className="product-list">
+                          <div className="product-card wow fadeInLeft" data-wow-delay={`${idx * 0.1}s`} data-wow-duration="0.5s">
+                            <div className="product-image-container">
+                              <Image className="product-image" src={`/client/images/pr-${idx + 13}.png`} alt={`Product ${idx + 13}`} title={`Product ${idx + 13}`} width={200} height={200} />
+                            </div>
+                            <div className="product-info">
+                              <div className="product-category">Beverages</div>
+                              <div className="product-name">Healthy Drinks</div>
+                              <div className="product-price">$35.00</div>
+                              <div className="product-description">Các loại đồ uống tốt cho sức khỏe, được làm từ trái cây tự nhiên, không chất bảo quản, giàu vitamin.</div>
+                            </div>
+                            <div className="product-actions">
+                              <button className="wishlist-btn">
+                                <i className="fas fa-heart"></i>
+                              </button>
+                              <button className="add-to-cart-btn">Add to cart</button>
+                              <button className="quick-view-btn">
+                                <i className="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="newsletter-banner">
+            <div className="container">
+              <div className="row align-items-center">
+                <div className="col-lg-7 col-md-12">
+                  <div className="newsletter-content">
+                    <h1 className="title">Ở nhà & nhận nhu cầu hàng ngày<br/>từ cửa hàng của chúng tôi</h1>
+                    <p className="subtitle">Mua sắm thông minh với <span className="brand">Tạp Hoá Xanh</span></p>
+                    <form className="newsletter-form">
+                      <div className="input-group">
+                        <span className="input-icon">
+                          <i className="fa fa-envelope"></i>
+                        </span>
+                        <input className="form-control" type="email" placeholder="Địa chỉ email của bạn" />
+                        <button className="btn-subscribe" type="submit">Đăng ký</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div className="col-lg-5 col-md-12">
+                  <div className="newsletter-image position-relative">
+                    <Image className="girl-img floating" src="/client/images/girl.png" alt="Girl" width={300} height={400} />
                   </div>
                 </div>
               </div>
@@ -847,6 +1064,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Cart Notification */}
+      <CartNotification 
+        message={addToCartMessage} 
+        onClose={() => setAddToCartMessage('')} 
+      />
     </div>
-  )
+  );
 }

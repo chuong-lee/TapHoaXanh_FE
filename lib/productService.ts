@@ -5,11 +5,12 @@ const API_BASE_URL = '/api';
 export interface Category {
   id: number;
   name: string;
-  slug: string;
+  slug?: string;
   image?: string;
   icon?: string;
   color?: string;
   parent_id?: number;
+  count?: number;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;

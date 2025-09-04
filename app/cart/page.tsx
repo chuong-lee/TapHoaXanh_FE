@@ -16,25 +16,25 @@ function fixImgSrc(src: string | undefined | null): string {
 export default function CartPage() {
   const { cart, updateQuantity, removeFromCart } = useCart()
 
-  // State lưu danh sách slug sản phẩm được chọn
-  const [selected, setSelected] = useState<{slug: string, variant_id?: number}[]>([]);
+  // State lưu danh sách ID sản phẩm được chọn
+  const [selected, setSelected] = useState<{id: number, variant_id?: number}[]>([]);
   const [showAll, setShowAll] = useState(false);
 
   // Hàm xử lý chọn/bỏ chọn sản phẩm
-  const handleSelect = (slug: string, variant_id?: number) => {
+  const handleSelect = (id: number, variant_id?: number) => {
     setSelected(prev => {
-      const exists = prev.some(s => s.slug === slug && s.variant_id === variant_id);
+      const exists = prev.some(s => s.id === id && s.variant_id === variant_id);
       if (exists) {
-        return prev.filter(s => !(s.slug === slug && s.variant_id === variant_id));
+        return prev.filter(s => !(s.id === id && s.variant_id === variant_id));
       } else {
-        return [...prev, { slug, variant_id }];
+        return [...prev, { id, variant_id }];
       }
     });
   };
 
   // Tổng tiền chỉ tính sản phẩm được chọn
   const total = useMemo(() =>
-    cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id))
+    cart.filter(item => selected.some(s => s.id === item.id && s.variant_id === item.variant_id))
         .reduce((sum, item) => sum + item.price * item.quantity, 0),
     [cart, selected]
   );
@@ -43,7 +43,7 @@ export default function CartPage() {
   const allSelected = cart.length > 0 && selected.length === cart.length;
   const handleSelectAll = () => {
     if (allSelected) setSelected([]);
-    else setSelected(cart.map(item => ({ slug: item.slug, variant_id: item.variant_id })));
+    else setSelected(cart.map(item => ({ id: item.id, variant_id: item.variant_id })));
   };
 
   return (
@@ -94,8 +94,8 @@ export default function CartPage() {
                         <input
                           type="checkbox"
                           className="form-check-input"
-                          checked={selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)}
-                          onChange={() => handleSelect(item.slug, item.variant_id)}
+                          checked={selected.some(s => s.id === item.id && s.variant_id === item.variant_id)}
+                          onChange={() => handleSelect(item.id, item.variant_id)}
                         />
                       </div>
                       <div className="col-md-2 text-center">
@@ -119,15 +119,15 @@ export default function CartPage() {
                       </div>
                       <div className="col-md-3 d-flex justify-content-center">
                         <div className="input-group" style={{ width: '120px' }}>
-                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.variant_id, item.quantity - 1)}>-</button>
+                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.id, item.variant_id, item.quantity - 1)}>-</button>
                           <input type="text" className="form-control text-center" value={item.quantity} readOnly />
-                          <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.slug, item.variant_id, item.quantity + 1)}>+</button>
+                                                      <button className="btn btn-outline-secondary" type="button" onClick={() => updateQuantity(item.id, item.variant_id, item.quantity + 1)}>+</button>
                         </div>
                       </div>
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.slug, item.variant_id)}
+                          onClick={() => removeFromCart(item.id, item.variant_id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa
@@ -185,7 +185,7 @@ export default function CartPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cart.filter(item => selected.some(s => s.slug === item.slug && s.variant_id === item.variant_id)).map(item => (
+                    {cart.filter(item => selected.some(s => s.id === item.id && s.variant_id === item.variant_id)).map(item => (
                       <tr key={item.id}>
                         <td>{item.name}</td>
                         <td className="text-end">{item.price.toLocaleString('vi-VN')}₫</td>

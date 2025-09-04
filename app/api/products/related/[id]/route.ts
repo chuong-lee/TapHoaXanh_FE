@@ -8,7 +8,7 @@ interface RelatedProduct {
   price: number
   discount: number
   images: string
-  slug: string
+
   description: string
   quantity: number
   category_id: number
@@ -119,7 +119,7 @@ export async function GET(
       price: product.price,
       discount: product.discount,
       images: processImageUrl(product.images),
-      slug: product.slug,
+      
       description: product.description,
       quantity: product.quantity,
       categoryId: product.category_id,

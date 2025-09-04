@@ -1,6 +1,7 @@
 @use './breakpoints'  as breakpoint;
 .section-article-detail {
-  
+    background: #fff;
+    padding-top: 140px ;
     .article-content {
       .article-category {
         color: #3bb77e;

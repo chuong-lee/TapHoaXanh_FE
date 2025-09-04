@@ -1,4 +1,45 @@
+document.querySelectorAll('.color-item').forEach((button, idx, buttons) => {
+  button.addEventListener('click', () => {
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    
+    // Nếu bạn muốn làm thêm logic (như cập nhật giá, hình ảnh v.v...), làm ở đây:
+    const colorName = button.querySelector('span').textContent;
+    const colorPrice = button.querySelector('span.d-block').textContent;
+    
+    console.log(`Bạn đã chọn màu: ${colorName} với giá ${colorPrice}`);
+  });
+});
 
+document.querySelectorAll('.memory-item').forEach((button, idx, buttons) => {
+  button.addEventListener('click', () => {
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    const memorySize = button.textContent.trim();
+    console.log(`Bạn đã chọn dung lượng: ${memorySize}`);
+
+    // Có thể thêm logic cập nhật giá, sản phẩm hoặc dữ liệu liên quan ở đây
+  });
+});
+
+
+$(document).ready(function(){
+  // Show or hide the back-to-top button
+  $(window).scroll(function(){
+    if ($(this).scrollTop() > 60) {
+      $('.back-to-top').fadeIn();
+    } else {
+      $('.back-to-top').fadeOut();
+    }
+  });
+
+  // Scroll to top when the button is clicked
+  $('.back-to-top').click(function(){
+    $('html, body').animate({scrollTop : 0},100);
+    return false;
+  });
+});
 // SELECT_TIME_DEPOSIT
 $("#select_time_deposit").on('change',function(){
   if($(this).find('option:selected').text()=="Select")
@@ -17,8 +58,18 @@ function activebtn() {
        }
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+  window.addEventListener("scroll", function () {
+    const navbar = document.getElementById("mainNavbar");
+    if (window.scrollY > 150) {
+      navbar.classList.add("scrolled");
+    } else {
+      navbar.classList.remove("scrolled");
+    }
+  });
+});
 // CONTROL-NUMBER
-+function ($) {
+(function ($) {
   $('.minus').click(function () {
       var $input = $(this).parent().find('input');
       var count = parseInt($input.val()) - 1;
@@ -33,7 +84,7 @@ function activebtn() {
       $input.change();
       return false;
   });
-}(jQuery);
+})(jQuery);
 $(document).ready(function(){
   
 // Show the button when the user scrolls down 100px from the top of the document
@@ -85,54 +136,74 @@ $(document).ready(function(){
   // Đưa tên file vào nội dung của div
   $('#fileName').text(fileNameWithoutExtension);
 // slider
-  $('.responsive').slick({
-    // dots: true,
-    infinite: true,
-    speed: 300,
-    slidesToShow: 3,
+
+if(window.innerWidth < 1025) {
+  mobileOnlySlider();
+}
+
+$(window).resize(function(e){
+  if(window.innerWidth < 1025) {
+      if(!$('#slider-logo').hasClass('slick-initialized')){
+          mobileOnlySlider();
+      }
+
+  }else{
+      if($('#slider-logo').hasClass('slick-initialized')){
+          $('#slider-logo').slick('unslick');
+      }
+  }
+});
+
+$(document).ready(function () {
+  $('.flash-sale-track').slick({
+    slidesToShow: 4,
     slidesToScroll: 1,
+    infinite: true,
+    arrows: true,
     autoplay: true,
-    autoplaySpeed: 2000,
-    responsive: [{
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 8,
-        slidesToScroll: 1,
-        // centerMode: true,
-
-      }
-    }, {
-      breakpoint: 835,
-      settings: {
-        slidesToShow: 2,
-        slidesToScroll: 1,
-        infinite: true,
-
-      }
-    }, {
-      breakpoint: 600,
-      settings: {
-        slidesToShow: 2,
-        slidesToScroll: 1,
-        infinite: true,
-
-      }
-    }, {
-      breakpoint: 480,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        infinite: true,
-      }
-    }, {
-      breakpoint: 320,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        infinite: true,
-      }
-    }]
+    autoplaySpeed: 3000,
+    prevArrow: $('.slick-prev'),
+    nextArrow: $('.slick-next'),
+    responsive: [
+      { breakpoint: 992, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 576, settings: { slidesToShow: 2 } } // đổi từ 1 ➜ 2
+    ]
   });
+});
+
+
+
+if(window.innerWidth < 1025) {
+  mobileOnlySlider_sales();
+}
+
+$(window).resize(function(e){
+  if(window.innerWidth < 1025) {
+      if(!$('#slider-sales').hasClass('slick-initialized')){
+          mobileOnlySlider_sales();
+      }
+
+  }else{
+      if($('#slider-sales').hasClass('slick-initialized')){
+          $('#slider-sales').slick('unslick');
+      }
+  }
+});
+
+$(document).ready(function(){
+  $("#show-search").click(function(){
+    $(".box-search").addClass("active");
+  });
+  $(".btn-close-search").click(function(){
+    $(".box-search").removeClass("active");
+  });
+  $(".box-category-sm .title").click(function(){
+    $(".box-category-sm").removeClass("active");
+    $(this).parent().addClass("active");
+  });
+});
+
 //click to copy
   $(".copy-button").click(function() {
     let element = $($(this).data('copyid'));
@@ -391,7 +462,7 @@ const emailInput = document.getElementById('emails');
 const submitBtn = document.getElementById('submitBtn');
 
 // function isValidEmail(email) {
-//   return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+//   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 // }
 
 // emailInput.addEventListener('input', () => {
@@ -485,4 +556,161 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 });
- 
+
+
+$(document).ready(function(){
+  
+  $(document).on('click', '.color-item', function() {
+    $('.color-item').removeClass('active');
+    $(this).addClass('active');
+  });
+});
+
+// Flash Sale Slider
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing Flash Sale Slider');
+    
+    // Wait a bit to ensure all elements are loaded
+    setTimeout(() => {
+        const sliderTrack = document.querySelector('.slider-track');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        const dotBtns = document.querySelectorAll('.dot-btn');
+        
+        console.log('Flash Sale Slider Debug:');
+        console.log('sliderTrack:', sliderTrack);
+        console.log('prevBtn:', prevBtn);
+        console.log('nextBtn:', nextBtn);
+        console.log('dotBtns:', dotBtns);
+        console.log('dotBtns length:', dotBtns.length);
+        
+        if (!sliderTrack) {
+            console.log('Slider track not found!');
+            return;
+        }
+        
+        let currentSlide = 0;
+        
+        // Calculate slide width based on screen size
+        function getSlideWidth() {
+            const width = window.innerWidth;
+            if (width > 1200) return 30; // 3 items per view
+            if (width > 992) return 33.333; // 3 items per view
+            if (width > 768) return 40; // 2.5 items per view
+            return 50; // 2 items per view on mobile
+        }
+        
+        let slideWidth = getSlideWidth();
+        let totalSlides = Math.ceil(document.querySelectorAll('.slider-item').length / (100 / slideWidth));
+        
+        console.log('Initial calculation:');
+        console.log('slideWidth:', slideWidth);
+        console.log('totalSlides:', totalSlides);
+        console.log('total items:', document.querySelectorAll('.slider-item').length);
+        
+        // Update on window resize
+        window.addEventListener('resize', () => {
+            slideWidth = getSlideWidth();
+            totalSlides = Math.ceil(document.querySelectorAll('.slider-item').length / (100 / slideWidth));
+            console.log('Resize - slideWidth:', slideWidth, 'totalSlides:', totalSlides);
+            updateSlider();
+        });
+        
+        function updateSlider() {
+            const translateX = -currentSlide * slideWidth;
+            console.log('updateSlider - translateX:', translateX, 'currentSlide:', currentSlide, 'slideWidth:', slideWidth);
+            sliderTrack.style.transform = `translateX(${translateX}%)`;
+            
+            // Update dots
+            dotBtns.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update navigation buttons
+            if (prevBtn) {
+                prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+                prevBtn.style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+            }
+            if (nextBtn) {
+                nextBtn.style.opacity = currentSlide === totalSlides - 1 ? '0.5' : '1';
+                nextBtn.style.pointerEvents = currentSlide === totalSlides - 1 ? 'none' : 'auto';
+            }
+        }
+        
+        // Next button
+        if (nextBtn) {
+            console.log('Next button found, adding event listener');
+            nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Next button clicked, currentSlide:', currentSlide, 'totalSlides:', totalSlides);
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    console.log('Moving to slide:', currentSlide);
+                    updateSlider();
+                } else {
+                    console.log('Already at last slide');
+                }
+            });
+        } else {
+            console.log('Next button not found!');
+        }
+        
+        // Previous button
+        if (prevBtn) {
+            console.log('Prev button found, adding event listener');
+            prevBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Prev button clicked, currentSlide:', currentSlide);
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    console.log('Moving to slide:', currentSlide);
+                    updateSlider();
+                } else {
+                    console.log('Already at first slide');
+                }
+            });
+        } else {
+            console.log('Prev button not found!');
+        }
+        
+        // Dot navigation
+        dotBtns.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                updateSlider();
+            });
+        });
+        
+        // Auto slide every 4 seconds
+        const autoSlideInterval = setInterval(() => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+            } else {
+                currentSlide = 0;
+            }
+            updateSlider();
+        }, 4000);
+        
+        // Pause auto slide on hover
+        const sliderContainer = document.querySelector('.slider-container');
+        if (sliderContainer) {
+            sliderContainer.addEventListener('mouseenter', () => {
+                clearInterval(autoSlideInterval);
+            });
+            
+            sliderContainer.addEventListener('mouseleave', () => {
+                setInterval(() => {
+                    if (currentSlide < totalSlides - 1) {
+                        currentSlide++;
+                    } else {
+                        currentSlide = 0;
+                    }
+                    updateSlider();
+                }, 4000);
+            });
+        }
+        
+        // Initialize
+        updateSlider();
+    }, 100);
+});

@@ -1,6 +1,9 @@
 @use './breakpoints'  as breakpoint;
 .product-detail-page {
- 
+  padding-top: 140px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
  
  
   .product-gallery {
