@@ -41,7 +41,15 @@ function LoginForm() {
     } catch (err) {
       const error = err as Error & { response?: { data?: { message?: string } } };
       console.error(error);
-      setError(error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.');
+      
+      // Kiểm tra nếu lỗi liên quan đến email chưa được xác thực
+      const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.';
+      
+      if (errorMessage.includes('email') && errorMessage.includes('xác thực')) {
+        setError(`${errorMessage} Bạn có thể gửi lại email xác thực.`);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

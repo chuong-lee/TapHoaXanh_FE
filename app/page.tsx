@@ -7,19 +7,12 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
 import Marquee from './components/Marquee';
 
-function fixImgSrc(img: string) {
-  if (!img) return '/images/placeholder.jpg';
-  if (img.startsWith('http')) return img;
-  if (img.startsWith('/')) return img;
-  if (img.startsWith('client/images/')) return '/' + img;
-  return '/images/products/' + img;
-}
-
 interface Category {
   name: string
   color: string
   icon: string
   count: number
+  image_url: string
 }
 
 interface Product {
@@ -41,7 +34,7 @@ export default function HomePage() {
   const [currentPage, _setCurrentPage] = useState(1)
   const itemsPerPage = 20
   const [categories, setCategories] = useState<Category[]>([]);
-
+console.log("categories", categories)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -187,7 +180,7 @@ export default function HomePage() {
                     flex: '0 0 170px'
                   }}
                 >
-                  <Image src={cat.icon} alt={cat.name} width={40} height={40} style={{objectFit: 'contain'}} />
+                  <Image src={cat.image_url} alt={cat.name} width={40} height={40} style={{objectFit: 'contain'}} />
                   <div className="fw-bold mt-2" style={{fontSize: 15}}>{cat.name}</div>
                   <div className="text-secondary small">{cat.count} sản phẩm</div>
                 </div>
@@ -216,7 +209,7 @@ export default function HomePage() {
                     {/* Thêm ảnh sản phẩm ở đây */}
                     <div className="featured-product-image d-flex align-items-center justify-content-center mb-2">
                       <Image
-                        src={fixImgSrc(product.images)}
+                        src={product.images}
                         alt={product.name}
                         width={120}
                         height={120}
@@ -300,7 +293,7 @@ export default function HomePage() {
                     )}
                     <div className="product-image">
                       <Image
-                        src={fixImgSrc(product.images)}
+                        src={product.images}
                         alt={product.name}
                         width={140}
                         height={140}
@@ -412,6 +405,8 @@ export default function HomePage() {
                 {/* Banner ngoài cùng bên trái */}
                 <div className="featured-product-card banner-in-grid">
                   <Image
+                  width={300}
+                  height={300}
                     src="/client/images/banne-milk.jpg"
                     alt="Banner"
                     className="banner-img-in-grid"
@@ -422,7 +417,9 @@ export default function HomePage() {
                   <div className="featured-product-card" key={product.id}>
                     <div className="featured-product-image">
                       <Image
-                        src={fixImgSrc(product.images)}
+                       width={300}
+                       height={300}
+                        src={product.images}
                         alt={product.name}
                         style={{objectFit: 'contain', width: '100%', height: '120px', background: 'transparent', mixBlendMode: 'multiply', filter: 'contrast(1.1)'}}
                       />
@@ -520,6 +517,8 @@ export default function HomePage() {
                   src="/images/girl-red-hoodie.jpg"
                   alt="Cô gái áo đỏ"
                   style={{maxWidth: '100%', height: 280, objectFit: 'contain'}}
+                  width={300}
+                  height={280}
                 />
               </div>
             </div>

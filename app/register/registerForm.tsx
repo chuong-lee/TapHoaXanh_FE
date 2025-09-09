@@ -39,28 +39,8 @@ function RegisterForm() {
         confirmPassword: confirmPasswordRef.current?.value || '',
       });
 
-      // Tự động login sau khi đăng ký thành công
-      try {
-        const loginRes = await api.post('/auth/login', {
-          email: email,
-          password: password,
-        });
-
-        const { access_token, refresh_token } = loginRes.data as { access_token?: string; refresh_token?: string };
-
-        if (access_token) localStorage.setItem('access_token', access_token);
-        if (refresh_token) localStorage.setItem('refresh_token', refresh_token);
-
-        await refreshProfile();
-        router.push(redirectTo);
-      } catch (loginErr) {
-        // Nếu login thất bại, vẫn chuyển về trang login để user login thủ công
-        console.error('Tự động login thất bại:', loginErr);
-        setError('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
-      }
+      // Chuyển đến trang verify-email với thông báo đăng ký thành công
+      router.push(`/verify-email?email=${encodeURIComponent(email)}&type=register`);
     } catch (err) {
       const error = err as Error & { response?: { data?: { message?: string } } };  
       console.error(error);
@@ -118,8 +98,19 @@ function RegisterForm() {
           required
         />
       </div>
-      {isLoading ? <>Đang load</> : <button type="submit" className="btn btn-primary w-100">Đăng Ký</button>}
-      {error && <p className="text-danger">{error}</p>}
+      {isLoading ? (
+        <button type="button" className="btn btn-primary w-100" disabled>
+          Đang đăng ký...
+        </button>
+      ) : (
+        <button type="submit" className="btn btn-primary w-100">Đăng Ký</button>
+      )}
+      
+      {error && (
+        <div className={`alert mt-3 ${error.includes('thành công') ? 'alert-success' : 'alert-danger'}`}>
+          {error}
+        </div>
+      )}
     </form>
   )
 }

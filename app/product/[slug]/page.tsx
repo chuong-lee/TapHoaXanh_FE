@@ -2,39 +2,22 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useCart } from '@/hooks/useCart'
+
 import api from '@/lib/axios'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Product } from '@/types'
+import { useCart } from '@/context/CartContext'
 
-interface ProductVariant {
-  id: number;
-  variant_name: string;
-  price_modifier: number;
-  stock: number;
-  productId: number;
-}
-
-type Product = {
-  id: number
-  name: string
-  price: number
-  slug: string
-  images: string | string[]
-  discount: number
-  description: string
-}
-
-function fixImgSrc(src: string | null | undefined): string {
-  if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.jpg';
-  src = src.toString().trim();
-  if (src.startsWith('http')) return src;
-  src = src.replace(/^\.\//, '');
-  if (src.startsWith('/')) return src;
-  if (src.startsWith('client/images/')) return '/' + src;
-  if (src.startsWith('images/')) return '/' + src;
-  return '/' + src;
-}
+// function fixImgSrc(src: string | null | undefined): string {
+//   if (!src || typeof src !== 'string' || !src.trim() || src === 'null' || src === 'undefined') return '/images/placeholder.jpg';
+//   src = src.toString().trim();
+//   if (src.startsWith('http')) return src;
+//   src = src.replace(/^\.\//, '');
+//   if (src.startsWith('/')) return src;
+//   if (src.startsWith('client/images/')) return '/' + src;
+//   if (src.startsWith('images/')) return '/' + src;
+//   return '/' + src;
+// }
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -42,12 +25,9 @@ export default function ProductDetailPage() {
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const { addToCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [tab, setTab] = useState<'desc' | 'profile' | 'review' | 'related'>('desc')
-  const [variants, setVariants] = useState<ProductVariant[]>([])
-  const [selectedVariant, setSelectedVariant] = useState<number | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   // Lấy chi tiết sản phẩm theo slug
@@ -62,20 +42,9 @@ export default function ProductDetailPage() {
         console.log('Sản phẩm tìm thấy:', res.data);
 
         if (res.data) {
-          const found = res.data;
-          const images: string[] = typeof found.images === 'string'
-            ? found.images
-              .split(',')
-              .map(s => s && s.trim())
-              .filter(s => !!s && s !== 'null' && s !== 'undefined')
-            : (Array.isArray(found.images) ? found.images.filter(s => !!s && s !== 'null' && s !== 'undefined') : []);
-
-          console.log('Images đã xử lý:', images);
-
-          const productWithImagesArray = { ...found, images }
-          setProduct(productWithImagesArray as Product)
-          setSelectedImage(images[0] || null)
-          console.log('Đã set product thành công');
+          setProduct(res.data)
+          // Reset quantity về 1 khi load sản phẩm mới
+          setQuantity(1)
         } else {
           console.log('Không tìm thấy sản phẩm với slug:', slug);
           setProduct(null)
@@ -90,58 +59,48 @@ export default function ProductDetailPage() {
     fetchProduct()
   }, [slug])
 
-  // Lấy biến thể đúng theo id của sản phẩm đang xem
+  // Đảm bảo quantity không vượt quá tồn kho
   useEffect(() => {
-    const fetchVariants = async () => {
-      if (!product) return;
-      try {
-        const res = await api.get<ProductVariant[]>(`/product-variant?productId=${product.id}`);
-        setVariants(Array.isArray(res.data) ? res.data : []);
-      } catch {
-        setVariants([]);
-      }
-    };
-    fetchVariants();
-  }, [product])
+    if (product && quantity > product.quantity) {
+      setQuantity(Math.max(1, product.quantity))
+    }
+  }, [product, quantity])
 
-  // Lấy 4 sản phẩm bất kỳ từ API (không trùng với sản phẩm hiện tại)
+
+  // Lấy sản phẩm liên quan cùng danh mục (không trùng với sản phẩm hiện tại)
   useEffect(() => {
     const fetchRelated = async () => {
+      if (!product) return;
+      
       try {
         const res = await api.get<Product[]>('/products');
-        let products = res.data.filter((item) => item.slug !== slug);
-        // Xáo trộn mảng và lấy 4 sản phẩm đầu tiên
-        products = products.sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRelatedProducts(products);
+        console.log(res.data, "res.data")
+        
+        // Lấy sản phẩm liên quan (loại trừ sản phẩm hiện tại)
+        const relatedProducts = res.data
+          .filter((item) => item.slug !== slug)
+          .slice(0, 4);
+
+        setRelatedProducts(relatedProducts);
       } catch {
         setRelatedProducts([]);
       }
     };
     fetchRelated();
-  }, [slug]);
+  }, [slug, product]);
 
   if (loading) return <p>Đang tải sản phẩm...</p>
   if (!product) return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>
 
-  const getSelectedPrice = () => {
-    const variant = variants.find(v => v.id === selectedVariant);
-    const priceModifier = variant?.price_modifier || 0;
-
-    // Nếu priceModifier = 0, giá gốc là product.price
-    // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
-    const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
-
+  const getProductPrice = () => {
     // Giá sau giảm
-    const finalPrice = basePrice - product.discount;
-
-    // Phần trăm giảm giá (nếu muốn hiển thị badge)
-    const _percent = Math.round((product.discount / basePrice) * 100);
+    const finalPrice = product.price - product.discount;
     return finalPrice;
   };
-  const totalPrice = getSelectedPrice() * quantity;
+  const totalPrice = getProductPrice() * quantity;
 
   return (
-    <div className="container main-content py-4" style={{ paddingTop: 110 }}>
+    <div className="container main-content py-4" style={{marginTop: 100}}>
       <style jsx>{`
         .option-btn {
           border: 2px solid #ddd;
@@ -177,49 +136,15 @@ export default function ProductDetailPage() {
         <div className="col-md-5">
           <div className="border rounded p-2 bg-white">
             <Image
-              src={fixImgSrc(selectedImage)}
+              src={product.images}
               alt={product.name}
               width={400}
               height={400}
-              className="rounded w-100"
+              className="object-fit-cover rounded w-100"
             />
           </div>
           <div className="d-flex gap-2 mt-3">
-            {(() => {
-              let imgs = Array.isArray(product.images)
-                ? product.images
-                : typeof product.images === 'string'
-                  ? product.images.split(',') : [];
-              imgs = imgs
-                .map(img => (typeof img === 'string' ? img.trim() : ''))
-                .filter(img => !!img && img !== 'null' && img !== 'undefined' && img !== '');
 
-              if (imgs.length === 0) {
-                return <div className="text-muted">Không có ảnh</div>;
-              }
-              if (imgs.length < 3) {
-                imgs = [...imgs];
-                while (imgs.length < 3) imgs.push(imgs[0]);
-              }
-              return imgs.slice(0, 3).map((img: string, index: number) => {
-                const safeImg = fixImgSrc(img);
-                // Chỉ render nếu safeImg là string hợp lệ
-                if (!safeImg || typeof safeImg !== 'string' || safeImg === 'null' || safeImg === 'undefined' || safeImg.trim() === '') {
-                  return null;
-                }
-                return (
-                  <Image
-                    key={index}
-                    src={safeImg}
-                    alt={`Ảnh nhỏ ${index}`}
-                    width={60}
-                    height={60}
-                    className={`border rounded product-thumb${selectedImage === img ? ' selected' : ''}`}
-                    onClick={() => setSelectedImage(img && img.trim() ? img : null)}
-                  />
-                );
-              });
-            })()}
           </div>
         </div>
         {/* Right: Product Info & Purchase Card */}
@@ -244,28 +169,23 @@ export default function ProductDetailPage() {
                 <span className="text-success fw-bold">MIỄN PHÍ GIAO HÀNG</span>
                 <span className="text-danger ms-3 fw-bold">QUÀ TẶNG MIỄN PHÍ</span>
               </div>
-              {/* Chọn biến thể */}
+              {/* Thông tin giá */}
               <div className="mb-3">
-                <span className="fw-bold">CHỌN PHIÊN BẢN:</span>
-                <div className="d-flex flex-wrap gap-2 mt-1">
-                  {Array.isArray(variants) && variants.length > 0 ? variants.map(v => (
-                    <label key={v.id} className={`btn option-btn${v.id === selectedVariant ? ' active' : ''} rounded-3 px-3 py-2`} style={{ minWidth: 120 }}>
-                      <input
-                        type="radio"
-                        name="variant"
-                        value={v.id}
-                        checked={v.id === selectedVariant}
-                        onChange={() => setSelectedVariant(v.id)}
-                        className="d-none"
-                      />
-                      <div>{v.variant_name}</div>
-                      <div className="fw-bold">
-                        {v.price_modifier > 0 ? `+${v.price_modifier.toLocaleString()}₫` : ''}
-                      </div>
-                      <div className="text-muted small">Kho: {v.stock}</div>
-                    </label>
-                  )) : <span className="text-muted">Không có phiên bản</span>}
+                <div className="d-flex align-items-baseline">
+                  <div className="fs-2 fw-bold text-dark me-3">
+                    {totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  </div>
+                  {product.discount > 0 && (
+                    <div className="text-decoration-line-through text-muted">
+                      {product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                    </div>
+                  )}
                 </div>
+                {product.discount > 0 && (
+                  <div className="text-success fw-bold">
+                    Tiết kiệm: {product.discount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  </div>
+                )}
               </div>
               <div className="bg-light rounded p-3 mb-3">
                 <ul className="mb-2">
@@ -274,104 +194,68 @@ export default function ProductDetailPage() {
                 </ul>
                 <div className="text-secondary mb-2" style={{ fontSize: 14 }}>Khuyến mãi kết thúc lúc: <span className="fw-bold">9h00 tối, 25/5/2024</span></div>
                 <div className="mt-2" style={{ fontSize: 15 }}>
-                  <div><b>Mã SP:</b> <span className="text-success">ABCO25168</span></div>
-                  <div><b>Danh mục:</b> <span className="text-success">Điện thoại & Máy tính bảng</span></div>
-                  <div><b>Thương hiệu:</b> <span className="text-success">Somsung</span></div>
-                </div>
-                <div className="mt-2 d-flex gap-2">
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-fb.jpg" /></Link>
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-ig.jpg" /></Link>
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-x.jpg" /></Link>
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-yt.jpg" /></Link>
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-tg.jpg" /></Link>
-                  <Link href="#"><Image alt="" height={28} width={28} src="/images/social-in.jpg" /></Link>
+                  <div><b>Mã SP:</b> <span className="text-success">{product.barcode || 'N/A'}</span></div>
+                  <div><b>Xuất xứ:</b> <span className="text-success">{product.origin || 'N/A'}</span></div>
+                  <div><b>Đơn vị:</b> <span className="text-success">{product.weight_unit || 'N/A'}</span></div>
+                  <div><b>Hạn sử dụng:</b> <span className="text-success">{product.expiry_date || 'N/A'}</span></div>
+                  <div><b>Tồn kho:</b> <span className="text-success">{product.quantity}</span></div>
                 </div>
               </div>
             </div>
             {/* Right part of right column: Purchase Card */}
             <div className="col-md-5">
               <div className="card shadow-sm p-3" style={{ borderRadius: 12 }}>
-                <div className="d-flex align-items-baseline">
-                  <div className="fs-2 fw-bold text-dark">
-                    {selectedVariant ? (
-                      <span>{totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                    ) : (
-                      <span className="text-muted" style={{ fontSize: 18 }}>Vui lòng chọn phiên bản</span>
-                    )}
-                  </div>
-                </div>
                 <div className="my-3">
-                  <span className="badge bg-success bg-opacity-10 text-success me-2">
-                    <i className="bi bi-check-circle-fill"></i> Còn hàng
-                  </span>
+                  {product.quantity > 0 ? (
+                    <span className="badge bg-success bg-opacity-10 text-success me-2">
+                      <i className="bi bi-check-circle-fill"></i> Còn hàng ({product.quantity})
+                    </span>
+                  ) : (
+                    <span className="badge bg-danger bg-opacity-10 text-danger me-2">
+                      <i className="bi bi-x-circle-fill"></i> Hết hàng
+                    </span>
+                  )}
                 </div>
-                {selectedVariant && (
-                  <div className="d-flex align-items-center mb-3">
-                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                    <span className="mx-3 fs-5 fw-bold">{quantity}</span>
-                    <button className="btn btn-light border rounded-pill px-3" onClick={() => setQuantity(q => q + 1)}>+</button>
-                  </div>
-                )}
-                {variants.length > 0 ? (
-                  <>
-                    <button
-                      className="btn w-100 mb-2 fw-bold"
-                      style={{
-                        background: '#22c55e',
-                        color: '#fff',
-                        borderRadius: 8,
-                        fontWeight: 600
-                      }}
-                      onClick={() => {
-                        if (!selectedVariant) return;
-                        const variant = variants.find(v => v.id === selectedVariant);
-                        const priceModifier = variant?.price_modifier || 0;
-
-                        // Nếu priceModifier = 0, giá gốc là product.price
-                        // Nếu priceModifier > 0, giá gốc là product.price + priceModifier
-                        const basePrice = priceModifier === 0 ? product.price : product.price + priceModifier;
-
-                        // Giá sau giảm
-                        const finalPrice = basePrice - product.discount;
-
-                        // Phần trăm giảm giá (nếu muốn hiển thị badge)
-                        const _percent = Math.round((product.discount / basePrice) * 100);
-                        addToCart({
-                          ...product,
-                          variant_id: variant?.id,
-                          variant_name: variant?.variant_name,
-                          price: finalPrice,
-                          stock: variant?.stock || 0,
-                          images: Array.isArray(product.images) ? product.images.join(',') : product.images,
-                        }, quantity);
-                        router.push('/cart');
-                      }}
-                      disabled={!selectedVariant}
-                    >
-                      Thêm vào giỏ hàng
-                    </button>
-                    <button
-                      className="btn w-100 mb-3 fw-bold"
-                      style={{
-                        background: '#fb923c',
-                        color: '#fff',
-                        borderRadius: 8,
-                        fontWeight: 600
-                      }}
-                      disabled={!selectedVariant}
-                    >
-                      Mua với PayPal
-                    </button>
-                  </>
-                ) : (
-                  <div className="alert alert-warning mt-2">Sản phẩm này chưa có biến thể, không thể mua.</div>
-                )}
+                <div className="d-flex align-items-center mb-3">
+                  <button 
+                    className="btn btn-light border rounded-pill px-3" 
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    disabled={product.quantity <= 0}
+                  >-</button>
+                  <span className="mx-3 fs-5 fw-bold">{quantity}</span>
+                  <button 
+                    className="btn btn-light border rounded-pill px-3" 
+                    onClick={() => setQuantity(q => Math.min(q + 1, product.quantity))}
+                    disabled={product.quantity <= 0 || quantity >= product.quantity}
+                  >+</button>
+                </div>
+                <button
+                  className="btn w-100 mb-2 fw-bold"
+                  style={{
+                    background: product.quantity > 0 ? '#22c55e' : '#6c757d',
+                    color: '#fff',
+                    borderRadius: 8,
+                    fontWeight: 600
+                  }}
+                  onClick={() => {
+                    if (product.quantity <= 0) return;
+                    const finalPrice = product.price - product.discount;
+                    addToCart({
+                      ...product,
+                      price: finalPrice,
+                    }, quantity);
+                    router.push('/cart');
+                  }}
+                  disabled={product.quantity <= 0}
+                >
+                  {product.quantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
+                </button>
                 <div className="d-flex justify-content-between text-sm">
                   <a href="#" className="text-decoration-none text-success">Đã thêm vào yêu thích</a>
                   <a href="#" className="text-decoration-none text-muted">So sánh</a>
                 </div>
                 <hr />
-                <div className="mb-2"><Image src="/images/safe-checkout.jpg" alt="Thanh toán an toàn"  height={24} /></div>
+                <div className="mb-2"><Image src="/images/safe-checkout.jpg" alt="Thanh toán an toàn" width={24} height={24} /></div>
                 <div className="mb-2 fw-bold">Đặt hàng nhanh 24/7<br /><span className="fw-normal">(025) 3886 25 16</span></div>
                 <div className="mb-2"><i className="bi bi-truck"></i> Giao từ <a href="#" className="text-decoration-none">Việt Nam</a></div>
               </div>
@@ -460,6 +344,7 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
       {/* Related Products */}
       <div className="mt-5">
         <h5 className="fw-bold mb-3">SẢN PHẨM LIÊN QUAN</h5>
@@ -475,7 +360,7 @@ export default function ProductDetailPage() {
                   </span>
                   <div className="product-image">
                     <Image
-                      src={fixImgSrc(Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.jpg') : '/images/placeholder.jpg'))}
+                      src={Array.isArray(item.images) ? item.images[0] : (typeof item.images === 'string' ? (item.images.split(',')[0] || '/images/placeholder.jpg') : '/images/placeholder.jpg')}
                       alt={item.name}
                       width={140}
                       height={140}

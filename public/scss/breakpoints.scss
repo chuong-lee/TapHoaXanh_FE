@@ -1,0 +1,87 @@
+$background-color: #fcf9f9;
+$color-page: #A3A3A3;
+$primary-color: #6bbf2d; 
+$color-page3: #c4a7ff;
+$color-page4: #adff39;
+$border-color: #dee2e6;
+$color_1: #000;
+$background-color_1: #177160;
+$background-color_2: #ef5b0c;
+$background-color_3: #002b7f;
+$background-color_4: #c89b55;
+$background-color: #ffffff;
+$color-page: #6D6E71;
+$color-page2: #F37021;
+$bnt-radiant: linear-gradient(to right, #ADFF39, #FFFA3B);
+$background-color_1: #f0f0f0;
+$bnt-radiant: linear-gradient(#003e3e, #000000);
+
+/* media size */
+$mobile-mini-width: 320px;
+$mobile-width: 480px;
+$tablet-width: 768px;
+$desktop-sm-width: 1024px;
+$desktop-width: 1366px;
+$desktop-width-xxl: 1440px;
+$breakpoints: (
+  sm: 480px,
+  md: 1024px,
+  lg: 1366px,
+);
+
+@mixin xs {
+  @media (max-width: #{$mobile-mini-width}) {
+    @content;
+  }
+}
+
+@mixin sm {
+  @media (min-width: #{$mobile-mini-width}) and (max-width: #{$mobile-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: #{$tablet-width}) and (max-width: #{$desktop-sm-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin lg {
+  @media (min-width: #{$desktop-sm-width}) and (max-width: #{$desktop-width}) {
+    @content;
+  }
+}
+
+@mixin xl {
+  @media (min-width: #{$desktop-width}) and (max-width: #{$desktop-width-xxl}) {
+    @content;
+  }
+}
+
+@mixin xxl {
+  @media (min-width: #{$desktop-width-xxl + 1px}) {
+    @content;
+  }
+}
+
+@mixin media($keys...) {
+  @each $key in $keys {
+    @media screen and (max-width: map-get($breakpoints, $key)) {
+      @content;
+    }
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+

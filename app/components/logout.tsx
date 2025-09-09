@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { profileService } from '../lib/profileService';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '@/context/CartContext';
 
 export default function LogoutButton() {
   const { setProfile } = useAuth();
+  const { setCart } = useCart();
   const router = useRouter();
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
@@ -17,6 +19,10 @@ export default function LogoutButton() {
       await profileService.logout();
       setProfile(null);
       localStorage.removeItem('token');
+      localStorage.removeItem('cart_local');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('checkout_user_info');
+      setCart([])
       router.push('/login');
     } catch {
       setLogoutError('Đăng xuất thất bại. Vui lòng thử lại!');

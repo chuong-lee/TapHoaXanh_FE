@@ -1,4 +1,8 @@
+// History payment styles
+@use './breakpoints' as breakpoint;
+
 .history-payment {
+  padding-top: 140px;
   padding: 40px 0;
   background-color: #f8f9fa;
   min-height: 100vh;
@@ -13,7 +17,7 @@
       .check-circle {
         width: 80px;
         height: 80px;
-        background: #28a745;
+       
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
@@ -29,7 +33,7 @@
       }
 
       h1 {
-        color: #28a745;
+        
         font-size: 2rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
@@ -138,7 +142,7 @@
         }
 
         .product-price {
-          color: #198754;
+          
           font-size: 1.1rem;
         }
       }
@@ -157,7 +161,7 @@
             border-color: #dee2e6 !important;
             
             .col {
-              color: #198754;
+              
               font-size: 1.2rem;
             }
           }

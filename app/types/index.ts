@@ -30,3 +30,43 @@ export type Voucher = {
     price: number | null;
     status: "chờ xử lý" | "đã xác nhận" | "đang giao" | "đã giao" | "đã hủy";
   }
+
+
+  // Interface sản phẩm
+export interface Product {
+  id: number;
+  // createdAt: string;  
+  // updatedAt: string;
+  // deletedAt: string | null;
+  name: string;
+  price: number;
+  quantity: number;
+  discount: number;
+  images: string;      
+  slug: string;
+  barcode: string;
+  expiry_date: string;  
+  origin: string;
+  weight_unit: string;
+  description: string;
+  purchase: number;     
+}
+
+
+export interface CartItem {
+  id: number;
+  quantity: number;
+  price: number;
+  product: Product;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  total_price: number;
+  slug:string
+}
+
+
+export interface Cart {
+  id: number;
+  cartItems: CartItem[];
+}

@@ -17,7 +17,41 @@ export type CartItem = {
 }
 
 export function useCart() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([
+    {
+      id: 1,
+      name: "Rau củ hữu cơ",
+      price: 45000,
+      quantity: 1,
+      slug: "rau-cu-huu-co",
+      images: "https://res.cloudinary.com/dlrqjti9s/image/upload/v1756114017/product-1_r3zkho.jpg",
+      discount: 10,
+      description: "Rau củ hữu cơ tươi ngon, an toàn.",
+      stock: 0,
+    },
+    {
+      id: 2,
+      name: "Xúc xích C.P.",
+      price: 38250,
+      quantity: 1,
+      slug: "xuc-xich-cp",
+      images: "https://res.cloudinary.com/dlrqjti9s/image/upload/v1756114016/product-3_j3ivmo.jpg",
+      discount: 15,
+      description: "Xúc xích thơm ngon, dễ chế biến.",
+      stock: 0,
+    },
+    {
+      id: 3,
+      name: "Bánh mì sandwich",
+      price: 19000,
+      quantity: 1,
+      slug: "banh-mi-sandwich",
+      images: "https://res.cloudinary.com/dlrqjti9s/image/upload/v1756114016/product-5_mdoz1g.jpg",
+      discount: 5,
+      description: "Bánh mì sandwich mềm, tiện lợi.",
+      stock: 0,
+    },
+  ]);
   const [_selected, setSelected] = useState<{ slug: string; variant_id: number | undefined }[]>([]);
   const prevCartLength = useRef(cart.length);
 
@@ -68,15 +102,15 @@ export function useCart() {
     });
   }
 
-  const removeFromCart = (slug: string, variant_id?: number) => {
-    const updatedCart = cart.filter((item) => !(item.slug === slug && item.variant_id === variant_id));
+  const removeFromCart = (slug: string) => {
+    const updatedCart = cart.filter((item) => !(item.slug === slug));
     saveToLocal(updatedCart);
   };
 
-  const updateQuantity = (slug: string, variant_id: number | undefined, quantity: number) => {
+  const updateQuantity = (slug: string, quantity: number) => {
     if (quantity < 1) return;
     const updatedCart = cart.map(item =>
-      item.slug === slug && item.variant_id === variant_id
+      item.slug === slug
         ? { ...item, quantity }
         : item
     );

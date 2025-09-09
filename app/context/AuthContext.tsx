@@ -8,7 +8,6 @@ interface AuthContextType {
   profile: ProfileDto | null;
   setProfile: React.Dispatch<React.SetStateAction<ProfileDto | null>>;
   refreshProfile: () => Promise<void>;
-  // You can add more auth-related state/methods here (token, logout, etc.)
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +16,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
   const router = useRouter()
   const [profile, setProfile] = useState<ProfileDto | null>(null);
+
+  
   const refreshProfile = async () => {
     try {
       const data = await profileService.getProfile();
