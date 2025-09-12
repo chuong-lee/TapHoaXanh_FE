@@ -31,7 +31,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const handleViewDetail = () => {
     // Bỏ kiểm tra đăng nhập, cho phép truy cập tự do
-    if (product.slug) {
+    if (product) {
       router.push(`/product/${product.slug}`);
     } else {
       alert('Không tìm thấy sản phẩm!');
