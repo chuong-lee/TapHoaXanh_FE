@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { ToastContainer } from "react-toastify";
 
 export default function RootLayout({
   children,
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
+        <ToastContainer />
         <AuthProvider>
           <CartProvider>
             <Header />

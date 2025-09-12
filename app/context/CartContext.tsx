@@ -1,5 +1,5 @@
 "use client";
-
+import { toast } from "react-toastify";
 import {
   Dispatch,
   SetStateAction,
@@ -8,16 +8,19 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from "react";
-import { Cart, CartItem, Product } from "@/types";
+import { Cart, CartAction, CartItem, Product } from "@/types";
 import api from "@/lib/axios";
 import { useAuth } from "./AuthContext";
+import debounce from "lodash.debounce";
+import axios from "axios";
 
 interface CartContextType {
   addToCart: (product: Product, quantity?: number) => void;
   cart: CartItem[];
-  updateQuantity: (slug: string, quantity: number) => void;
-  removeFromCart: (slug: string) => void;
+  updateQuantity: (id: number, action: CartAction, quantity?: number) => void;
+  removeFromCart: (id: number) => Promise<void>;
   isCartLoading: boolean;
   setCart: Dispatch<SetStateAction<CartItem[]>>;
   fetchCart: () => Promise<Cart>;
@@ -26,19 +29,38 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const debouncedUpdate = useRef(
+    debounce(async (id: number, action: CartAction, quantity?: number) => {
+      try {
+        await api.put("/cart/update", { productId: id, action, quantity });
+      } catch (error: unknown) {
+        const messages = "An unknown error occurred";
+
+        if (axios.isAxiosError(error)) {
+          return error.response?.data?.message;
+        }
+        toast(messages, {
+          type: "error",
+        });
+        fetchCart();
+      }
+    }, 500)
+  ).current;
+
   const { profile } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>(JSON.parse(localStorage.getItem("cart_local") || "[]"));
+  const [cart, setCart] = useState<CartItem[]>([]);
+
   const [isCartLoading, setIsCartLoading] = useState(true);
 
-  const saveToLocal = (items: CartItem[]) => {
-    localStorage.setItem("cart_local", JSON.stringify(items));
-    setCart(items);
-  };
+  const addToCart = async (product: Product, quantity: number = 1) => {
+    await api.post("/cart/add", {
+      productId: product.id,
+      quantity: quantity,
+    });
 
-  const addToCart = (product: Product, quantity: number = 1) => {
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex(
-        (item) => item.product.slug === product.slug
+        (item) => item.product.id === product.id
       );
 
       let updatedCart;
@@ -60,47 +82,50 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           } as CartItem,
         ];
       }
-      saveToLocal(updatedCart);
+
       return updatedCart;
     });
   };
 
-  const removeFromCart = (slug: string) => {
-    const updatedCart = cart.filter((item) => !(item.product.slug === slug));
-    saveToLocal(updatedCart);
+  const removeFromCart = async (id: number) => {
+    const updatedCart = cart.filter((item) => !(item.product.id === id));
+
+    await api.put("/cart/update", {
+      productId: id,
+      quantity: 0,
+    });
+
+    setCart(updatedCart);
   };
 
-  const updateQuantity = (slug: string, quantity: number) => {
-    if (quantity < 1) return;
-    const updatedCart = cart.map((item) =>
-      item.product.slug === slug ? { ...item, quantity } : item
+  const updateQuantity = (
+    id: number,
+    action: CartAction,
+    quantity?: number
+  ) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.id === id
+          ? {
+              ...item,
+              quantity:
+                action === "increase"
+                  ? item.quantity + 1
+                  : action === "decrease"
+                  ? item.quantity - 1
+                  : quantity ?? item.quantity,
+            }
+          : item
+      )
     );
-    saveToLocal(updatedCart);
-    
+
+    debouncedUpdate(id, action, quantity);
   };
 
   async function fetchCart() {
-    setIsCartLoading(true);
-    const cart_local = JSON.parse(localStorage.getItem("cart_local") || "[]");
     const res = await api.get<Cart>("/cart/owned");
+    setCart(res.data.cartItems);
 
-    const cartItems = res.data.cartItems;
-
-    const mergedCart = [...cartItems, ...cart_local].reduce<CartItem[]>(
-      (acc, item) => {
-        const exist = acc.find((i) => i.product.id === item.product.id);
-        if (exist) {
-          exist.quantity += item.quantity;
-        } else {
-          acc.push({ ...item });
-        }
-        return acc;
-      },
-      []
-    );
-    saveToLocal(mergedCart);
-    setCart(mergedCart);
-    setIsCartLoading(false);
     return res.data;
   }
 

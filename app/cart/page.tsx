@@ -43,13 +43,11 @@ export default function CartPage() {
   const total = useMemo(() => {
     return cart.length > 0
       ? cart
-          .filter((item) =>
-            selected.some((s) => s.slug === item.product.slug)
-          )
+          .filter((item) => selected.some((s) => s.slug === item.product.slug))
           .reduce((sum, item) => sum + item.price * item.quantity, 0)
       : 0;
   }, [cart, selected]);
-  
+
   // Hàm kiểm tra đã chọn hết chưa
   const allSelected = cart.length > 0 && selected.length === cart.length;
   const handleSelectAll = () => {
@@ -72,7 +70,7 @@ export default function CartPage() {
             <p className="text-muted">
               Bạn đang có {cart.length || 0} sản phẩm trong giỏ hàng
             </p>
-            {isCartLoading && (
+            {isCartLoading && cart.length < 1 && (
               <div className="alert alert-warning mt-4">
                 Đang tải giỏ hàng...
               </div>
@@ -99,7 +97,7 @@ export default function CartPage() {
                   </label>
                 </div>
                 {/* Hiển thị tối đa 5 sản phẩm, nếu nhiều hơn thì có nút xem tất cả */}
-                {(showAll ? cart : cart.slice(0, 5)).map((item, idx) => (
+                {(showAll ? cart : cart.slice(0, 10)).map((item, idx) => (
                   <div
                     className="card mb-3 border-0 border-bottom rounded-0 pb-3"
                     key={item.product.id + "-" + idx}
@@ -158,10 +156,7 @@ export default function CartPage() {
                             disabled={item.quantity <= 1}
                             onClick={() => {
                               if (item.quantity > 1) {
-                                updateQuantity(
-                                  item.product.slug,
-                                  item.quantity - 1
-                                );
+                                updateQuantity(item.product.id, "decrease");
                               }
                             }}
                           >
@@ -170,21 +165,19 @@ export default function CartPage() {
                           <input
                             type="number"
                             className="form-control text-center"
-                            value={item.quantity}
+                            value={String(item.quantity)}
                             min="1"
-                            max="999"
                             onChange={(e) => {
-                              const newQuantity = parseInt(e.target.value) || 1;
-                              if (newQuantity >= 1 && newQuantity <= 999) {
-                                updateQuantity(item.product.slug, newQuantity);
-                              }
-                            }}
-                            onBlur={(e) => {
-                              const newQuantity = parseInt(e.target.value) || 1;
-                              if (newQuantity < 1) {
-                                updateQuantity(item.product.slug, 1);
-                              } else if (newQuantity > 999) {
-                                updateQuantity(item.product.slug, 999);
+                              const newQuantity = parseInt(e.target.value) || 0;
+
+                              if (newQuantity >= 1) {
+                                updateQuantity(
+                                  item.product.id,
+                                  "update",
+                                  newQuantity
+                                );
+                              } else {
+                                e.target.value = String(item.quantity);
                               }
                             }}
                           />
@@ -196,10 +189,7 @@ export default function CartPage() {
                             disabled={item.quantity >= 999}
                             onClick={() => {
                               if (item.quantity < 999) {
-                                updateQuantity(
-                                  item.product.slug,
-                                  item.quantity + 1
-                                );
+                                updateQuantity(item.product.id, "increase");
                               }
                             }}
                           >
@@ -210,7 +200,7 @@ export default function CartPage() {
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.product.slug)}
+                          onClick={() => removeFromCart(item.product.id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa
@@ -272,18 +262,19 @@ export default function CartPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cart.length>0 && cart
-                      .filter((item) =>
-                        selected.some((s) => s.slug === item.product.slug)
-                      )
-                      .map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.product.name}</td>
-                          <td className="text-end">
-                            {item.price.toLocaleString("vi-VN")}₫
-                          </td>
-                        </tr>
-                      ))}
+                    {cart.length > 0 &&
+                      cart
+                        .filter((item) =>
+                          selected.some((s) => s.slug === item.product.slug)
+                        )
+                        .map((item) => (
+                          <tr key={item.id}>
+                            <td>{item.product.name}</td>
+                            <td className="text-end">
+                              {item.price.toLocaleString("vi-VN")}₫
+                            </td>
+                          </tr>
+                        ))}
                   </tbody>
                 </table>
                 <div className="d-flex justify-content-between">
@@ -312,16 +303,7 @@ export default function CartPage() {
                   aria-disabled={selected.length === 0}
                   disabled={selected.length === 0}
                   onClick={() => {
-                    if (selected.length === 0) return;
-                    // Lưu danh sách sản phẩm đã chọn vào localStorage
-                    const selectedItems = cart.filter((item) =>
-                      selected.some((s) => s.slug === item.product.slug)
-                    );
-                    localStorage.setItem(
-                      "cart_selected",
-                      JSON.stringify(selectedItems)
-                    );
-                    window.location.href = "/checkout";
+                    console.log(cart);
                   }}
                 >
                   THANH TOÁN
