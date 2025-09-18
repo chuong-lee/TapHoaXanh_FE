@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import api from "@/lib/axios";
 import Image from "next/image";
-import { Product } from "@/types";
+import { Product, ProductImages, Rating } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -25,6 +25,8 @@ export default function ProductDetailPage() {
   const slug = params.slug as string;
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
+  const [productImages, setProductImages] = useState<ProductImages[]>([]);
+
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { profile } = useAuth();
@@ -33,6 +35,11 @@ export default function ProductDetailPage() {
     "desc"
   );
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [mainImage, setMainImage] = useState<string>(
+    product?.images || "" // fallback ảnh chính
+  );
+
+  const [rating, setRating] = useState<Rating[]>([]);
 
   // Lấy chi tiết sản phẩm theo slug
   useEffect(() => {
@@ -48,6 +55,7 @@ export default function ProductDetailPage() {
         if (res.data) {
           setProduct(res.data);
           // Reset quantity về 1 khi load sản phẩm mới
+          setMainImage(res.data.images); // đặt ảnh chính
           setQuantity(1);
         } else {
           console.log("Không tìm thấy sản phẩm với slug:", slug);
@@ -92,6 +100,32 @@ export default function ProductDetailPage() {
     fetchRelated();
   }, [slug, product]);
 
+  useEffect(() => {
+    const fetchProductImages = async () => {
+      try {
+        if (!product?.id) return;
+        const response = await api.get(
+          `/product-images/by-product/${product.id}`
+        );
+        setProductImages(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProductImages();
+
+    const fetchRatingByProductId = async () => {
+      try {
+        if (!product?.id) return;
+        const response = await api.get(`/rating/by-product/${product.id}`);
+        setRating(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchRatingByProductId();
+  }, [product?.id]);
+
   if (loading) return <p>Đang tải sản phẩm...</p>;
   if (!product)
     return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>;
@@ -102,6 +136,22 @@ export default function ProductDetailPage() {
     return finalPrice;
   };
   const totalPrice = getProductPrice() * quantity;
+
+  function formatDateTime(isoString: string): { date: string; time: string } {
+    const date = new Date(isoString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return {
+      date: `${day}/${month}/${year}`,
+      time: `${hours}:${minutes}`,
+    };
+  }
 
   return (
     <div className="container main-content py-4" style={{ marginTop: 100 }}>
@@ -141,15 +191,44 @@ export default function ProductDetailPage() {
         <div className="col-md-5">
           <div className="border rounded p-2 bg-white">
             <Image
-              src={product.images}
-              alt={product.name}
+              src={mainImage} // dùng ảnh chính
+              alt={product?.name || "Sản phẩm"}
               width={400}
               height={400}
               className="object-fit-cover rounded w-100"
             />
           </div>
-          <div className="d-flex gap-2 mt-3"></div>
+
+          <div
+            className="d-flex gap-2 mt-3 overflow-auto"
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
+            {productImages.length > 0 &&
+              productImages.map((img, idx) => (
+                <Image
+                  key={idx}
+                  src={img.image_url}
+                  alt={`Ảnh ${idx + 1}`}
+                  width={120}
+                  height={120}
+                  className={`product-thumb rounded ${
+                    mainImage === img.image_url ? "selected" : ""
+                  }`}
+                  style={{
+                    cursor: "pointer",
+                    border:
+                      mainImage === img.image_url
+                        ? "2px solid #4caf50"
+                        : "1px solid #ddd",
+                  }}
+                  onClick={() => setMainImage(img.image_url)} // click đổi ảnh
+                />
+              ))}
+          </div>
         </div>
+
         {/* Right: Product Info & Purchase Card */}
         <div className="col-md-7">
           <div className="row">
@@ -500,43 +579,36 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <b>Đánh giá sản phẩm này</b>
-                  <div>Hãy cho mọi người biết cảm nhận của bạn</div>
-                  <button className="btn btn-outline-primary mt-2 w-100">
-                    Viết đánh giá
-                  </button>
-                </div>
               </div>
               {/* Danh sách bình luận */}
-              <div className="col-md-7">
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Nguyễn Văn A</b>{" "}
-                  <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">
-                    Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng.
-                    Tôi sẽ cân nhắc kỹ hơn lần sau.
-                  </div>
-                </div>
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Trần Thị B</b>{" "}
-                  <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">
-                    Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng.
-                    Tôi sẽ cân nhắc kỹ hơn lần sau.
-                  </div>
-                </div>
-                <div className="border rounded p-3 mb-2">
-                  <b className="text-danger">Lê Văn C</b>{" "}
-                  <span className="text-muted ms-2">29/09/2023 18:40</span>
-                  <span className="float-end fw-bold">4.0</span>
-                  <div className="mt-2">
-                    Sản phẩm không tốt như mong đợi, chất lượng kém, nhanh hỏng.
-                    Tôi sẽ cân nhắc kỹ hơn lần sau.
-                  </div>
-                </div>
+
+              <div
+                className="col-md-7"
+                style={{
+                  maxHeight: "400px", // chiều cao tối đa, có thể chỉnh
+                  overflowY: "auto", // cho phép scroll dọc
+                }}
+              >
+                {rating.length > 0 &&
+                  rating.map((item) => {
+                    const { date, time } = formatDateTime(item.createdAt);
+
+                    return (
+                      <div
+                        className="border rounded p-3 mb-2"
+                        key={item.ratingId}
+                      >
+                        <b className="text-danger">{item.userName || "abc"}</b>{" "}
+                        <span className="text-muted ms-2">
+                          {date} {time}
+                        </span>
+                        <span className="float-end fw-bold text-warning">
+                          {item.rating}★
+                        </span>
+                        <div className="mt-2">{item.comment}</div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
