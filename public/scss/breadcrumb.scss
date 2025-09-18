@@ -6,6 +6,9 @@
   position: relative;
   overflow: hidden;
  
+  // Animation for page load
+  animation: fadeInUp 0.6s ease-out;
+  
   // Background overlay for better text readability
   &::before {
     content: '';
@@ -94,8 +97,7 @@
     }
   }
   
-  // Animation for page load
-  animation: fadeInUp 0.6s ease-out;
+  
   
   @keyframes fadeInUp {
     from {

@@ -13,8 +13,20 @@ export type Voucher = {
 
 export type News = {
   id: string;
-  title: string;
-  image: string;
+  name: string;
+  images: string[];
+  date: string;
+  views: number;
+  readTime: string;
+  description: string;
+  type: string;
+  createdAt: string;
+};
+
+export type RelatedNews = {
+  id: string;
+  name: string;
+  images: string[];
   date: string;
   views: number;
   readTime: string;
