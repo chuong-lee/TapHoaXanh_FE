@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useRef, FormEvent } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
-import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
+import { FormEvent, useRef, useState } from 'react'
 
 
 
@@ -16,9 +15,6 @@ function RegisterForm() {
   const passwordRef = useRef<HTMLInputElement>(null)
   const confirmPasswordRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/'
-  const { refreshProfile } = useAuth();
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();

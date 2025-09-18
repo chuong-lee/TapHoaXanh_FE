@@ -13,8 +13,20 @@ export type Voucher = {
 
 export type News = {
   id: string;
-  title: string;
-  image: string;
+  name: string;
+  images: string[];
+  date: string;
+  views: number;
+  readTime: string;
+  description: string;
+  type: string;
+  createdAt: string;
+};
+
+export type RelatedNews = {
+  id: string;
+  name: string;
+  images: string[];
   date: string;
   views: number;
   readTime: string;
@@ -33,9 +45,6 @@ export interface Order {
 // Interface sản phẩm
 export interface Product {
   id: number;
-  // createdAt: string;
-  // updatedAt: string;
-  // deletedAt: string | null;
   name: string;
   price: number;
   quantity: number;
@@ -68,3 +77,18 @@ export interface Cart {
 }
 
 export type CartAction = "update" | "increase" | "decrease";
+
+export interface ProductImages {
+  id: number;
+  product_id: number;
+  image_url: string;
+}
+
+export interface Rating {
+  ratingId: number;
+  productName: string;
+  rating: number;
+  userName: string;
+  comment: string;
+  createdAt: string;
+}
