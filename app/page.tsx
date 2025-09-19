@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
+import { FaRegHeart } from "react-icons/fa";
 import Marquee from "./components/Marquee";
 
 interface Category {
@@ -34,7 +36,6 @@ export default function HomePage() {
   const [currentPage, _setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [categories, setCategories] = useState<Category[]>([]);
-  console.log("categories", categories);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,7 +53,6 @@ export default function HomePage() {
         } else {
           console.error("❌ Dữ liệu sản phẩm không hợp lệ:", data);
         }
-        console.log("Products loaded:", productList);
         setAllProducts(productList);
         setProducts(productList);
       } catch {
@@ -85,6 +85,17 @@ export default function HomePage() {
     router.push(`/product/${product.slug}`);
   };
 
+  const handleWishList = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: number
+  ) => {
+    e.preventDefault();
+    try {
+      await api.post("wishlist", { productId });
+    } catch (error) {
+      console.log("Lỗi", error);
+    }
+  };
   return (
     <>
       <Marquee />
@@ -446,7 +457,7 @@ export default function HomePage() {
                     )}
                     <div className="product-image">
                       <Image
-                        src={product.images}
+                        src={product.images || "images/thailan.jpeg"}
                         alt={product.name}
                         width={140}
                         height={140}
@@ -480,8 +491,16 @@ export default function HomePage() {
                           {(product.price + product.discount).toLocaleString()}₫
                         </span>
                       </div>
-                      <div className="product-rating">
-                        <span className="star">★</span> <span>4.0</span>
+                      <div className="d-flex align-items-center justify-content-between">
+                        <div className="product-rating">
+                          <span className="star">★</span> <span>5.0</span>
+                        </div>
+                        <Button
+                          className="d-flex align-items-center justify-content-center"
+                          onClick={(e) => handleWishList(e, product.id)}
+                        >
+                          <FaRegHeart size={24} />
+                        </Button>
                       </div>
                     </div>
                     <div style={{ height: 18 }}></div>
