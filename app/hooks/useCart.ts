@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from "react"
 import api from "../lib/axios"
+import { handleError } from "@/helpers/handleError"
 
 export type CartItem = {
   id: number
@@ -121,8 +122,8 @@ export function useCart() {
     try {
       await api.post("/api/cart/sync", cart)
       localStorage.removeItem("cart_local")
-    } catch (error) {
-      console.error("Sync giỏ hàng thất bại:", error)
+    } catch (error: unknown) {
+      handleError(error);
     }
   }
 

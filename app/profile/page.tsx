@@ -1,42 +1,53 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useReducer } from 'react';
-import Link from 'next/link';
-import { useAuth } from '../context/AuthContext';
-import { profileService } from '../lib/profileService';
-import { Tabs, Tab, Form } from 'react-bootstrap';
-import LogoutButton from '../components/logout';
-import Avatar from '../components/Avatar';
+import { useState, useRef, useEffect, useReducer } from "react";
+import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
+import { profileService } from "../lib/profileService";
+import { Tabs, Tab, Form } from "react-bootstrap";
+import LogoutButton from "../components/logout";
+import Avatar from "../components/Avatar";
+import AddressList from "../components/AddressList";
 
 export default function ProfilePage() {
   const { profile, setProfile, refreshProfile } = useAuth();
-  const [form, setForm] = useState({ name: profile?.name || '', phone: profile?.phone || '', email: profile?.email || '', image: profile?.image || '' });
+  const [form, setForm] = useState({
+    name: profile?.name || "",
+    phone: profile?.phone || "",
+    email: profile?.email || "",
+    image: profile?.image || "",
+  });
   const updateLoadingRef = useRef(false);
   const updateSuccessRef = useRef<string | null>(null);
   const updateErrorRef = useRef<string | null>(null);
 
   // Password change state
   const [passwordForm, setPasswordForm] = useState({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const passwordLoadingRef = useRef(false);
   const passwordSuccessRef = useRef<string | null>(null);
   const passwordErrorRef = useRef<string | null>(null);
 
-  // Avatar upload 
+  // Avatar upload
   const avatarFileRef = useRef<File | null>(null);
   const avatarLoadingRef = useRef(false);
   const avatarSuccessRef = useRef<string | null>(null);
   const avatarErrorRef = useRef<string | null>(null);
 
   // Force update function để trigger re-render khi cần
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   useEffect(() => {
     if (profile) {
-      setForm({ name: profile.name, phone: profile.phone, email: profile.email, image: profile.image });
+      setForm({
+        name: profile.name,
+        phone: profile.phone,
+        email: profile.email,
+        image: profile.image,
+      });
     }
   }, [profile]);
 
@@ -53,9 +64,9 @@ export default function ProfilePage() {
     try {
       const updated = await profileService.updateProfile(form);
       setProfile(updated);
-      updateSuccessRef.current = 'Thông tin đã được cập nhật!';
+      updateSuccessRef.current = "Thông tin đã được cập nhật!";
     } catch {
-      updateErrorRef.current = 'Cập nhật thông tin thất bại!';
+      updateErrorRef.current = "Cập nhật thông tin thất bại!";
     } finally {
       updateLoadingRef.current = false;
     }
@@ -72,7 +83,8 @@ export default function ProfilePage() {
     passwordSuccessRef.current = null;
     passwordErrorRef.current = null;
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      passwordErrorRef.current = 'Mật khẩu mới và mật khẩu xác nhận không khớp!';
+      passwordErrorRef.current =
+        "Mật khẩu mới và mật khẩu xác nhận không khớp!";
       passwordLoadingRef.current = false;
       return;
     }
@@ -82,11 +94,15 @@ export default function ProfilePage() {
         newPassword: passwordForm.newPassword,
         confirmPassword: passwordForm.confirmPassword,
       });
-      passwordSuccessRef.current = 'Mật khẩu đã được cập nhật!';
-      setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      passwordSuccessRef.current = "Mật khẩu đã được cập nhật!";
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
       refreshProfile();
     } catch {
-      passwordErrorRef.current = 'Cập nhật mật khẩu thất bại!';
+      passwordErrorRef.current = "Cập nhật mật khẩu thất bại!";
     } finally {
       passwordLoadingRef.current = false;
     }
@@ -99,7 +115,7 @@ export default function ProfilePage() {
       avatarFileRef.current = file;
       avatarErrorRef.current = null;
       avatarSuccessRef.current = null;
-      
+
       // Tự động upload ngay lập tức
       await handleAvatarUpload();
     }
@@ -108,44 +124,43 @@ export default function ProfilePage() {
   // Handle avatar upload
   const handleAvatarUpload = async () => {
     if (!avatarFileRef.current) return;
-    
+
     avatarLoadingRef.current = true;
     avatarErrorRef.current = null;
     avatarSuccessRef.current = null;
-    
+
     try {
       const result = await profileService.uploadAvatar(avatarFileRef.current);
-      
+
       // Cập nhật profile với avatar mới
       if (profile) {
-        const updatedProfile = { 
-          name: profile.name, 
-          phone: profile.phone, 
-          email: profile.email, 
-          image: result.imageUrl 
+        const updatedProfile = {
+          name: profile.name,
+          phone: profile.phone,
+          email: profile.email,
+          image: result.imageUrl,
         };
         setProfile(updatedProfile);
-        setForm(prev => ({ ...prev, image: result.imageUrl }));
+        setForm((prev) => ({ ...prev, image: result.imageUrl }));
       }
-      
+
       avatarSuccessRef.current = result.message;
       avatarFileRef.current = null;
-      
+
       // Reset input file
-      const fileInput = document.getElementById('avatar-input') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
-      
+      const fileInput = document.getElementById(
+        "avatar-input"
+      ) as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
     } catch {
-      avatarErrorRef.current = 'Upload avatar thất bại. Vui lòng thử lại.';
+      avatarErrorRef.current = "Upload avatar thất bại. Vui lòng thử lại.";
     } finally {
       avatarLoadingRef.current = false;
       forceUpdate();
     }
   };
 
-  useEffect(() => {
-    refreshProfile()
-  }, [refreshProfile])
+  // Removed unnecessary useEffect that was causing infinite re-renders
 
   if (!profile) return <div className="container py-5">Loading...</div>;
 
@@ -161,138 +176,124 @@ export default function ProfilePage() {
           </div>
           <div className="row">
             <div className="col-lg-12">
-              <Tabs defaultActiveKey="personal" id="profile-tabs" className="mb-3" fill>
+              <Tabs
+                defaultActiveKey="personal"
+                id="profile-tabs"
+                className="mb-3"
+                fill
+              >
                 <Tab eventKey="personal" title="Thông tin cá nhân">
                   <div className="profile-section">
                     <div className="profile-header d-flex align-items-center mb-4">
                       <div className="profile-image position-relative">
-                        <Avatar image={form.image} name={form.name} size={100} />
+                        <Avatar
+                          image={form.image}
+                          name={form.name}
+                          size={100}
+                        />
                         {/* <div className="edit-icon"><i className="fas fa-edit"></i></div> */}
                       </div>
-                                              <div className="avatar-upload-section ms-4">
-                          <div className="mb-3">
-                            <label htmlFor="avatar-input" className="form-label">Thay đổi avatar</label>
-                            <input
-                              type="file"
-                              id="avatar-input"
-                              className="form-control"
-                              accept="image/*"
-                              onChange={handleAvatarChange}
-                            />
-                          </div>
-                          {avatarLoadingRef.current && (
-                            <div className="text-info mt-2">Đang upload avatar...</div>
-                          )}
-                          {avatarSuccessRef.current && (
-                            <div className="text-success mt-2">{avatarSuccessRef.current}</div>
-                          )}
-                          {avatarErrorRef.current && (
-                            <div className="text-danger mt-2">{avatarErrorRef.current}</div>
-                          )}
+                      <div className="avatar-upload-section ms-4">
+                        <div className="mb-3">
+                          <label htmlFor="avatar-input" className="form-label">
+                            Thay đổi avatar
+                          </label>
+                          <input
+                            type="file"
+                            id="avatar-input"
+                            className="form-control"
+                            accept="image/*"
+                            onChange={handleAvatarChange}
+                          />
                         </div>
+                        {avatarLoadingRef.current && (
+                          <div className="text-info mt-2">
+                            Đang upload avatar...
+                          </div>
+                        )}
+                        {avatarSuccessRef.current && (
+                          <div className="text-success mt-2">
+                            {avatarSuccessRef.current}
+                          </div>
+                        )}
+                        {avatarErrorRef.current && (
+                          <div className="text-danger mt-2">
+                            {avatarErrorRef.current}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <form className="profile-form" id="profile-form" onSubmit={handleSubmit}>
+                    <form
+                      className="profile-form"
+                      id="profile-form"
+                      onSubmit={handleSubmit}
+                    >
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="name">Tên người dùng</label>
-                        <input className="form-control" id="name" type="text" value={form.name} onChange={handleChange} required />
+                        <label className="form-label" htmlFor="name">
+                          Tên người dùng
+                        </label>
+                        <input
+                          className="form-control"
+                          id="name"
+                          type="text"
+                          value={form.name}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="email">Địa chỉ email<span className="text-danger">*</span></label>
-                        <Form.Control type="email" id="email" value={form.email} onChange={handleChange} disabled />
+                        <label className="form-label" htmlFor="email">
+                          Địa chỉ email<span className="text-danger">*</span>
+                        </label>
+                        <Form.Control
+                          type="email"
+                          id="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          disabled
+                        />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="phone">Số điện thoại</label>
-                        <input className="form-control" id="phone" type="tel" value={form.phone} onChange={handleChange} required />
+                        <label className="form-label" htmlFor="phone">
+                          Số điện thoại
+                        </label>
+                        <input
+                          className="form-control"
+                          id="phone"
+                          type="tel"
+                          value={form.phone}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
                       <div className="mt-4">
-                        <button className="btn btn-warning" type="submit" disabled={updateLoadingRef.current}>{updateLoadingRef.current ? 'Updating...' : 'Thay đổi thông tin'}</button>
+                        <button
+                          className="btn btn-warning"
+                          type="submit"
+                          disabled={updateLoadingRef.current}
+                        >
+                          {updateLoadingRef.current
+                            ? "Updating..."
+                            : "Thay đổi thông tin"}
+                        </button>
                       </div>
-                      {updateSuccessRef.current && <div className="text-success mt-2">{updateSuccessRef.current}</div>}
-                      {updateErrorRef.current && <div className="text-danger mt-2">{updateErrorRef.current}</div>}
+                      {updateSuccessRef.current && (
+                        <div className="text-success mt-2">
+                          {updateSuccessRef.current}
+                        </div>
+                      )}
+                      {updateErrorRef.current && (
+                        <div className="text-danger mt-2">
+                          {updateErrorRef.current}
+                        </div>
+                      )}
                     </form>
                   </div>
                 </Tab>
                 <Tab eventKey="addresses" title="Địa chỉ giao hàng">
-                  <div className="address-list">
-                    <div className="address-item">
-                      <div className="address-info">
-                        <h3 className="name">Bessie Cooper</h3>
-                        <p className="address">2464 Royal Ln, Mesa, New Jersey 45463</p>
-                      </div>
-                      <div className="address-actions">
-                        <div className="address-actions">
-                          <button className="btn edit-btn text-success" type="button">Edit</button>
-                          <button className="btn delete-btn text-danger" type="button">Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="address-item">
-                      <div className="address-info">
-                        <h3 className="name">Bessie Cooper</h3>
-                        <p className="address">2464 Royal Ln, Mesa, New Jersey 45463</p>
-                      </div>
-                      <div className="address-actions">
-                        <button className="btn edit-btn text-success" type="button">Edit</button>
-                        <button className="btn delete-btn text-danger" type="button">Delete</button>
-                      </div>
-                    </div>
-                    <div className="add-address">
-                      <h2 className="section-title">Add New Address</h2>
-                      <form className="address-form">
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label htmlFor="firstName">First Name</label><span className="required">*</span>
-                            <input id="firstName" type="text" placeholder="Ex: John" required />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="lastName">Last Name</label><span className="required">*</span>
-                            <input id="lastName" type="text" placeholder="Ex: Doe" required />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="company">Company Name</label><span className="optional">(Optional)</span>
-                            <input id="company" type="text" placeholder="Enter Company Name" />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="country">Country</label><span className="required">*</span>
-                            <select id="country" required>
-                              <option value="">Select Country</option>
-                            </select>
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="street">Street address</label><span className="required">*</span>
-                            <input id="street" type="text" placeholder="Enter Street Address" required />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="city">City</label><span className="required">*</span>
-                            <select id="city" required>
-                              <option value="">Select City</option>
-                            </select>
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="state">State</label><span className="required">*</span>
-                            <select id="state" required>
-                              <option value="">Select State</option>
-                            </select>
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="zipCode">Zip Code</label><span className="required">*</span>
-                            <input id="zipCode" type="text" placeholder="Enter Zip Code" required />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="phone">Phone</label><span className="required">*</span>
-                            <input id="phone" type="tel" placeholder="Enter Phone Number" required />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="email">Email</label><span className="required">*</span>
-                            <input id="email" type="email" placeholder="Enter Email Address" required />
-                          </div>
-                          <button className="add-address-btn" type="submit">Add address</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
+                  <AddressList />
                 </Tab>
-                <Tab eventKey="orders" title="Thông tin đơn hàng">
+                {/* <Tab eventKey="orders" title="Thông tin đơn hàng">
                   <h2>Orders</h2>
                   <div className="table-container">
                     <table className="order-table">
@@ -323,9 +324,9 @@ export default function ProfilePage() {
                       <button className="cancel-order-btn">Cancel Order</button>
                     </div>
                   </div>
-                </Tab>
-                <Tab eventKey="payments" title="Phương thức thanh toán">
-                  {/* <div className="payment-methods">
+                </Tab> */}
+                {/* <Tab eventKey="payments" title="Phương thức thanh toán">
+                  <div className="payment-methods">
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="paypal" defaultChecked />
                       <label className="label-name" htmlFor="paypal"><Image className="img-icon" src="/client/images/paypal.jpg" alt="Paypal" width={24} height={24} />Paypal</label>
@@ -371,27 +372,78 @@ export default function ProfilePage() {
                       </div>
                       <button className="add-card-btn">Add Card</button>
                     </div>
-                  </div> */}
-                </Tab>
+                  </div>
+                </Tab> */}
                 <Tab eventKey="password" title="Đổi mật khẩu">
-                  <div className="change-password-form card p-4 shadow-sm" style={{ maxWidth: 400, margin: '0 auto' }}>
-                    <h4 className="change-password-title mb-4 text-center">Đổi mật khẩu</h4>
+                  <div
+                    className="change-password-form card p-4 shadow-sm"
+                    style={{ maxWidth: 400, margin: "0 auto" }}
+                  >
+                    <h4 className="change-password-title mb-4 text-center">
+                      Đổi mật khẩu
+                    </h4>
                     <form onSubmit={handlePasswordSubmit}>
                       <div className="form-group mb-3">
-                        <label htmlFor="oldPassword" className="form-label">Mật khẩu cũ</label>
-                        <input id="oldPassword" className="form-control" type="password" placeholder="Nhập mật khẩu cũ" required value={passwordForm.oldPassword} onChange={handlePasswordChange} />
+                        <label htmlFor="oldPassword" className="form-label">
+                          Mật khẩu cũ
+                        </label>
+                        <input
+                          id="oldPassword"
+                          className="form-control"
+                          type="password"
+                          placeholder="Nhập mật khẩu cũ"
+                          required
+                          value={passwordForm.oldPassword}
+                          onChange={handlePasswordChange}
+                        />
                       </div>
                       <div className="form-group mb-3">
-                        <label htmlFor="newPassword" className="form-label">Mật khẩu mới</label>
-                        <input id="newPassword" className="form-control" type="password" placeholder="Nhập mật khẩu mới" required value={passwordForm.newPassword} onChange={handlePasswordChange} />
+                        <label htmlFor="newPassword" className="form-label">
+                          Mật khẩu mới
+                        </label>
+                        <input
+                          id="newPassword"
+                          className="form-control"
+                          type="password"
+                          placeholder="Nhập mật khẩu mới"
+                          required
+                          value={passwordForm.newPassword}
+                          onChange={handlePasswordChange}
+                        />
                       </div>
                       <div className="form-group mb-4">
-                        <label htmlFor="confirmPassword" className="form-label">Xác nhận mật khẩu mới</label>
-                        <input id="confirmPassword" className="form-control" type="password" placeholder="Nhập lại mật khẩu mới" required value={passwordForm.confirmPassword} onChange={handlePasswordChange} />
+                        <label htmlFor="confirmPassword" className="form-label">
+                          Xác nhận mật khẩu mới
+                        </label>
+                        <input
+                          id="confirmPassword"
+                          className="form-control"
+                          type="password"
+                          placeholder="Nhập lại mật khẩu mới"
+                          required
+                          value={passwordForm.confirmPassword}
+                          onChange={handlePasswordChange}
+                        />
                       </div>
-                      <button className="btn btn-success w-100 change-password-btn" type="submit" disabled={passwordLoadingRef.current}>{passwordLoadingRef.current ? 'Đang cập nhật...' : 'Đổi mật khẩu'}</button>
-                      {passwordSuccessRef.current && <div className="text-success mt-3 text-center">{passwordSuccessRef.current}</div>}
-                      {passwordErrorRef.current && <div className="text-danger mt-3 text-center">{passwordErrorRef.current}</div>}
+                      <button
+                        className="btn btn-success w-100 change-password-btn"
+                        type="submit"
+                        disabled={passwordLoadingRef.current}
+                      >
+                        {passwordLoadingRef.current
+                          ? "Đang cập nhật..."
+                          : "Đổi mật khẩu"}
+                      </button>
+                      {passwordSuccessRef.current && (
+                        <div className="text-success mt-3 text-center">
+                          {passwordSuccessRef.current}
+                        </div>
+                      )}
+                      {passwordErrorRef.current && (
+                        <div className="text-danger mt-3 text-center">
+                          {passwordErrorRef.current}
+                        </div>
+                      )}
                     </form>
                   </div>
                 </Tab>

@@ -58,7 +58,7 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Nếu refresh thất bại, xóa token và chuyển về trang login
+        // refresh thất bại sẽ xóa token và chuyển về trang login
         localStorage.removeItem('access_token');
         if (window.location.pathname !== '/login') window.location.href = '/login';
         

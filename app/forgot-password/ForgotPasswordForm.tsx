@@ -3,6 +3,8 @@
 import { useState, useRef, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/axios'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -28,10 +30,15 @@ function ForgotPasswordForm() {
       setTimeout(() => {
         router.push('/login');
       }, 3000);
-    } catch (err) {
-      const error = err as Error & { response?: { data?: { message?: string } } };
-      console.error(error);
-      setError(error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+    } catch (error: unknown) {
+      const messages = "An unknown error occurred";
+
+      if (axios.isAxiosError(error)) {
+        return error.response?.data?.message;
+      }
+      toast(messages, {
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }

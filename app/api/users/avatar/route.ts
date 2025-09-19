@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { handleError } from '@/helpers/handleError';
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,8 +63,8 @@ export async function POST(request: NextRequest) {
       message: 'Avatar đã được upload thành công!'
     });
 
-  } catch (error) {
-    console.error('Upload avatar error:', error);
+  } catch (error: unknown) {
+    handleError(error);
     return NextResponse.json(
       { error: 'Lỗi server khi upload avatar' },
       { status: 500 }

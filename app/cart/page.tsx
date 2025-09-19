@@ -1,6 +1,7 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { CartItem } from "@/types";
 import Image from "next/image";
 import { useState, useMemo } from "react";
 
@@ -21,20 +22,41 @@ function fixImgSrc(src: string | undefined | null): string {
 }
 
 export default function CartPage() {
-  const { isCartLoading, cart, updateQuantity, removeFromCart } = useCart();
-
-  // State lưu danh sách slug sản phẩm được chọn
-  const [selected, setSelected] = useState<{ slug: string }[]>([]);
+  const {
+    isCartLoading,
+    cart,
+    updateQuantity,
+    removeFromCart,
+    removeMultipleFromCart,
+  } = useCart();
+  const [selected, setSelected] = useState<CartItem[]>([]);
   const [showAll, setShowAll] = useState(false);
-
-  // Hàm xử lý chọn/bỏ chọn sản phẩm
-  const handleSelect = (slug: string) => {
+  const router = useRouter();
+  const handleSelect = (cartItem: CartItem) => {
     setSelected((prev) => {
-      const exists = prev.some((s) => s.slug === slug);
+      const exists = prev.some(
+        (itemsSelected) => itemsSelected.product.id === cartItem.product.id
+      );
       if (exists) {
-        return prev.filter((s) => !(s.slug === slug));
+        localStorage.setItem(
+          "cart_selected",
+          JSON.stringify(
+            prev.filter(
+              (itemsSelected) =>
+                itemsSelected.product.id !== cartItem.product.id
+            )
+          )
+        );
+        return prev.filter(
+          (itemsSelected) => itemsSelected.product.id !== cartItem.product.id
+        );
       } else {
-        return [...prev, { slug }];
+        localStorage.setItem(
+          "cart_selected",
+          JSON.stringify([...prev, cartItem])
+        );
+
+        return [...prev, cartItem];
       }
     });
   };
@@ -43,7 +65,11 @@ export default function CartPage() {
   const total = useMemo(() => {
     return cart.length > 0
       ? cart
-          .filter((item) => selected.some((s) => s.slug === item.product.slug))
+          .filter((item) =>
+            selected.some(
+              (itemsSelected) => itemsSelected.product.id === item.product.id
+            )
+          )
           .reduce((sum, item) => sum + item.price * item.quantity, 0)
       : 0;
   }, [cart, selected]);
@@ -51,13 +77,12 @@ export default function CartPage() {
   // Hàm kiểm tra đã chọn hết chưa
   const allSelected = cart.length > 0 && selected.length === cart.length;
   const handleSelectAll = () => {
-    if (allSelected) setSelected([]);
-    else
-      setSelected(
-        cart.map((item) => ({
-          slug: item.product.slug,
-        }))
-      );
+    if (allSelected) {
+      localStorage.setItem("cart_selected", JSON.stringify([]));
+    } else {
+      localStorage.setItem("cart_selected", JSON.stringify(cart));
+      setSelected(cart);
+    }
   };
 
   return (
@@ -83,8 +108,7 @@ export default function CartPage() {
 
             {cart.length > 0 && !isCartLoading && (
               <>
-                {/* Chọn tất cả */}
-                <div className="form-check mb-2">
+                <div className="d-flex align-items-center gap-2 items-center form-check mb-4">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -95,6 +119,19 @@ export default function CartPage() {
                   <label className="form-check-label" htmlFor="select-all">
                     Chọn tất cả
                   </label>
+                  <div
+                    style={{
+                      marginLeft: "auto",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                    }}
+                    className="text-danger"
+                    onClick={() => {
+                      removeMultipleFromCart(cart.map((item) => item.id));
+                    }}
+                  >
+                    Xóa tất cả
+                  </div>
                 </div>
                 {/* Hiển thị tối đa 5 sản phẩm, nếu nhiều hơn thì có nút xem tất cả */}
                 {(showAll ? cart : cart.slice(0, 10)).map((item, idx) => (
@@ -108,9 +145,10 @@ export default function CartPage() {
                           type="checkbox"
                           className="form-check-input"
                           checked={selected.some(
-                            (s) => s.slug === item.product.slug
+                            (itemsSelected) =>
+                              itemsSelected.product.id === item.product.id
                           )}
-                          onChange={() => handleSelect(item.product.slug)}
+                          onChange={() => handleSelect(item)}
                         />
                       </div>
                       <div className="col-md-2 text-center">
@@ -134,9 +172,6 @@ export default function CartPage() {
                           >
                             {item.product.name}
                           </h6>
-                          <p className="card-text text-muted small">
-                            (Hộp 500g)
-                          </p>
                           <p className="card-text fw-bold">
                             {(
                               item.product.price *
@@ -156,7 +191,11 @@ export default function CartPage() {
                             disabled={item.quantity <= 1}
                             onClick={() => {
                               if (item.quantity > 1) {
-                                updateQuantity(item.product.id, "decrease");
+                                updateQuantity(
+                                  item.product.id,
+                                  "decrease",
+                                  item.quantity - 1
+                                );
                               }
                             }}
                           >
@@ -189,7 +228,11 @@ export default function CartPage() {
                             disabled={item.quantity >= 999}
                             onClick={() => {
                               if (item.quantity < 999) {
-                                updateQuantity(item.product.id, "increase");
+                                updateQuantity(
+                                  item.product.id,
+                                  "increase",
+                                  item.quantity + 1
+                                );
                               }
                             }}
                           >
@@ -265,13 +308,17 @@ export default function CartPage() {
                     {cart.length > 0 &&
                       cart
                         .filter((item) =>
-                          selected.some((s) => s.slug === item.product.slug)
+                          selected?.some(
+                            (itemsSelected) =>
+                              itemsSelected.product.id === item.product.id
+                          )
                         )
                         .map((item) => (
                           <tr key={item.id}>
                             <td>{item.product.name}</td>
                             <td className="text-end">
-                              {item.price.toLocaleString("vi-VN")}₫
+                              {item.price?.toLocaleString("vi-VN")}₫ (x
+                              {item.quantity})
                             </td>
                           </tr>
                         ))}
@@ -299,11 +346,11 @@ export default function CartPage() {
                     border: "none",
                     fontWeight: 600,
                   }}
-                  tabIndex={selected.length === 0 ? -1 : 0}
-                  aria-disabled={selected.length === 0}
-                  disabled={selected.length === 0}
+                  // tabIndex={selected.length === 0 ? -1 : 0}
+                  // aria-disabled={selected.length === 0}
+                  // disabled={selected.length === 0}
                   onClick={() => {
-                    console.log(cart);
+                    router.push("/checkout");
                   }}
                 >
                   THANH TOÁN
