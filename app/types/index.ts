@@ -4,11 +4,11 @@ export type Voucher = {
   max_discount: number;
   min_order_value: number;
   quantity: number;
-  is_used: number;
   start_date: string;
   end_date: string;
-  description?: string;
-  image?: string; // Thêm trường image
+  is_used: boolean;
+  type?: "PERCENTAGE" | "NORMAL";
+  value?: number;
 };
 
 export type News = {
@@ -35,11 +35,34 @@ export type RelatedNews = {
   createdAt: string;
 };
 
+export interface OrderItem {
+  id: number;
+  quantity: number;
+  unit_price: number;
+  product: Product;
+}
+
+export interface Payment {
+  id: number;
+  createdAt: string; // hoặc Date nếu bạn parse
+  updatedAt: string;
+  deletedAt?: string | null; // có thể null nếu chưa xoá
+  payment_method: string;
+  status: string;
+  amount: number;
+  txn_ref: string;
+  order_id: number;
+}
 export interface Order {
   id: number;
   createdAt: string | null;
-  price: number | null;
-  status: "chờ xử lý" | "đã xác nhận" | "đang giao" | "đã giao" | "đã hủy";
+  // price: number | null;
+  total_price: number;
+  order_code: string;
+  status: "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
+  orderItem: OrderItem[];
+  voucher: Voucher[] | null;
+  payments: Payment[];
 }
 
 // Interface sản phẩm
@@ -91,4 +114,29 @@ export interface Rating {
   userName: string;
   comment: string;
   createdAt: string;
+}
+// Address types
+export interface Address {
+  id: number;
+  street: string;
+  city: string;
+  district: string;
+  is_default: boolean;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAddressDto {
+  street: string;
+  city: string;
+  district: string;
+  is_default: boolean;
+}
+
+export interface UpdateAddressDto {
+  street?: string;
+  city?: string;
+  district?: string;
+  is_default?: boolean;
 }

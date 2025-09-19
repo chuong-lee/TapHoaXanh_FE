@@ -195,7 +195,7 @@ export default function ProductDetailPage() {
               alt={product?.name || "Sản phẩm"}
               width={400}
               height={400}
-              className="object-fit-cover rounded w-100"
+              className="object-fit-contain rounded w-100"
             />
           </div>
 

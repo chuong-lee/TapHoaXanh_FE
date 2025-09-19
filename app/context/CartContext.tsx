@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "react-toastify";
+
 import {
   Dispatch,
   SetStateAction,
@@ -14,7 +14,8 @@ import { Cart, CartAction, CartItem, Product } from "@/types";
 import api from "@/lib/axios";
 import { useAuth } from "./AuthContext";
 import debounce from "lodash.debounce";
-import axios from "axios";
+
+import { handleError } from "@/helpers/handleError";
 
 interface CartContextType {
   addToCart: (product: Product, quantity?: number) => void;
@@ -22,6 +23,7 @@ interface CartContextType {
   updateQuantity: (id: number, action: CartAction, quantity?: number) => void;
   removeFromCart: (id: number) => Promise<void>;
   isCartLoading: boolean;
+  removeMultipleFromCart: (newId: number[]) => Promise<void>;
   setCart: Dispatch<SetStateAction<CartItem[]>>;
   fetchCart: () => Promise<Cart>;
 }
@@ -30,18 +32,15 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const debouncedUpdate = useRef(
-    debounce(async (id: number, action: CartAction, quantity?: number) => {
+    debounce(async (id: number, quantity?: number) => {
       try {
-        await api.put("/cart/update", { productId: id, action, quantity });
-      } catch (error: unknown) {
-        const messages = "An unknown error occurred";
-
-        if (axios.isAxiosError(error)) {
-          return error.response?.data?.message;
-        }
-        toast(messages, {
-          type: "error",
+        await api.put("/cart/update", {
+          productIds: [id],
+          action: "update",
+          quantity: quantity,
         });
+      } catch (error: unknown) {
+        handleError(error);
         fetchCart();
       }
     }, 500)
@@ -87,14 +86,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const removeFromCart = async (id: number) => {
-    const updatedCart = cart.filter((item) => !(item.product.id === id));
+  const removeFromCart = async (newId: number) => {
+    const updatedCart = cart.filter((item) => !(item.product.id === newId));
 
-    await api.put("/cart/update", {
-      productId: id,
-      quantity: 0,
-    });
+    await api.put("/cart/update", { productIds: newId, action: "remove" });
+    setCart(updatedCart);
+  };
 
+  const removeMultipleFromCart = async (newId: number[]) => {
+    const updatedCart = cart.filter((item) => !newId.includes(item.id));
     setCart(updatedCart);
   };
 
@@ -113,13 +113,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                   ? item.quantity + 1
                   : action === "decrease"
                   ? item.quantity - 1
-                  : quantity ?? item.quantity,
+                  : item.quantity,
             }
           : item
       )
     );
 
-    debouncedUpdate(id, action, quantity);
+    debouncedUpdate(id, quantity);
   };
 
   async function fetchCart() {
@@ -140,6 +140,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   return (
     <CartContext.Provider
       value={{
+        removeMultipleFromCart,
         fetchCart,
         isCartLoading,
         cart,

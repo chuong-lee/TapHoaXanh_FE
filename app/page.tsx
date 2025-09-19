@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { FaRegHeart } from "react-icons/fa";
 import Marquee from "./components/Marquee";
+import { useAuth } from "./context/AuthContext";
 
 interface Category {
   name: string;
@@ -30,6 +31,7 @@ interface Product {
 
 export default function HomePage() {
   const router = useRouter();
+  const { profile } = useAuth();
   const [_allProducts, setAllProducts] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,43 +140,30 @@ export default function HomePage() {
                     Chào mừng bạn đến với Tạp Hóa Xanh! Nơi cung cấp thực phẩm
                     sạch, an toàn và chất lượng cho gia đình bạn.
                   </p>
-                  <form className="d-flex mb-3" style={{ maxWidth: 420 }}>
-                    <div className="position-relative flex-grow-1">
-                      <span
-                        className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-                        style={{ color: "#888" }}
-                      >
-                        <i className="fa-solid fa-envelope"></i>
-                      </span>
-                      <input
-                        type="email"
-                        className="form-control ps-5"
-                        placeholder="Nhập email của bạn"
+                  {!profile && (
+                    <div className="d-flex mb-3" style={{ maxWidth: 420 }}>
+                      <Link
+                        href="/register"
+                        className="btn fw-bold"
                         style={{
                           borderRadius: 24,
                           height: 44,
-                          border: "none",
-                          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                          minWidth: 120,
+                          fontWeight: 600,
+                          fontSize: 17,
+                          background: "#22c55e",
+                          color: "#fff",
+                          boxShadow: "0 2px 8px rgba(34,197,94,0.08)",
+                          textDecoration: "none",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
-                      />
+                      >
+                        Đăng ký
+                      </Link>
                     </div>
-                    <button
-                      className="btn fw-bold ms-2"
-                      type="submit"
-                      style={{
-                        borderRadius: 24,
-                        height: 44,
-                        minWidth: 120,
-                        fontWeight: 600,
-                        fontSize: 17,
-                        background: "#22c55e",
-                        color: "#fff",
-                        boxShadow: "0 2px 8px rgba(34,197,94,0.08)",
-                      }}
-                    >
-                      Đăng ký
-                    </button>
-                  </form>
+                  )}
                 </div>
                 <div
                   className="col-lg-5 text-center d-flex justify-content-end align-items-end"
@@ -205,7 +194,7 @@ export default function HomePage() {
               Danh mục nổi bật
             </h2>
             <div className="categories-scroll d-flex flex-nowrap gap-3">
-              {categories.map((cat) => (
+              {categories.slice(0, 10).map((cat) => (
                 <div
                   className="category-card d-flex flex-column align-items-center justify-content-center py-3 px-2"
                   key={cat.name}
@@ -217,13 +206,13 @@ export default function HomePage() {
                     flex: "0 0 170px",
                   }}
                 >
-                  <Image
-                    src={cat.image_url}
+                  {/* <Image
+                    src={cat.image_url || "/client/images/default-category.png"}
                     alt={cat.name}
                     width={40}
                     height={40}
                     style={{ objectFit: "contain" }}
-                  />
+                  /> */}
                   <div className="fw-bold mt-2" style={{ fontSize: 15 }}>
                     {cat.name}
                   </div>
@@ -257,6 +246,7 @@ export default function HomePage() {
                 <button
                   className="btn btn-danger fw-bold px-4 py-2 mt-3 align-self-start"
                   style={{ borderRadius: 24, fontSize: 18 }}
+                  onClick={() => router.push("/product")}
                 >
                   Mua ngay
                 </button>
@@ -560,6 +550,7 @@ export default function HomePage() {
                       fontSize: 20,
                       boxShadow: "0 2px 8px rgba(220,53,69,0.08)",
                     }}
+                    onClick={() => router.push("/product")}
                   >
                     Mua ngay
                   </button>
@@ -620,6 +611,7 @@ export default function HomePage() {
                       fontSize: 20,
                       boxShadow: "0 2px 8px rgba(220,53,69,0.08)",
                     }}
+                    onClick={() => router.push("/product")}
                   >
                     Mua ngay
                   </button>
@@ -686,32 +678,27 @@ export default function HomePage() {
                     <div className="sold-row">Đã bán: 90/120</div>
                     <Link
                       href={product.slug ? `/product/${product.slug}` : "#"}
-                      passHref
-                      legacyBehavior
+                      className="btn-featured-addcart"
+                      style={{
+                        background: "#22c55e",
+                        color: "#fff",
+                        borderRadius: 999,
+                        fontWeight: 600,
+                        fontSize: 16,
+                        padding: "10px 0",
+                        minHeight: 36,
+                        width: "92%",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        marginTop: "auto",
+                        marginBottom: 20,
+                        cursor: product.slug ? "pointer" : "not-allowed",
+                        pointerEvents: product.slug ? "auto" : "none",
+                        display: "inline-block",
+                        textAlign: "center",
+                      }}
                     >
-                      <a
-                        className="btn-featured-addcart"
-                        style={{
-                          background: "#22c55e",
-                          color: "#fff",
-                          borderRadius: 999,
-                          fontWeight: 600,
-                          fontSize: 16,
-                          padding: "10px 0",
-                          minHeight: 36,
-                          width: "92%",
-                          marginLeft: "auto",
-                          marginRight: "auto",
-                          marginTop: "auto",
-                          marginBottom: 20,
-                          cursor: product.slug ? "pointer" : "not-allowed",
-                          pointerEvents: product.slug ? "auto" : "none",
-                          display: "inline-block",
-                          textAlign: "center",
-                        }}
-                      >
-                        Xem chi tiết <i className="fa fa-eye"></i>
-                      </a>
+                      Xem chi tiết <i className="fa fa-eye"></i>
                     </Link>
                   </div>
                 ))}
@@ -746,47 +733,34 @@ export default function HomePage() {
                     TapHoaXanh
                   </span>
                 </div>
-                <form className="d-flex" style={{ maxWidth: 400 }}>
-                  <div className="position-relative flex-grow-1">
-                    <span
-                      className="input-icon position-absolute top-50 start-0 translate-middle-y ms-3"
-                      style={{ color: "#888" }}
-                    >
-                      <i className="fa-solid fa-envelope"></i>
-                    </span>
-                    <input
-                      type="email"
-                      className="form-control ps-5"
-                      placeholder="Nhập email của bạn"
+                {!profile && (
+                  <div className="d-flex" style={{ maxWidth: 400 }}>
+                    <Link
+                      href="/register"
+                      className="btn fw-bold"
                       style={{
                         borderRadius: 24,
                         height: 48,
-                        border: "none",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                        minWidth: 120,
+                        fontWeight: 600,
+                        fontSize: 17,
+                        background: "#ffd43b",
+                        color: "#222",
+                        boxShadow: "0 2px 8px rgba(220,53,69,0.08)",
+                        textDecoration: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                    />
+                    >
+                      Đăng ký
+                    </Link>
                   </div>
-                  <button
-                    className="btn fw-bold ms-2"
-                    type="submit"
-                    style={{
-                      borderRadius: 24,
-                      height: 48,
-                      minWidth: 120,
-                      fontWeight: 600,
-                      fontSize: 17,
-                      background: "#ffd43b",
-                      color: "#222",
-                      boxShadow: "0 2px 8px rgba(220,53,69,0.08)",
-                    }}
-                  >
-                    Đăng ký
-                  </button>
-                </form>
+                )}
               </div>
               <div className="col-md-5 text-center">
                 <Image
-                  src="/images/girl-red-hoodie.jpg"
+                  src="/client/images/girl-red-hoodie.jpg"
                   alt="Cô gái áo đỏ"
                   style={{
                     maxWidth: "100%",
