@@ -1,8 +1,8 @@
 'use client'
-
-import api from '@/lib/axios'
+import { useState, useRef, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { FormEvent, useRef, useState } from 'react'
+import api from '@/lib/axios'
+import { handleError } from '@/helpers/handleError'
 
 
 
@@ -37,11 +37,9 @@ function RegisterForm() {
 
       // Chuyển đến trang verify-email với thông báo đăng ký thành công
       router.push(`/verify-email?email=${encodeURIComponent(email)}&type=register`);
-    } catch (err) {
-      const error = err as Error & { response?: { data?: { message?: string } } };  
-      console.error(error);
-      setError(error.response?.data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra thông tin.');
-    } finally {
+    } catch (error: unknown) {
+      handleError(error);
+      } finally {
       setIsLoading(false);
     }
   };

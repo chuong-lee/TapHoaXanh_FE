@@ -4,6 +4,7 @@ import { useState, useRef, FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
 import { useAuth } from '../context/AuthContext';
+import { handleError } from '@/helpers/handleError';
 
 
 
@@ -38,18 +39,9 @@ function LoginForm() {
 
       await refreshProfile();
       router.push(redirectTo);
-    } catch (err) {
-      const error = err as Error & { response?: { data?: { message?: string } } };
-      console.error(error);
+    } catch (error: unknown) {
+      handleError(error);
       
-      // Kiểm tra nếu lỗi liên quan đến email chưa được xác thực
-      const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra thông tin.';
-      
-      if (errorMessage.includes('email') && errorMessage.includes('xác thực')) {
-        setError(`${errorMessage} Bạn có thể gửi lại email xác thực.`);
-      } else {
-        setError(errorMessage);
-      }
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { profileService } from '../lib/profileService';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { toast } from 'react-toastify';
 
 export default function LogoutButton() {
   const { setProfile } = useAuth();
@@ -25,7 +26,7 @@ export default function LogoutButton() {
       setCart([])
       router.push('/login');
     } catch {
-      setLogoutError('Đăng xuất thất bại. Vui lòng thử lại!');
+      toast.error('Đăng xuất thất bại. Vui lòng thử lại!');
     } finally {
       setLogoutLoading(false);
     }

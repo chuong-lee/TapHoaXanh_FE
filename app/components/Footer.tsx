@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import React from 'react';
 
 const Footer = () => (
@@ -49,7 +48,6 @@ const Footer = () => (
       </div>
       <div className="d-flex justify-content-between align-items-center" style={{fontSize: 14, color: "#888"}}>
         <span>© Bản quyền thuộc về DalatGap Store</span>
-        <Image src="/images/bocongthuong.jpg" alt="Bộ Công Thương" height={40} width={40} />
       </div>
     </div>
   </footer>
