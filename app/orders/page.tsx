@@ -6,7 +6,7 @@ import { Order } from "@/types";
 import { formatDateTime } from "@/helpers/format";
 
 const STATUS_LABELS = [
-  { key: "pending", label: "Chờ vận chuyển" },
+  { key: "pending", label: "Chờ xác nhận" },
   { key: "confirmed", label: "Đã xác nhận" },
   { key: "shipping", label: "Đang vận chuyển" },
   { key: "delivered", label: "Đã giao hàng" },

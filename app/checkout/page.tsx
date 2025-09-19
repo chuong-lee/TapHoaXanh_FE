@@ -139,11 +139,15 @@ function CheckoutPage() {
         await api.post("/order/from-cart", orderPayload);
       } else {
         const orderId = await api.post("/order/from-cart", orderPayload);
-        await api.post("/payment/create-payment", { orderId });
+        const paymentRes = await api.post("/payment/create-payment", {
+          orderId: orderId.data.id,
+        });
+        const paymentUrl = paymentRes.data.paymentUrl;
+        if (paymentUrl) {
+          window.location.href = paymentUrl; // 🔥 Tự động redirect
+          return;
+        }
       }
-      toast("Đặt hàng thành công", {
-        type: "success",
-      });
       removeMultipleFromCart(cartItems.map((item) => item.id));
       localStorage.removeItem("cart_selected");
 
