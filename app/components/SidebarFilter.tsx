@@ -1,51 +1,56 @@
-'use client'
-import { useEffect, useState } from 'react'
-import api from '@/lib/axios'
+"use client";
+import { useEffect, useState } from "react";
+import api from "@/lib/axios";
 
 type Category = {
-  id: number
-  name: string
-  count: number
-}
+  id: number;
+  name: string;
+  count: number;
+};
 
 interface SidebarFilterProps {
-  onCategoryChange?: (categoryId: number | null) => void
-  onPriceChange?: (price: number) => void
+  onCategoryChange?: (categoryId: number | null) => void;
+  onPriceChange?: (price: number) => void;
 }
 
-export default function SidebarFilter({ onCategoryChange, onPriceChange }: SidebarFilterProps) {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [selected, setSelected] = useState<number | null>(null)
-  const [price, setPrice] = useState(1000000)
+export default function SidebarFilter({
+  onCategoryChange,
+  onPriceChange,
+}: SidebarFilterProps) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [price, setPrice] = useState(1000000);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/categories')
-        setCategories(Array.isArray(res.data) ? res.data : [])
+        const res = await api.get("/categories");
+        setCategories(Array.isArray(res.data) ? res.data : []);
       } catch {
-        setCategories([])
+        setCategories([]);
       }
-    }
-    fetchCategories()
-  }, [])
+    };
+    fetchCategories();
+  }, []);
 
   const handleCategoryChange = (categoryId: number | null) => {
-    setSelected(categoryId)
+    setSelected(categoryId);
     if (onCategoryChange) {
-      onCategoryChange(categoryId)
+      onCategoryChange(categoryId);
     }
-  }
+  };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value)
-    setPrice(value)
-    if (onPriceChange) onPriceChange(value)
-  }
+    const value = Number(e.target.value);
+    setPrice(value);
+    if (onPriceChange) onPriceChange(value);
+  };
 
   return (
     <div className="sidebar-filter p-3 border rounded bg-white">
-      <h5 className="fw-bold mb-3" style={{color: '#22c55e'}}>Danh mục</h5>
+      <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
+        Danh mục
+      </h5>
       <div>
         {/* Tất cả sản phẩm */}
         <div className="form-check mb-2">
@@ -56,13 +61,17 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
             id="cat-all"
             checked={selected === null}
             onChange={() => handleCategoryChange(null)}
-            style={{accentColor: '#22c55e'}}
+            style={{ accentColor: "#22c55e" }}
           />
-          <label className="form-check-label" htmlFor="cat-all" style={{cursor: 'pointer'}}>
+          <label
+            className="form-check-label"
+            htmlFor="cat-all"
+            style={{ cursor: "pointer" }}
+          >
             <strong>Tất cả sản phẩm</strong>
           </label>
         </div>
-        {categories.map(cat => (
+        {categories.slice(0, 11).map((cat) => (
           <div key={cat.id} className="form-check mb-2">
             <input
               className="form-check-input"
@@ -71,9 +80,13 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
               id={`cat-${cat.id}`}
               checked={selected === cat.id}
               onChange={() => handleCategoryChange(cat.id)}
-              style={{accentColor: '#22c55e'}}
+              style={{ accentColor: "#22c55e" }}
             />
-            <label className="form-check-label" htmlFor={`cat-${cat.id}`} style={{cursor: 'pointer'}}>
+            <label
+              className="form-check-label"
+              htmlFor={`cat-${cat.id}`}
+              style={{ cursor: "pointer" }}
+            >
               {cat.name} <span className="text-muted">({cat.count || 0})</span>
             </label>
           </div>
@@ -81,10 +94,12 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
       </div>
       {/* Phần lọc giá */}
       <div className="mt-4">
-        <h6 className="fw-bold mb-3" style={{color: '#22c55e'}}>Lọc theo giá</h6>
+        <h6 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
+          Lọc theo giá
+        </h6>
         <div className="mb-3">
           <label className="form-label small">Khoảng giá:</label>
-          <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input
               type="range"
               className="form-range custom-range"
@@ -93,9 +108,16 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
               step="10000"
               value={price}
               onChange={handlePriceChange}
-              style={{accentColor: '#22c55e', width: '80%'}}
+              style={{ accentColor: "#22c55e", width: "80%" }}
             />
-            <span style={{fontWeight: 600, color: '#22c55e', minWidth: 90, textAlign: 'right'}}>
+            <span
+              style={{
+                fontWeight: 600,
+                color: "#22c55e",
+                minWidth: 90,
+                textAlign: "right",
+              }}
+            >
               {price.toLocaleString()}đ
             </span>
           </div>
@@ -109,19 +131,19 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
         .custom-range::-webkit-slider-thumb {
           background: #22c55e;
           border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(34,197,94,0.2);
+          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
           width: 24px;
           height: 24px;
           border-radius: 50%;
           transition: box-shadow 0.2s;
         }
         .custom-range:focus::-webkit-slider-thumb {
-          box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+          box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
         }
         .custom-range::-moz-range-thumb {
           background: #22c55e;
           border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(34,197,94,0.2);
+          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
           width: 24px;
           height: 24px;
           border-radius: 50%;
@@ -129,7 +151,7 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
         .custom-range::-ms-thumb {
           background: #22c55e;
           border: 2px solid #fff;
-          box-shadow: 0 2px 8px rgba(34,197,94,0.2);
+          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
           width: 24px;
           height: 24px;
           border-radius: 50%;
@@ -140,5 +162,5 @@ export default function SidebarFilter({ onCategoryChange, onPriceChange }: Sideb
         }
       `}</style>
     </div>
-  )
+  );
 }

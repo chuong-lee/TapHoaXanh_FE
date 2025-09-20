@@ -11,10 +11,13 @@
   "dependencies": {
     "@fluentui/react-dialog": "^9.15.1",
     "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@types/nodemailer": "^7.0.1",
     "axios": "^1.12.0",
     "bootstrap": "^5.3.8",
+    "cloudinary": "^2.7.0",
     "lodash.debounce": "^4.0.8",
     "next": "^15.4.1",
+    "nodemailer": "^7.0.6",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
