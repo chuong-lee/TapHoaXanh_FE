@@ -88,7 +88,12 @@ function CheckoutPage() {
 
   // Tính tổng tiền
   const subtotal = cartItems
-    ? cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    ? cartItems.reduce((sum, item) => {
+        // Tính giá sau khi giảm giá
+        const discountedPrice =
+          item.product.price * (1 - item.product.discount / 100);
+        return sum + discountedPrice * item.quantity;
+      }, 0)
     : 0;
 
   let discount = 0;
@@ -128,17 +133,21 @@ function CheckoutPage() {
     setErrorFields([]);
 
     const orderPayload = {
-      paymentId: form.payment.toUpperCase(),
       voucherId: selectedVoucher?.id,
       note: form.notes,
       cartItemIds: cartItems.map((item) => item.id),
     };
 
     try {
+      const orderId = await api.post("/order/from-cart", orderPayload);
       if (form.payment === "cod") {
-        await api.post("/order/from-cart", orderPayload);
+        await api.post("/payment/create-payment-cash", {
+          orderId: orderId.data.id,
+        });
+        toast("Đặt hàng thành công", {
+          type: "success",
+        });
       } else {
-        const orderId = await api.post("/order/from-cart", orderPayload);
         const paymentRes = await api.post("/payment/create-payment", {
           orderId: orderId.data.id,
         });
@@ -151,7 +160,10 @@ function CheckoutPage() {
       removeMultipleFromCart(cartItems.map((item) => item.id));
       localStorage.removeItem("cart_selected");
 
-      // router.push("/orders");
+      // Chuyển về trang chủ sau khi xử lý xong
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
     } catch (error: unknown) {
       const messages = "An unknown error occurred";
 
@@ -427,9 +439,11 @@ function CheckoutPage() {
                             {item.product.name} ×{item.quantity}
                           </td>
                           <td className="text-end">
-                            {(item.price * item.quantity).toLocaleString(
-                              "vi-VN"
-                            )}
+                            {(
+                              item.product.price *
+                              (1 - item.product.discount / 100) *
+                              item.quantity
+                            ).toLocaleString("vi-VN")}
                             ₫
                           </td>
                         </tr>

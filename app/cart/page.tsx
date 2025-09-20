@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CartItem } from "@/types";
 import Image from "next/image";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 function fixImgSrc(src: string | undefined | null): string {
   if (
@@ -32,6 +32,20 @@ export default function CartPage() {
   const [selected, setSelected] = useState<CartItem[]>([]);
   const [showAll, setShowAll] = useState(false);
   const router = useRouter();
+
+  // Load selected items from localStorage on component mount
+  useEffect(() => {
+    const savedSelected = localStorage.getItem("cart_selected");
+    if (savedSelected) {
+      try {
+        const parsedSelected = JSON.parse(savedSelected);
+        setSelected(parsedSelected);
+      } catch (error) {
+        console.error("Error parsing cart_selected from localStorage:", error);
+        setSelected([]);
+      }
+    }
+  }, []);
   const handleSelect = (cartItem: CartItem) => {
     setSelected((prev) => {
       const exists = prev.some(
@@ -70,7 +84,12 @@ export default function CartPage() {
               (itemsSelected) => itemsSelected.product.id === item.product.id
             )
           )
-          .reduce((sum, item) => sum + item.price * item.quantity, 0)
+          .reduce((sum, item) => {
+            // Tính giá sau khi giảm giá
+            const discountedPrice =
+              item.product.price * (1 - item.product.discount / 100);
+            return sum + discountedPrice * item.quantity;
+          }, 0)
       : 0;
   }, [cart, selected]);
 
@@ -79,6 +98,7 @@ export default function CartPage() {
   const handleSelectAll = () => {
     if (allSelected) {
       localStorage.setItem("cart_selected", JSON.stringify([]));
+      setSelected([]);
     } else {
       localStorage.setItem("cart_selected", JSON.stringify(cart));
       setSelected(cart);
@@ -317,7 +337,11 @@ export default function CartPage() {
                           <tr key={item.id}>
                             <td>{item.product.name}</td>
                             <td className="text-end">
-                              {item.price?.toLocaleString("vi-VN")}₫ (x
+                              {(
+                                item.product.price *
+                                (1 - item.product.discount / 100)
+                              ).toLocaleString("vi-VN")}
+                              ₫ (x
                               {item.quantity})
                             </td>
                           </tr>

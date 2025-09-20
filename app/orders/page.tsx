@@ -6,11 +6,9 @@ import { Order } from "@/types";
 import { formatDateTime } from "@/helpers/format";
 
 const STATUS_LABELS = [
-  { key: "pending", label: "Chờ xác nhận" },
-  { key: "confirmed", label: "Đã xác nhận" },
-  { key: "shipping", label: "Đang vận chuyển" },
-  { key: "delivered", label: "Đã giao hàng" },
-  { key: "cancelled", label: "Đã hủy" },
+  { key: "pending", label: "Chưa thanh toán" },
+  { key: "success", label: "Đã thanh toán" },
+  { key: "fail", label: "Đã hủy" },
 ];
 
 export default function OrdersPage() {
@@ -132,9 +130,9 @@ export default function OrdersPage() {
                               ? "bg-warning"
                               : selectedOrder.status === "confirmed"
                               ? "bg-info"
-                              : selectedOrder.status === "shipping"
+                              : selectedOrder.status === "success"
                               ? "bg-primary"
-                              : selectedOrder.status === "delivered"
+                              : selectedOrder.status === "pending_cod"
                               ? "bg-success"
                               : "bg-danger"
                           }`}
@@ -174,48 +172,96 @@ export default function OrdersPage() {
                         {selectedOrder.orderItem?.map((item) => (
                           <tr key={item.id}>
                             <td>
-                              <Image
-                                src={item.product.images}
-                                alt={item.product.name}
-                                width={60}
-                                height={60}
-                                style={{
-                                  objectFit: "cover",
-                                  borderRadius: "8px",
-                                }}
-                              />
+                              {item.product?.images ? (
+                                <Image
+                                  src={item.product.images}
+                                  alt={item.product.name || "Sản phẩm"}
+                                  width={60}
+                                  height={60}
+                                  style={{
+                                    objectFit: "cover",
+                                    borderRadius: "8px",
+                                  }}
+                                />
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
                             </td>
                             <td>
-                              <div>
-                                <strong>{item.product.name}</strong>
-                                <br />
-                                <small className="text-muted">
-                                  {item.product.description}
-                                </small>
-                              </div>
+                              {item.product?.name ? (
+                                <div>
+                                  <strong>{item.product.name}</strong>
+                                  <br />
+                                  <small className="text-muted">
+                                    {item.product.description}
+                                  </small>
+                                </div>
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
                             </td>
-                            <td className="text-center">{item.quantity}</td>
-                            <td>
-                              {(
-                                item.product.price + item.product.discount
-                              ).toLocaleString("vi-VN")}
-                              ₫
-                            </td>
-                            <td>
-                              <span className="text-danger">
-                                -{item.product.discount.toLocaleString("vi-VN")}
-                                ₫
-                              </span>
-                            </td>
-                            <td>
-                              <strong className="text-success">
-                                {item.unit_price.toLocaleString("vi-VN")}₫
-                              </strong>
+                            <td className="text-center">
+                              {item.quantity ?? (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
                             </td>
                             <td>
-                              {new Date(
-                                item.product.expiry_date
-                              ).toLocaleDateString("vi-VN")}
+                              {item.product?.price !== undefined &&
+                              item.product?.discount !== undefined ? (
+                                <>
+                                  {(
+                                    item.product.price + item.product.discount
+                                  ).toLocaleString("vi-VN")}
+                                  ₫
+                                </>
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {item.product?.discount !== undefined ? (
+                                <span className="text-danger">
+                                  -
+                                  {item.product.discount.toLocaleString(
+                                    "vi-VN"
+                                  )}
+                                  ₫
+                                </span>
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {item.unit_price !== undefined ? (
+                                <strong className="text-success">
+                                  {item.unit_price.toLocaleString("vi-VN")}₫
+                                </strong>
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
+                            </td>
+                            <td>
+                              {item.product?.expiry_date ? (
+                                new Date(
+                                  item.product.expiry_date
+                                ).toLocaleDateString("vi-VN")
+                              ) : (
+                                <span className="text-muted">
+                                  Chờ tải dữ liệu
+                                </span>
+                              )}
                             </td>
                           </tr>
                         ))}

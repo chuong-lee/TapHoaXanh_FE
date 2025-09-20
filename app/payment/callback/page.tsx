@@ -133,10 +133,10 @@ function PaymentCallbackContent() {
                     </h4>
                     <p className="text-muted mb-4">{message}</p>
                     <div className="d-grid gap-2">
-                      <a href="/profile?tab=orders" className="btn btn-primary">
+                      <Link href="/orders" className="btn btn-primary">
                         <i className="fas fa-shopping-bag me-2"></i>
                         Xem đơn hàng
-                      </a>
+                      </Link>
                       <Link href="/" className="btn btn-outline-secondary">
                         <i className="fas fa-home me-2"></i>
                         Về trang chủ

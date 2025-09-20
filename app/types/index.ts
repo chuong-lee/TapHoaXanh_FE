@@ -59,7 +59,7 @@ export interface Order {
   // price: number | null;
   total_price: number;
   order_code: string;
-  status: "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
+  status: "pending" | "confirmed" | "success" | "pending_cod" | "cancelled";
   orderItem: OrderItem[];
   voucher: Voucher[] | null;
   payments: Payment[];
