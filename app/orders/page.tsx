@@ -4,6 +4,7 @@ import Image from "next/image";
 import api from "@/lib/axios";
 import { Order } from "@/types";
 import { formatDateTime } from "@/helpers/format";
+import { toast } from "react-toastify";
 
 const STATUS_LABELS = [
   { key: "pending", label: "Chưa thanh toán" },
@@ -42,6 +43,28 @@ export default function OrdersPage() {
     setSelectedOrder(null);
   };
 
+  const handlePayment = async (orderId: number) => {
+    try {
+      const response = await api.post("/payment/create-payment", {
+        orderId: orderId,
+      });
+
+      const paymentUrl = response.data.paymentUrl;
+      if (paymentUrl) {
+        window.location.href = paymentUrl;
+      } else {
+        toast.error("Không thể tạo link thanh toán. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Có lỗi xảy ra khi tạo thanh toán. Vui lòng thử lại.");
+    }
+  };
+
+  const isPaymentPending = (status: string) => {
+    return status === "pending" || status === "fail";
+  };
+
   return (
     <main className="main-content">
       <div className="container py-4">
@@ -76,12 +99,22 @@ export default function OrdersPage() {
                       {STATUS_LABELS.find((s) => s.key === order.status)?.label}
                     </td>
                     <td>
-                      <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => handleViewDetails(order)}
-                      >
-                        Xem chi tiết
-                      </button>
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() => handleViewDetails(order)}
+                        >
+                          Xem chi tiết
+                        </button>
+                        {isPaymentPending(order.status) && (
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => handlePayment(order.id)}
+                          >
+                            Thanh toán
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -301,28 +334,44 @@ export default function OrdersPage() {
                       <div className="mt-4">
                         <h6 className="fw-bold mb-3">Thông tin thanh toán</h6>
                         <div className="row">
-                          {selectedOrder.payments.map((payment, index) => (
-                            <div key={index} className="col-md-6 mb-2">
-                              <div className="card">
-                                <div className="card-body p-3">
-                                  <p className="card-text small">
-                                    Phương thức:{" "}
-                                    {payment.payment_method || "Chưa xác định"}
-                                  </p>
-                                  <p className="card-text small">
-                                    Trạng thái:{" "}
-                                    {payment.status || "Chưa xác định"}
-                                  </p>
-                                </div>
+                          <div className="col-md-6 mb-2">
+                            <div className="card">
+                              <div className="card-body p-3">
+                                <p className="card-text small">
+                                  Phương thức:{" "}
+                                  {selectedOrder.payments[
+                                    selectedOrder.payments.length - 1
+                                  ].payment_method || "Chưa xác định"}
+                                </p>
+                                <p className="card-text small">
+                                  Trạng thái:{" "}
+                                  {selectedOrder.payments[
+                                    selectedOrder.payments.length - 1
+                                  ].status || "Chưa xác định"}
+                                </p>
                               </div>
                             </div>
-                          ))}
+                          </div>
                         </div>
                       </div>
                     )}
                 </div>
                 <div className="modal-footer">
+                  {isPaymentPending(selectedOrder.status) && (
+                    <button
+                      type="button"
+                      className="btn btn-success me-2"
+                      onClick={() => {
+                        handlePayment(selectedOrder.id);
+                        closeModal();
+                      }}
+                    >
+                      <i className="fas fa-credit-card me-1"></i>
+                      Thanh toán ngay
+                    </button>
+                  )}
                   <button type="button" className="btn btn-warning me-2">
+                    <i className="fas fa-star me-1"></i>
                     Đánh giá
                   </button>
                   <button
@@ -330,6 +379,7 @@ export default function OrdersPage() {
                     className="btn btn-secondary"
                     onClick={closeModal}
                   >
+                    <i className="fas fa-times me-1"></i>
                     Đóng
                   </button>
                 </div>

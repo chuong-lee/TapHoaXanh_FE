@@ -30,22 +30,62 @@ function PaymentCallbackContent() {
           queryParams[key] = value;
         });
 
-        console.log("Payment callback params:", queryParams);
-
-        // Kiểm tra xem có TxnRef không
-        if (queryParams.TxnRef) {
-          console.log("TxnRef found:", queryParams.TxnRef);
-        }
+        // Khởi tạo biến để lưu thông tin VNPay
+        let isVnPaySuccess = false;
+        let vnPayErrorMessage = "";
 
         // Kiểm tra xem có vnp_ResponseCode không (VNPay response code)
         if (queryParams.vnp_ResponseCode) {
-          console.log("VNPay Response Code:", queryParams.vnp_ResponseCode);
+          // Kiểm tra mã response của VNPay
+          const responseCode = queryParams.vnp_ResponseCode;
+          const transactionStatus = queryParams.vnp_TransactionStatus;
 
-          // Nếu response code là 00 thì thanh toán thành công
-          if (queryParams.vnp_ResponseCode === "00") {
-            console.log("Payment successful according to VNPay");
-          } else {
-            console.log("Payment failed according to VNPay");
+          // Lưu thông tin response code để sử dụng sau khi gọi API
+          isVnPaySuccess = responseCode === "00" && transactionStatus === "00";
+
+          // Xác định thông báo lỗi cụ thể dựa trên mã response (nếu thất bại)
+          if (!isVnPaySuccess) {
+            switch (responseCode) {
+              case "24":
+                vnPayErrorMessage = "Giao dịch bị hủy bởi người dùng.";
+                break;
+              case "07":
+                vnPayErrorMessage =
+                  "Trừ tiền thành công. Giao dịch bị nghi ngờ (liên quan tới lừa đảo, giao dịch bất thường).";
+                break;
+              case "09":
+                vnPayErrorMessage =
+                  "Giao dịch không thành công do: Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking.";
+                break;
+              case "10":
+                vnPayErrorMessage =
+                  "Xác thực thông tin thẻ/tài khoản không đúng quá 3 lần.";
+                break;
+              case "11":
+                vnPayErrorMessage =
+                  "Đã hết hạn chờ thanh toán. Xin vui lòng thực hiện lại giao dịch.";
+                break;
+              case "12":
+                vnPayErrorMessage = "Giao dịch bị hủy bởi người dùng.";
+                break;
+              case "51":
+                vnPayErrorMessage =
+                  "Giao dịch thất bại do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.";
+                break;
+              case "65":
+                vnPayErrorMessage =
+                  "Giao dịch thất bại do: Tài khoản của Quý khách đã vượt quá hạn mức giao dịch trong ngày.";
+                break;
+              case "75":
+                vnPayErrorMessage = "Ngân hàng thanh toán đang bảo trì.";
+                break;
+              case "79":
+                vnPayErrorMessage =
+                  "Nhập sai mật khẩu thanh toán quá số lần quy định. Xin vui lòng thực hiện lại giao dịch.";
+                break;
+              default:
+                vnPayErrorMessage = `Thanh toán thất bại. Mã lỗi: ${responseCode}`;
+            }
           }
         }
 
@@ -59,8 +99,8 @@ function PaymentCallbackContent() {
 
         const responseData = response.data;
 
-        // Kiểm tra kết quả
-        if (responseData.success) {
+        // Kiểm tra kết quả từ API và VNPay
+        if (responseData.success && isVnPaySuccess) {
           setStatus("success");
           setMessage(
             "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận."
@@ -70,9 +110,13 @@ function PaymentCallbackContent() {
           localStorage.removeItem("pending_payment_order");
         } else {
           setStatus("error");
-          setMessage(
-            responseData.message || "Thanh toán thất bại. Vui lòng thử lại."
-          );
+
+          // Ưu tiên thông báo lỗi từ VNPay nếu có, nếu không thì dùng từ API
+          const errorMessage =
+            vnPayErrorMessage ||
+            responseData.message ||
+            "Thanh toán thất bại. Vui lòng thử lại.";
+          setMessage(errorMessage);
         }
       } catch (error) {
         console.error("Payment callback error:", error);

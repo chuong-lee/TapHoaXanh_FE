@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CartItem, Voucher } from "@/types";
+import { Voucher } from "@/types";
 import api from "@/lib/axios";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,15 +11,10 @@ import { useRouter } from "next/navigation";
 
 function CheckoutPage() {
   const router = useRouter();
-  const { removeMultipleFromCart } = useCart();
+  const { cart, removeMultipleFromCart } = useCart();
   const { profile } = useAuth();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const cartItemsLocal = localStorage.getItem("cart_selected");
-    setCartItems(cartItemsLocal ? JSON.parse(cartItemsLocal) : []);
-  }, []);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -73,10 +68,24 @@ function CheckoutPage() {
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("cart_selected")) {
+    if (cart.length === 0) {
       router.push("/cart");
     }
-  }, [router]);
+  }, [cart.length, router]);
+
+  // Load selected items from localStorage
+  useEffect(() => {
+    const savedSelected = localStorage.getItem("cart_selected");
+    if (savedSelected) {
+      try {
+        const parsedSelected = JSON.parse(savedSelected);
+        setSelectedItems(parsedSelected.map((item: { id: number }) => item.id));
+      } catch (error) {
+        console.error("Error parsing cart_selected from localStorage:", error);
+        setSelectedItems([]);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchVouchers() {
@@ -86,14 +95,16 @@ function CheckoutPage() {
     fetchVouchers();
   }, []);
 
-  // Tính tổng tiền
-  const subtotal = cartItems
-    ? cartItems.reduce((sum, item) => {
-        // Tính giá sau khi giảm giá
-        const discountedPrice =
-          item.product.price * (1 - item.product.discount / 100);
-        return sum + discountedPrice * item.quantity;
-      }, 0)
+  // Tính tổng tiền chỉ cho những items được chọn
+  const subtotal = cart
+    ? cart
+        .filter((item) => selectedItems.includes(item.id))
+        .reduce((sum, item) => {
+          // Tính giá sau khi giảm giá
+          const discountedPrice =
+            item.product.price * (1 - item.product.discount / 100);
+          return sum + discountedPrice * item.quantity;
+        }, 0)
     : 0;
 
   let discount = 0;
@@ -135,8 +146,11 @@ function CheckoutPage() {
     const orderPayload = {
       voucherId: selectedVoucher?.id,
       note: form.notes,
-      cartItemIds: cartItems.map((item) => item.id),
+      cartItemIds: selectedItems,
     };
+
+    console.log("Selected items:", selectedItems);
+    console.log("Order payload:", orderPayload);
 
     try {
       const orderId = await api.post("/order/from-cart", orderPayload);
@@ -157,7 +171,8 @@ function CheckoutPage() {
           return;
         }
       }
-      removeMultipleFromCart(cartItems.map((item) => item.id));
+      // Chỉ xóa những cart items đã được thanh toán
+      removeMultipleFromCart(selectedItems);
       localStorage.removeItem("cart_selected");
 
       // Chuyển về trang chủ sau khi xử lý xong
@@ -432,22 +447,24 @@ function CheckoutPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cartItems?.length > 0 &&
-                      cartItems.map((item) => (
-                        <tr key={item.id}>
-                          <td>
-                            {item.product.name} ×{item.quantity}
-                          </td>
-                          <td className="text-end">
-                            {(
-                              item.product.price *
-                              (1 - item.product.discount / 100) *
-                              item.quantity
-                            ).toLocaleString("vi-VN")}
-                            ₫
-                          </td>
-                        </tr>
-                      ))}
+                    {cart?.length > 0 &&
+                      cart
+                        .filter((item) => selectedItems.includes(item.id))
+                        .map((item) => (
+                          <tr key={item.id}>
+                            <td>
+                              {item.product.name} ×{item.quantity}
+                            </td>
+                            <td className="text-end">
+                              {(
+                                item.product.price *
+                                (1 - item.product.discount / 100) *
+                                item.quantity
+                              ).toLocaleString("vi-VN")}
+                              ₫
+                            </td>
+                          </tr>
+                        ))}
                     <tr>
                       <td>
                         <b>Tạm tính</b>

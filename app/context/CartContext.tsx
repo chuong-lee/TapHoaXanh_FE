@@ -52,50 +52,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isCartLoading, setIsCartLoading] = useState(true);
 
   const addToCart = async (product: Product, quantity: number = 1) => {
-    await api.post("/cart/add", {
+    const response = await api.post("/cart/add", {
       productId: product.id,
       quantity: quantity,
     });
 
-    setCart((prevCart) => {
-      const existingIndex = prevCart.findIndex(
-        (item) => item.product.id === product.id
-      );
-
-      let updatedCart;
-      if (existingIndex !== -1) {
-        updatedCart = [...prevCart];
-        updatedCart[existingIndex].quantity += quantity;
-        updatedCart[existingIndex].total_price =
-          updatedCart[existingIndex].quantity *
-          (product.price - product.discount);
-      } else {
-        updatedCart = [
-          ...prevCart,
-          {
-            id: Date.now(),
-            product,
-            quantity,
-            total_price: quantity * (product.price - product.discount),
-            slug: product.slug,
-          } as CartItem,
-        ];
-      }
-
-      return updatedCart;
-    });
+    // Fetch updated cart from database to get correct IDs
+    await fetchCart();
   };
 
-  const removeFromCart = async (newId: number) => {
-    const updatedCart = cart.filter((item) => !(item.product.id === newId));
+  const removeFromCart = async (productId: number) => {
+    await api.put("/cart/update", { productIds: productId, action: "remove" });
 
-    await api.put("/cart/update", { productIds: newId, action: "remove" });
-    setCart(updatedCart);
+    // Fetch updated cart from database
+    await fetchCart();
   };
 
-  const removeMultipleFromCart = async (newId: number[]) => {
-    const updatedCart = cart.filter((item) => !newId.includes(item.id));
-    setCart(updatedCart);
+  const removeMultipleFromCart = async (cartItemIds: number[]) => {
+    // Remove multiple cart items by their database IDs
+    for (const id of cartItemIds) {
+      await api.put("/cart/update", { productIds: id, action: "remove" });
+    }
+
+    // Fetch updated cart from database
+    await fetchCart();
   };
 
   const updateQuantity = (

@@ -30,7 +30,7 @@ export default function ProductListPage() {
   const [maxPrice, setMaxPrice] = useState(1000000);
 
   // State cho show và sort
-  const [show, setShow] = useState(50);
+  const [show, setShow] = useState(12);
   const [sort, setSort] = useState("price-asc");
 
   useEffect(() => {
