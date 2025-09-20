@@ -15,6 +15,7 @@ import { useCart } from "@/context/CartContext";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const { fetchCart, cart } = useCart();
   const router = useRouter();
   const { profile } = useAuth();
@@ -24,6 +25,24 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Đóng dropdown khi click bên ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.avatar-dropdown-container')) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
 
   // Hàm kiểm tra đăng nhập và chuyển hướng
@@ -183,7 +202,10 @@ const Header = () => {
               </button>
               {profile ? (
                 <div className="avatar-dropdown-container">
-                  <div className="avatar-trigger">
+                  <div 
+                    className="avatar-trigger"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                  >
                     <Avatar
                       image={profile.image}
                       name={profile.name}
@@ -191,15 +213,21 @@ const Header = () => {
                       className="border-2 border-white"
                     />
                   </div>
-                  <div className="avatar-dropdown-menu">
-                    <Link href="/profile" className="dropdown-item">
-                      Thông tin người dùng
-                    </Link>
-                    <div className="dropdown-divider"></div>
-                    <div className="px-3 py-1">
-                      <LogoutButton />
+                  {showDropdown && (
+                    <div className="avatar-dropdown-menu">
+                      <Link 
+                        href="/profile" 
+                        className="dropdown-item"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        Thông tin người dùng
+                      </Link>
+                      <div className="dropdown-divider"></div>
+                      <div className="px-3 py-1">
+                        <LogoutButton />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <div className="d-flex align-items-center gap-3">

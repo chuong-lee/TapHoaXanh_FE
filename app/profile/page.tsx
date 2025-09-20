@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useReducer } from "react";
-import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { profileService } from "../lib/profileService";
 import { Tabs, Tab, Form } from "react-bootstrap";
@@ -166,14 +165,14 @@ export default function ProfilePage() {
 
   return (
     <section>
-      <div className="my-account">
+      <div className="my-account mt5">
         <div className="container">
           <h1 className="page-title">Thông tin người dùng</h1>
-          <div className="breadcrumb mt-3">
+          {/* <div className="breadcrumb mt-3">
             <Link href="/">Trang chủ </Link>
             <span>/</span>
             <span>Thông tin người dùng</span>
-          </div>
+          </div> */}
           <div className="row">
             <div className="col-lg-12">
               <Tabs

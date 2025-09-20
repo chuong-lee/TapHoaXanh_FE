@@ -75,7 +75,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
       </div>
       <div className="mb-1">
-        <span className="fw-bold text-danger me-2" style={{fontSize: 18}}>${product.price.toLocaleString()}</span>
+        <span className="fw-bold text-danger me-2" style={{fontSize: 18}}>{product.price.toLocaleString()} VNĐ</span>
         <span className="text-muted text-decoration-line-through small">${(product.price + product.discount).toLocaleString()}</span>
       </div>
       <div className="mb-1" style={{color: '#ffc107', fontWeight: 500, fontSize: 15}}>

@@ -343,10 +343,10 @@ export default function HomePage() {
                         className="fw-bold text-success me-2"
                         style={{ fontSize: 18 }}
                       >
-                        {product.price.toLocaleString()}₫
+                        {product.price.toLocaleString()} VNĐ
                       </span>
                       <span className="text-muted text-decoration-line-through small">
-                        {(product.price + product.discount).toLocaleString()}₫
+                        {(product.price + product.discount).toLocaleString()} VNĐ
                       </span>
                     </div>
                     {/* Thanh tiến trình bán */}
@@ -464,10 +464,10 @@ export default function HomePage() {
                           className="price-main"
                           style={{ color: "#e11d48" }}
                         >
-                          {product.price.toLocaleString()}₫
+                          {product.price.toLocaleString()} VNĐ
                         </span>
                         <span className="price-old">
-                          {(product.price + product.discount).toLocaleString()}₫
+                          {(product.price + product.discount).toLocaleString()} VNĐ
                         </span>
                       </div>
                       <div className="product-rating">
@@ -641,10 +641,10 @@ export default function HomePage() {
                     <div className="product-title">{product.name}</div>
                     <div className="price-row">
                       <span className="price-main">
-                        {product.price.toLocaleString()}₫
+                        {product.price.toLocaleString()} VNĐ
                       </span>
                       <span className="price-old">
-                        {(product.price + product.discount).toLocaleString()}₫
+                        {(product.price + product.discount).toLocaleString()} VNĐ
                       </span>
                     </div>
                     <div

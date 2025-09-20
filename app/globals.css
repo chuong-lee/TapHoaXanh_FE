@@ -1555,9 +1555,23 @@ a:hover,
   min-width: 200px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.2s ease;
+  transform: translateY(-10px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
+  animation: dropdownFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .avatar-dropdown-container:hover .avatar-dropdown-menu {
@@ -1570,9 +1584,35 @@ a:hover,
   display: block;
   padding: 8px 16px;
   color: #333;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: itemSlideIn 0.3s ease-out forwards;
+}
+
+.avatar-dropdown-menu .dropdown-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.avatar-dropdown-menu .dropdown-item:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.avatar-dropdown-menu .dropdown-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+@keyframes itemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .avatar-dropdown-menu .dropdown-item:hover {
@@ -1585,6 +1625,41 @@ a:hover,
   height: 1px;
   background: #e9ecef;
   margin: 4px 0;
+  opacity: 0;
+  transform: scaleX(0);
+  animation: dividerSlideIn 0.3s ease-out forwards;
+  animation-delay: 0.25s;
+}
+
+@keyframes dividerSlideIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* Style cho text đăng xuất trong dropdown */
+.avatar-dropdown-menu .px-3 {
+  padding: 0 !important;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: itemSlideIn 0.3s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+.avatar-dropdown-menu .px-3 .dropdown-item {
+  text-align: center;
+  border: none;
+  background: none;
+  width: 100%;
+  margin: 0;
+  opacity: 1;
+  transform: none;
+  animation: none;
 }
 
 /* Login/Register Links Styles */
@@ -1604,6 +1679,878 @@ a:hover,
 
 .header-icons .nav-link span {
   transition: color 0.2s ease;
+}
+
+/* Header Responsive Styles */
+@media (max-width: 992px) {
+  .header-icons .nav-link {
+    font-size: 0.85rem !important;
+    padding: 4px 8px !important;
+  }
+
+  .header-icons .nav-link span {
+    font-size: 0.85rem;
+  }
+
+  /* Đảm bảo header layout không bị ảnh hưởng */
+  .navbar .container {
+    justify-content: space-between !important;
+  }
+
+  .navbar .d-flex {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-icons .nav-link {
+    font-size: 0.8rem !important;
+    padding: 3px 6px !important;
+  }
+
+  .header-icons .nav-link span {
+    font-size: 0.8rem;
+  }
+
+  /* Đảm bảo header layout */
+  .navbar .container {
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .navbar .d-flex {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Logo luôn ở góc trái */
+  .navbar-brand {
+    margin-right: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Cart và avatar luôn ở góc phải */
+  .header-icons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Avatar responsive */
+  .avatar-trigger .rounded-full,
+  .avatar-trigger img,
+  .avatar-trigger .avatar-component {
+    width: 45px !important;
+    height: 45px !important;
+  }
+
+  /* Dropdown responsive */
+  .avatar-dropdown-menu {
+    min-width: 180px;
+    right: -10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-icons .nav-link {
+    font-size: 0.75rem !important;
+    padding: 2px 4px !important;
+  }
+
+  .header-icons .nav-link span {
+    font-size: 0.75rem;
+  }
+
+  /* Đảm bảo header layout trên mobile nhỏ */
+  .navbar .container {
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .navbar .d-flex {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Logo luôn ở góc trái */
+  .navbar-brand {
+    margin-right: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Cart và avatar luôn ở góc phải */
+  .header-icons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Avatar smaller on mobile */
+  .avatar-trigger .rounded-full,
+  .avatar-trigger img,
+  .avatar-trigger .avatar-component {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* Dropdown smaller on mobile */
+  .avatar-dropdown-menu {
+    min-width: 160px;
+    right: -20px;
+    font-size: 0.9rem;
+  }
+
+  .avatar-dropdown-menu .dropdown-item {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Homepage Responsive Styles */
+@media (max-width: 1200px) {
+  .hero-section {
+    padding: 60px 0;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1.1rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding: 50px 0;
+    text-align: center;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 0;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+    line-height: 1.3;
+  }
+
+  .hero-content p {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem;
+  }
+}
+
+/* iPhone 12 Pro và các thiết bị nhỏ hơn 390px */
+@media (max-width: 390px) {
+  .hero-section {
+    padding: 20px 0;
+  }
+
+  .hero-content h1 {
+    font-size: 1.3rem;
+    line-height: 1.3;
+    margin-bottom: 15px;
+  }
+
+  .hero-content p {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .section-subtitle {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+
+  .product-card {
+    padding: 10px;
+    min-height: 180px;
+  }
+
+  .product-card h5 {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+
+  .product-card .product-name {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .product-card .product-brand {
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+  }
+
+  .product-card .price {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+
+  .product-card .rating {
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+  }
+
+  .product-card .btn {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+
+  /* Header responsive cho iPhone */
+  .navbar .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .header-icons {
+    gap: 6px !important;
+  }
+
+  .header-icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 5px;
+  }
+
+  .avatar-trigger {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Container padding */
+  .container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .row {
+    margin-left: -4px;
+    margin-right: -4px;
+  }
+
+  .col,
+  [class*="col-"] {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  /* Promotional cards responsive */
+  .promotional-cards {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .promotional-card {
+    padding: 15px;
+    min-height: 120px;
+  }
+
+  .promotional-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .promotional-card p {
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+  }
+
+  .promotional-card .btn {
+    font-size: 0.8rem;
+    padding: 8px 16px;
+  }
+
+  /* Category cards */
+  .category-card {
+    padding: 12px;
+    min-height: 100px;
+  }
+
+  .category-card h6 {
+    font-size: 0.8rem;
+  }
+
+  /* Product image container */
+  .product-image-container {
+    height: 120px;
+    margin-bottom: 8px;
+  }
+
+  .product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Discount badge */
+  .discount-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Button styles */
+  .btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+
+  /* Text responsive */
+  h1,
+  .h1 {
+    font-size: 1.5rem;
+  }
+  h2,
+  .h2 {
+    font-size: 1.3rem;
+  }
+  h3,
+  .h3 {
+    font-size: 1.1rem;
+  }
+  h4,
+  .h4 {
+    font-size: 1rem;
+  }
+  h5,
+  .h5 {
+    font-size: 0.9rem;
+  }
+  h6,
+  .h6 {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 30px 0;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .product-card {
+    padding: 12px;
+  }
+
+  .product-card h5 {
+    font-size: 0.9rem;
+  }
+
+  .product-card .price {
+    font-size: 0.95rem;
+  }
+}
+
+/* Voucher Page Responsive */
+@media (max-width: 1200px) {
+  .voucher-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .voucher-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .voucher-card {
+    padding: 16px;
+    min-height: 140px;
+  }
+
+  .voucher-card h5 {
+    font-size: 1.1rem;
+  }
+
+  .voucher-card .voucher-value {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .voucher-card {
+    padding: 14px;
+    min-height: 120px;
+  }
+
+  .voucher-card h5 {
+    font-size: 1rem;
+  }
+
+  .voucher-card .voucher-value {
+    font-size: 1.1rem;
+  }
+
+  .voucher-card .voucher-details {
+    font-size: 0.85rem;
+  }
+}
+
+/* Orders Page Responsive */
+@media (max-width: 992px) {
+  .orders-table {
+    font-size: 0.9rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .orders-table {
+    font-size: 0.8rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 6px 4px;
+  }
+
+  .orders-table .btn {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+
+  .order-details-modal .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .order-details-table {
+    font-size: 0.8rem;
+  }
+
+  .order-details-table th,
+  .order-details-table td {
+    padding: 6px 4px;
+  }
+}
+
+@media (max-width: 576px) {
+  .orders-table {
+    font-size: 0.75rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 4px 2px;
+  }
+
+  .orders-table .btn {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+
+  .order-details-modal .modal-dialog {
+    margin: 5px;
+    max-width: calc(100% - 10px);
+  }
+
+  .order-details-table {
+    font-size: 0.75rem;
+  }
+
+  .order-details-table th,
+  .order-details-table td {
+    padding: 4px 2px;
+  }
+
+  .order-details-table img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Forms Responsive */
+@media (max-width: 768px) {
+  .login-card,
+  .register-card,
+  .checkout-card {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+
+  .form-control {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .btn {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+
+  .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .modal-footer {
+    padding: 15px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-card,
+  .register-card,
+  .checkout-card {
+    margin: 10px 5px;
+    padding: 15px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .modal-dialog {
+    margin: 5px;
+    max-width: calc(100% - 10px);
+  }
+
+  .modal-body {
+    padding: 10px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+  }
+
+  .alert {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+}
+
+/* Profile Page Responsive */
+@media (max-width: 992px) {
+  .my-account {
+    margin-top: 80px;
+  }
+
+  .profile-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .profile-image {
+    text-align: center;
+  }
+
+  .avatar-upload-section {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .my-account {
+    margin-top: 70px;
+    padding-top: 120px;
+  }
+
+  .list-group-pane {
+    margin-bottom: 20px;
+  }
+
+  .list-group-item {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+
+  .profile-section {
+    padding: 20px;
+  }
+
+  .profile-form .row {
+    margin: 0;
+  }
+
+  .profile-form .col-md-6 {
+    padding: 0 0 15px 0;
+  }
+
+  .avatar-upload-section {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .my-account {
+    margin-top: 60px;
+    padding-top: 100px;
+  }
+
+  .list-group-item {
+    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .profile-section {
+    padding: 15px;
+  }
+
+  .profile-form .form-label {
+    font-size: 0.9rem;
+  }
+
+  .profile-form .form-control {
+    font-size: 16px;
+  }
+
+  .avatar-upload-section {
+    margin-top: 15px;
+  }
+
+  .profile-image img,
+  .profile-image .avatar-component {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}
+
+/* General Responsive Utilities */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .row {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .col,
+  [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .text-center-mobile {
+    text-align: center;
+  }
+
+  .d-none-mobile {
+    display: none !important;
+  }
+
+  .d-block-mobile {
+    display: block !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .row {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .col,
+  [class*="col-"] {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  h1,
+  .h1 {
+    font-size: 1.8rem;
+  }
+
+  h2,
+  .h2 {
+    font-size: 1.5rem;
+  }
+
+  h3,
+  .h3 {
+    font-size: 1.3rem;
+  }
+
+  h4,
+  .h4 {
+    font-size: 1.1rem;
+  }
+
+  h5,
+  .h5 {
+    font-size: 1rem;
+  }
+
+  h6,
+  .h6 {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ẩn dấu chấm xanh status indicator */
+.avatar-trigger::after,
+.avatar-trigger::before,
+.avatar-component::after,
+.avatar-component::before,
+.rounded-full::after,
+.rounded-full::before,
+.avatar-dropdown-container::after,
+.avatar-dropdown-container::before {
+  display: none !important;
+}
+
+/* Ẩn tất cả pseudo elements có thể tạo dấu chấm xanh */
+.avatar-trigger *::after,
+.avatar-trigger *::before,
+.avatar-component *::after,
+.avatar-component *::before {
+  display: none !important;
+}
+
+/* Ẩn status indicator từ browser hoặc extension */
+[class*="status"],
+[class*="online"],
+[class*="indicator"],
+[class*="dot"] {
+  display: none !important;
 }
 
 /* Avatar Upload Styles */
@@ -1923,5 +2870,4 @@ a:hover,
   .form-actions .btn {
     width: 100%;
   }
-
 }
