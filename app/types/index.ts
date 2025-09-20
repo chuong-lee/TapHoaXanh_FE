@@ -80,7 +80,15 @@ export interface Product {
   weight_unit: string;
   description: string;
   purchase: number;
+  categoryId: number;
+  brandId: number;
 }
+
+export type CategoryCount = {
+  categoryId: number;
+  categoryName: string;
+  count: string;
+};
 
 export interface CartItem {
   id: number;
