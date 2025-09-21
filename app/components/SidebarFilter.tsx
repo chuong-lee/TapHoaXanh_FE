@@ -20,7 +20,7 @@ export default function SidebarFilter({
   const [categories, setCategories] = useState<Category[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [price, setPrice] = useState(1000000);
-
+  console.log("selected", selected);
   useEffect(() => {
     const fetchCategories = async () => {
       try {

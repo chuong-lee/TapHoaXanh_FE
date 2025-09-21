@@ -120,7 +120,7 @@ export function useCart() {
 
   const syncWithDatabase = async () => {
     try {
-      await api.post("/api/cart/sync", cart)
+      await api.post("/cart/sync", cart)
       localStorage.removeItem("cart_local")
     } catch (error: unknown) {
       handleError(error);

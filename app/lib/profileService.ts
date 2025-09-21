@@ -1,3 +1,4 @@
+import { Address } from "@/types";
 import api from "./axios";
 
 export interface ProfileDto {
@@ -8,6 +9,10 @@ export interface ProfileDto {
 }
 
 export const profileService = {
+  getAddress: async (): Promise<Address[]> => {
+    const res = await api.get("/address/all");
+    return res.data;
+  },
   getProfile: async (): Promise<ProfileDto> => {
     const res = await api.get("/users/profile");
     return res.data as ProfileDto;
@@ -34,7 +39,7 @@ export const profileService = {
     const formData = new FormData();
     formData.append("avatar", file);
 
-    const res = await fetch("/api/users/avatar", {
+    const res = await fetch("/users/avatar", {
       method: "POST",
       body: formData,
     });
