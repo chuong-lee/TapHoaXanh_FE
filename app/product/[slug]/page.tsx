@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { FaRegHeart } from "react-icons/fa";
+import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 import api from "@/lib/axios";
 import Image from "next/image";
@@ -131,11 +134,37 @@ export default function ProductDetailPage() {
     return <div className="alert alert-danger">Không tìm thấy sản phẩm</div>;
 
   const getProductPrice = () => {
-    // Giá sau giảm
-    const finalPrice = product.price - product.discount;
+    // Giá sau giảm (discount theo phần trăm)
+    const finalPrice = product.price * (1 - product.discount / 100);
     return finalPrice;
   };
   const totalPrice = getProductPrice() * quantity;
+
+  const handleWishList = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await api.post("wishlist", { productId: product.id });
+      toast.success(`Đã thêm "${product.name}" vào sản phẩm yêu thích!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (error) {
+      console.log("Lỗi khi thêm vào wishlist:", error);
+      toast.error("Có lỗi xảy ra khi thêm vào sản phẩm yêu thích!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
 
   function formatDateTime(isoString: string): { date: string; time: string } {
     const date = new Date(isoString);
@@ -233,7 +262,49 @@ export default function ProductDetailPage() {
         <div className="col-md-7">
           <div className="row">
             {/* Left part of right column: Info */}
-            <div className="col-md-7">
+            <div className="col-md-7 position-relative">
+              <Button
+                className="position-absolute"
+                style={{
+                  top: "0px",
+                  right: "0px",
+                  zIndex: 10,
+                  background: "rgba(255, 255, 255, 0.9)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(220, 53, 69, 0.1)";
+                  e.currentTarget.style.transform = "scale(1.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.9)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                onClick={handleWishList}
+              >
+                <FaRegHeart
+                  size={18}
+                  color="#dc3545"
+                  style={{
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#b02a37";
+                    e.currentTarget.style.transform = "scale(1.2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#dc3545";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                />
+              </Button>
               <h4 className="mb-1">{product.name}</h4>
               <div
                 style={{
@@ -274,10 +345,13 @@ export default function ProductDetailPage() {
                 {product.discount > 0 && (
                   <div className="text-success fw-bold">
                     Tiết kiệm:{" "}
-                    {product.discount.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
+                    {(product.price - getProductPrice()).toLocaleString(
+                      "vi-VN",
+                      {
+                        style: "currency",
+                        currency: "VND",
+                      }
+                    )}
                   </div>
                 )}
               </div>
@@ -385,7 +459,8 @@ export default function ProductDetailPage() {
                     }
 
                     if (product.quantity <= 0) return;
-                    const finalPrice = product.price - product.discount;
+                    const finalPrice =
+                      product.price * (1 - product.discount / 100);
                     addToCart(
                       {
                         ...product,
@@ -621,13 +696,11 @@ export default function ProductDetailPage() {
         <div className="row g-3">
           {relatedProducts.map((item) => {
             const basePrice = item.price;
-            const finalPrice = basePrice - item.discount;
+            const finalPrice = basePrice * (1 - item.discount / 100);
             return (
               <div className="col-3" key={item.id}>
                 <div className="custom-product-card h-100">
-                  <span className="badge-hot">
-                    -{Math.round((item.discount / item.price) * 100)}%
-                  </span>
+                  <span className="badge-hot">-{item.discount}%</span>
                   <div className="product-image">
                     <Image
                       src={
@@ -650,9 +723,7 @@ export default function ProductDetailPage() {
                     />
                   </div>
                   <div className="product-info">
-                    <div className="product-type">Đồ ăn vặt</div>
                     <div className="product-name">{item.name}</div>
-                    <div className="product-brand">Bởi NestFood</div>
                     <div className="product-price">
                       <span className="price-main">
                         {finalPrice.toLocaleString()}₫

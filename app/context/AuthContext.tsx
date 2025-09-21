@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (localStorage.getItem("access_token")) {
       refreshProfile();
     }
-  }, []);
+  }, [refreshProfile]);
 
   useEffect(() => {
     if (profile) {

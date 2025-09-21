@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Voucher } from "@/types";
+import { Voucher, Address } from "@/types";
 import api from "@/lib/axios";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { addressService } from "@/lib/addressService";
 
 function CheckoutPage() {
   const router = useRouter();
@@ -15,6 +16,11 @@ function CheckoutPage() {
   const { profile } = useAuth();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
+    null
+  );
+  const [addressLoading, setAddressLoading] = useState(true);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -95,6 +101,28 @@ function CheckoutPage() {
     fetchVouchers();
   }, []);
 
+  // Load addresses
+  useEffect(() => {
+    const loadAddresses = async () => {
+      try {
+        setAddressLoading(true);
+        const data = await addressService.getAllAddresses();
+        setAddresses(data);
+        // Tự động chọn địa chỉ mặc định nếu có
+        const defaultAddress = data.find((addr) => addr.is_default);
+        if (defaultAddress) {
+          setSelectedAddressId(defaultAddress.id);
+        }
+      } catch (error) {
+        console.error("Error loading addresses:", error);
+        toast.error("Không thể tải danh sách địa chỉ");
+      } finally {
+        setAddressLoading(false);
+      }
+    };
+    loadAddresses();
+  }, []);
+
   // Tính tổng tiền chỉ cho những items được chọn
   const subtotal = cart
     ? cart
@@ -108,49 +136,59 @@ function CheckoutPage() {
     : 0;
 
   let discount = 0;
-  if (selectedVoucher && subtotal >= selectedVoucher.min_order_value) {
-    discount = Math.min(selectedVoucher.max_discount, subtotal);
+  if (
+    selectedVoucher &&
+    subtotal >= selectedVoucher.min_order_value &&
+    selectedVoucher.value
+  ) {
+    if (selectedVoucher.type === "PERCENTAGE") {
+      // Giảm theo phần trăm
+      const calculatedDiscount = subtotal * (selectedVoucher.value / 100);
+      discount = Math.min(selectedVoucher.max_discount, calculatedDiscount);
+    } else if (selectedVoucher.type === "NORMAL") {
+      // Giảm theo số tiền cố định
+      discount = Math.min(selectedVoucher.max_discount, selectedVoucher.value);
+    }
   }
-  const shipping = subtotal > 300000 ? 0 : 15000;
-  const total = subtotal - discount + shipping;
+  const total = subtotal - discount;
 
-  const requiredFields = [
-    { key: "fullName", label: "Họ và tên" },
-    { key: "address", label: "Địa chỉ" },
-    { key: "city", label: "Tỉnh/Thành phố" },
-    { key: "state", label: "Huyện/Quận" },
-    { key: "zip", label: "Xã/Thị trấn" },
-    { key: "phone", label: "Số điện thoại" },
-    { key: "email", label: "Email" },
-  ];
+  // Tự động chuyển về COD nếu đang chọn VNPay mà tổng tiền < 5,000đ
+  useEffect(() => {
+    if (form.payment === "vnpay" && total < 5000) {
+      setForm((f) => ({ ...f, payment: "cod" }));
+    }
+  }, [total, form.payment]);
 
   // Kiểm tra xem đã nhập đầy đủ thông tin nhận hàng chưa
   const isFormInfoComplete = () => {
-    return requiredFields.every((field) => {
-      const value = form[field.key as keyof typeof form];
-      return value && value.toString().trim() !== "";
-    });
+    return (
+      selectedAddressId !== null && form.fullName && form.phone && form.email
+    );
   };
 
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    const missing = requiredFields.filter(
-      (f) => !form[f.key as keyof typeof form]
-    );
-    if (missing.length > 0) {
-      setErrorFields(missing.map((f) => f.label));
+
+    // Kiểm tra địa chỉ đã chọn
+    if (!selectedAddressId) {
+      toast.error("Vui lòng chọn địa chỉ giao hàng");
       return;
     }
+
+    // Kiểm tra thông tin cơ bản
+    if (!form.fullName || !form.phone || !form.email) {
+      toast.error("Vui lòng kiểm tra lại thông tin cá nhân");
+      return;
+    }
+
     setErrorFields([]);
 
     const orderPayload = {
       voucherId: selectedVoucher?.id,
       note: form.notes,
       cartItemIds: selectedItems,
+      addressId: selectedAddressId, // Gửi ID địa chỉ đã chọn
     };
-
-    console.log("Selected items:", selectedItems);
-    console.log("Order payload:", orderPayload);
 
     try {
       const orderId = await api.post("/order/from-cart", orderPayload);
@@ -274,17 +312,6 @@ function CheckoutPage() {
               ) : (
                 // Hiển thị form thông tin nhận hàng (mặc định) khi chưa chọn phương thức thanh toán hoặc COD
                 <>
-                  <div
-                    className="alert mb-4"
-                    style={{
-                      backgroundColor: "#f0fdf4",
-                      borderColor: "#bbf7d0",
-                      color: "#166534",
-                    }}
-                  >
-                    Thêm <b>{(300000 - subtotal).toLocaleString("vi-VN")}₫</b>{" "}
-                    vào giỏ để được <b>miễn phí giao hàng!</b>
-                  </div>
                   <h3 className="fw-bold mb-3">
                     <i className="fa-solid fa-user me-2"></i>
                     Thông tin nhận hàng
@@ -299,9 +326,8 @@ function CheckoutPage() {
                       }}
                     >
                       <i className="fa-solid fa-info-circle me-2"></i>
-                      <strong>Bước 1:</strong>Vui lòng nhập đầy đủ thông tin
-                      nhận hàng bên dưới, sau đó chọn phương thức thanh toán ở
-                      bên phải.
+                      <strong>Bước 1:</strong>Vui lòng chọn địa chỉ giao hàng
+                      bên dưới, sau đó chọn phương thức thanh toán ở bên phải.
                     </div>
                   )}
                   <div className="row g-3">
@@ -317,56 +343,46 @@ function CheckoutPage() {
                       />
                     </div>
                     <div className="col-12">
-                      <label>Địa chỉ *</label>
-                      <input
-                        className="form-control"
-                        placeholder="Số nhà, tên đường"
-                        value={form.address}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, address: e.target.value }))
-                        }
-                      />
-                      <input
-                        className="form-control mt-2"
-                        placeholder="Căn hộ, tầng, v.v. (không bắt buộc)"
-                        value={form.address2}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, address2: e.target.value }))
-                        }
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label>Tỉnh/Thành phố *</label>
-                      <input
-                        className="form-control"
-                        placeholder="Nhập tỉnh hoặc thành phố"
-                        value={form.city}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, city: e.target.value }))
-                        }
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label>Huyện/Quận *</label>
-                      <input
-                        className="form-control"
-                        placeholder="Nhập huyện hoặc quận"
-                        value={form.state}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, state: e.target.value }))
-                        }
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label>Xã/Thị trấn *</label>
-                      <input
-                        className="form-control"
-                        placeholder="Nhập xã hoặc thị trấn"
-                        value={form.zip}
-                        onChange={(e) =>
-                          setForm((f) => ({ ...f, zip: e.target.value }))
-                        }
-                      />
+                      <label>Chọn địa chỉ giao hàng *</label>
+                      {addressLoading ? (
+                        <div className="text-center py-3">
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2 text-muted">
+                            Đang tải danh sách địa chỉ...
+                          </p>
+                        </div>
+                      ) : addresses.length === 0 ? (
+                        <div className="alert alert-warning">
+                          <i className="fa-solid fa-exclamation-triangle me-2"></i>
+                          Bạn chưa có địa chỉ nào. Vui lòng thêm địa chỉ trong{" "}
+                          <a href="/profile" className="alert-link">
+                            thông tin cá nhân
+                          </a>
+                          .
+                        </div>
+                      ) : (
+                        <select
+                          className="form-control"
+                          value={selectedAddressId || ""}
+                          onChange={(e) =>
+                            setSelectedAddressId(Number(e.target.value))
+                          }
+                        >
+                          <option value="">-- Chọn địa chỉ giao hàng --</option>
+                          {addresses.map((address) => (
+                            <option key={address.id} value={address.id}>
+                              {address.street}, {address.district},{" "}
+                              {address.city}
+                              {address.is_default && " (Mặc định)"}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                     <div className="col-md-6">
                       <label>Số điện thoại *</label>
@@ -480,14 +496,6 @@ function CheckoutPage() {
                       </td>
                     </tr>
                     <tr>
-                      <td>Phí vận chuyển</td>
-                      <td className="text-end">
-                        {shipping === 0
-                          ? "Miễn phí"
-                          : shipping.toLocaleString("vi-VN") + "₫"}
-                      </td>
-                    </tr>
-                    <tr>
                       <td>
                         <b>Tổng cộng</b>
                       </td>
@@ -562,16 +570,27 @@ function CheckoutPage() {
                           type="radio"
                           className="form-check-input"
                           checked={form.payment === "vnpay"}
+                          disabled={total < 5000}
                           onChange={() =>
                             setForm((f) => ({ ...f, payment: "vnpay" }))
                           }
                         />
                         <label className="form-check-label">
                           <b>Ví điện tử (VNPay)</b>
+                          {total < 5000 && (
+                            <span className="text-danger ms-2">
+                              (Tối thiểu 5,000đ)
+                            </span>
+                          )}
                         </label>
                         <div className="small text-muted ms-4">
-                          Thanh toán nhanh chóng và an toàn qua ví điện tử. Bạn
-                          sẽ được chuyển đến trang thanh toán.
+                          {total < 5000 ? (
+                            <span className="text-danger">
+                              Đơn hàng tối thiểu 5,000đ để sử dụng VNPay
+                            </span>
+                          ) : (
+                            "Thanh toán nhanh chóng và an toàn qua ví điện tử. Bạn sẽ được chuyển đến trang thanh toán."
+                          )}
                         </div>
                       </div>
                       <div className="form-check mt-2">

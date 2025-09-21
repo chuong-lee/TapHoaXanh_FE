@@ -7,7 +7,6 @@ import api from "@/lib/axios";
 
 export default function PostPage() {
   const [news, setNews] = useState<News[]>([]);
-  console.log("🚀 ~ PostPage ~ news:", news);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

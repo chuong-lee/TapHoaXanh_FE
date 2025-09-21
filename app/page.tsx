@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { FaRegHeart } from "react-icons/fa";
+import { toast } from "react-toastify";
 import Marquee from "./components/Marquee";
 import { useAuth } from "./context/AuthContext";
 
@@ -89,13 +90,30 @@ export default function HomePage() {
 
   const handleWishList = async (
     e: React.MouseEvent<HTMLButtonElement>,
-    productId: number
+    productId: number,
+    productName: string
   ) => {
     e.preventDefault();
     try {
       await api.post("wishlist", { productId });
+      toast.success(`Đã thêm "${productName}" vào sản phẩm yêu thích!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (error) {
       console.log("Lỗi", error);
+      toast.error("Có lỗi xảy ra khi thêm vào sản phẩm yêu thích!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
   return (
@@ -258,6 +276,52 @@ export default function HomePage() {
                     key={product.id}
                     className="featured-product-card card border-0 shadow-sm position-relative p-3"
                   >
+                    <Button
+                      className="position-absolute"
+                      style={{
+                        top: "8px",
+                        right: "8px",
+                        zIndex: 10,
+                        background: "rgba(255, 255, 255, 0.9)",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "40px",
+                        height: "40px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(220, 53, 69, 0.1)";
+                        e.currentTarget.style.transform = "scale(1.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255, 255, 255, 0.9)";
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
+                      onClick={(e) =>
+                        handleWishList(e, product.id, product.name)
+                      }
+                    >
+                      <FaRegHeart
+                        size={18}
+                        color="#dc3545"
+                        style={{
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = "#b02a37";
+                          e.currentTarget.style.transform = "scale(1.2)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = "#dc3545";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      />
+                    </Button>
                     {/* Thêm ảnh sản phẩm ở đây */}
                     <div className="featured-product-image d-flex align-items-center justify-content-center mb-2">
                       <Image
@@ -354,10 +418,14 @@ export default function HomePage() {
                         className="fw-bold text-success me-2"
                         style={{ fontSize: 18 }}
                       >
-                        {product.price.toLocaleString()} VNĐ
+                        {(
+                          product.price *
+                          (1 - product.discount / 100)
+                        ).toLocaleString()}{" "}
+                        VNĐ
                       </span>
                       <span className="text-muted text-decoration-line-through small">
-                        {(product.price + product.discount).toLocaleString()} VNĐ
+                        {product.price.toLocaleString()} VNĐ
                       </span>
                     </div>
                     {/* Thanh tiến trình bán */}
@@ -475,10 +543,14 @@ export default function HomePage() {
                           className="price-main"
                           style={{ color: "#e11d48" }}
                         >
-                          {product.price.toLocaleString()} VNĐ
+                          {(
+                            product.price *
+                            (1 - product.discount / 100)
+                          ).toLocaleString()}{" "}
+                          VNĐ
                         </span>
                         <span className="price-old">
-                          {(product.price + product.discount).toLocaleString()} VNĐ
+                          {product.price.toLocaleString()} VNĐ
                         </span>
                       </div>
                       <div className="d-flex align-items-center justify-content-between">
@@ -487,9 +559,39 @@ export default function HomePage() {
                         </div>
                         <Button
                           className="d-flex align-items-center justify-content-center"
-                          onClick={(e) => handleWishList(e, product.id)}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            transition: "all 0.3s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background =
+                              "rgba(220, 53, 69, 0.1)";
+                            e.currentTarget.style.transform = "scale(1.1)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.transform = "scale(1)";
+                          }}
+                          onClick={(e) =>
+                            handleWishList(e, product.id, product.name)
+                          }
                         >
-                          <FaRegHeart size={24} />
+                          <FaRegHeart
+                            size={24}
+                            color="#dc3545"
+                            style={{
+                              transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = "#b02a37";
+                              e.currentTarget.style.transform = "scale(1.2)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = "#dc3545";
+                              e.currentTarget.style.transform = "scale(1)";
+                            }}
+                          />
                         </Button>
                       </div>
                     </div>
@@ -636,7 +738,56 @@ export default function HomePage() {
                 </div>
                 {/* Các sản phẩm còn lại */}
                 {products.slice(rowIdx * 4, rowIdx * 4 + 4).map((product) => (
-                  <div className="featured-product-card" key={product.id}>
+                  <div
+                    className="featured-product-card position-relative"
+                    key={product.id}
+                  >
+                    <Button
+                      className="position-absolute"
+                      style={{
+                        top: "8px",
+                        right: "8px",
+                        zIndex: 10,
+                        background: "rgba(255, 255, 255, 0.9)",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "40px",
+                        height: "40px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.3s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(220, 53, 69, 0.1)";
+                        e.currentTarget.style.transform = "scale(1.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255, 255, 255, 0.9)";
+                        e.currentTarget.style.transform = "scale(1)";
+                      }}
+                      onClick={(e) =>
+                        handleWishList(e, product.id, product.name)
+                      }
+                    >
+                      <FaRegHeart
+                        size={18}
+                        color="#dc3545"
+                        style={{
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = "#b02a37";
+                          e.currentTarget.style.transform = "scale(1.2)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = "#dc3545";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      />
+                    </Button>
                     <div className="featured-product-image">
                       <Image
                         width={300}
@@ -660,10 +811,14 @@ export default function HomePage() {
                     <div className="product-title">{product.name}</div>
                     <div className="price-row">
                       <span className="price-main">
-                        {product.price.toLocaleString()} VNĐ
+                        {(
+                          product.price *
+                          (1 - product.discount / 100)
+                        ).toLocaleString()}{" "}
+                        VNĐ
                       </span>
                       <span className="price-old">
-                        {(product.price + product.discount).toLocaleString()} VNĐ
+                        {product.price.toLocaleString()} VNĐ
                       </span>
                     </div>
                     <div

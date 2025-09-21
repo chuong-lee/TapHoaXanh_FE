@@ -7,6 +7,7 @@ import { Tabs, Tab, Form } from "react-bootstrap";
 import LogoutButton from "../components/logout";
 import Avatar from "../components/Avatar";
 import AddressList from "../components/AddressList";
+import Wishlist from "../components/Wishlist";
 
 export default function ProfilePage() {
   const { profile, setProfile, refreshProfile } = useAuth();
@@ -291,6 +292,9 @@ export default function ProfilePage() {
                 </Tab>
                 <Tab eventKey="addresses" title="Địa chỉ giao hàng">
                   <AddressList />
+                </Tab>
+                <Tab eventKey="wishlist" title="Sản phẩm yêu thích">
+                  <Wishlist />
                 </Tab>
                 {/* <Tab eventKey="orders" title="Thông tin đơn hàng">
                   <h2>Orders</h2>

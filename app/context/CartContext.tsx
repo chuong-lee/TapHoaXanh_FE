@@ -52,7 +52,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isCartLoading, setIsCartLoading] = useState(true);
 
   const addToCart = async (product: Product, quantity: number = 1) => {
-    const response = await api.post("/cart/add", {
+    await api.post("/cart/add", {
       productId: product.id,
       quantity: quantity,
     });
