@@ -24,17 +24,9 @@ function CheckoutPage() {
 
   const [form, setForm] = useState({
     fullName: "",
-    address: "",
-    address2: "",
-    city: "",
-    state: "",
-    zip: "",
     phone: "",
     email: "",
-    createAccount: false,
-    shipToDifferent: false,
     notes: "",
-    agree: false,
     payment: "",
     voucher: "",
   });
@@ -342,6 +334,7 @@ function CheckoutPage() {
                         }
                       />
                     </div>
+                    <div></div>
                     <div className="col-12">
                       <label>Chọn địa chỉ giao hàng *</label>
                       {addressLoading ? (
@@ -406,24 +399,7 @@ function CheckoutPage() {
                         }
                       />
                     </div>
-                    <div className="col-12">
-                      <div className="form-check">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          checked={form.shipToDifferent}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              shipToDifferent: e.target.checked,
-                            }))
-                          }
-                        />
-                        <label className="form-check-label">
-                          Giao hàng tới địa chỉ khác?
-                        </label>
-                      </div>
-                    </div>
+
                     <div className="col-12">
                       <label>Ghi chú đơn hàng (không bắt buộc)</label>
                       <textarea

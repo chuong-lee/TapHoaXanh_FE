@@ -166,9 +166,11 @@ export default function ProfilePage() {
 
   return (
     <section>
-      <div className="my-account mt5">
+      <div className="my-account mt5" style={{ marginTop: "100px" }}>
         <div className="container">
-          <h1 className="page-title">Thông tin người dùng</h1>
+          <h1 className="page-title" style={{ marginBottom: "48px" }}>
+            Thông tin người dùng
+          </h1>
           {/* <div className="breadcrumb mt-3">
             <Link href="/">Trang chủ </Link>
             <span>/</span>

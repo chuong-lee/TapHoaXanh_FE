@@ -9,8 +9,10 @@ import React, {
   useCallback,
 } from "react";
 import { profileService, ProfileDto } from "../lib/profileService";
+import { Address } from "@/types";
 
 interface AuthContextType {
+  address: Address[];
   profile: ProfileDto | null;
   setProfile: React.Dispatch<React.SetStateAction<ProfileDto | null>>;
   refreshProfile: () => Promise<void>;
@@ -22,10 +24,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileDto | null>(null);
-
+  const [address, setAddress] = useState<Address[]>([]);
   const refreshProfile = useCallback(async () => {
     try {
       const data = await profileService.getProfile();
+      const addressData = await profileService.getAddress();
+
+      setAddress(addressData);
       setProfile(data);
     } catch {
       setProfile(null);
@@ -47,7 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [pathname, profile, router]);
 
   return (
-    <AuthContext.Provider value={{ profile, setProfile, refreshProfile }}>
+    <AuthContext.Provider
+      value={{ address, profile, setProfile, refreshProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

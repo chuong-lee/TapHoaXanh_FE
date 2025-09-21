@@ -10,7 +10,15 @@ export type Voucher = {
   type?: "PERCENTAGE" | "NORMAL";
   value?: number;
 };
-
+export interface Address {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  street: string;
+  city: string;
+  district: string;
+  is_default: boolean;
+}
 export type News = {
   id: string;
   name: string;

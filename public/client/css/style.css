@@ -8,7 +8,7 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
@@ -197,7 +197,7 @@ body {
 }
 
 .btn-send {
-  background: #FFF7D8;
+  background: #fff7d8;
   color: #000;
   border-radius: 16px;
   padding: 20px;
@@ -259,13 +259,13 @@ body {
 
 .form-select {
   --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  color: #6D6E71;
+  color: #6d6e71;
 }
 .form-select:focus {
   box-shadow: none;
 }
 .form-select option {
-  color: #6D6E71;
+  color: #6d6e71;
   background: #1b1c21;
 }
 
@@ -283,7 +283,7 @@ body {
 }
 
 .dropdown-menu {
-  background: #052323;
+  background: #fff;
 }
 .dropdown-menu .dropdown-item {
   color: white;
@@ -324,7 +324,6 @@ body {
   top: 30px;
   justify-content: center;
   display: flex;
-
 }
 .header-index .navbar {
   background: #fff;
@@ -433,7 +432,8 @@ section .home .featured-categories .categories-grid .category-item {
 section .home .featured-categories .categories-grid .category-item .icon {
   margin-bottom: 10px;
 }
-section .home .featured-categories .categories-grid .category-item .icon img, section .home .featured-categories .categories-grid .category-item .icon svg {
+section .home .featured-categories .categories-grid .category-item .icon img,
+section .home .featured-categories .categories-grid .category-item .icon svg {
   width: 54px;
   height: 54px;
   display: block;
@@ -635,7 +635,7 @@ section .home .promo-banners .promo-banner.bg-blue {
   background: linear-gradient(120deg, #e3f2fd 0%, #b3e5fc 100%);
 }
 section .home .promo-banners .promo-banner.bg-blue .promo-btn {
-  background: #FFBA31;
+  background: #ffba31;
   color: #222;
   border: none;
 }
@@ -645,14 +645,14 @@ section .home .promo-banners .promo-banner.bg-blue .promo-btn {
     font-weight: 600;
     border-radius: 10px;
     padding: 16px 38px;
-    background: #FFBA31;
+    background: #ffba31;
   }
 }
 section .home .promo-banners .promo-banner.bg-yellow {
   background: #ffd233;
 }
 section .home .promo-banners .promo-banner.bg-yellow .promo-btn {
-  background: #FFBA31;
+  background: #ffba31;
   color: #222;
   border: none;
 }
@@ -662,7 +662,7 @@ section .home .promo-banners .promo-banner.bg-yellow .promo-btn {
     font-weight: 600;
     border-radius: 10px;
     padding: 16px 38px;
-    background: #FFBA31;
+    background: #ffba31;
   }
 }
 section .home .flash-sales .section-title {
@@ -716,7 +716,16 @@ section .home .flash-sales .flash-sales-list .flash-card.border-orange {
 section .home .flash-sales .flash-sales-list .flash-card .card-top {
   padding: 0 0 0 0;
 }
-section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-pink, section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-blue, section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-green, section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-orange {
+section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-pink,
+section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-blue,
+section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-green,
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .card-top
+  .badge-orange {
   font-size: 1.1rem;
   font-weight: 700;
   border-radius: 10px 10px 0 10px;
@@ -730,10 +739,22 @@ section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-pink {
 section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-blue {
   background: #4cb4f6;
 }
-section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-green {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .card-top
+  .badge-green {
   background: #43b05c;
 }
-section .home .flash-sales .flash-sales-list .flash-card .card-top .badge-orange {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .card-top
+  .badge-orange {
   background: #ffb400;
   color: #fff;
 }
@@ -757,7 +778,13 @@ section .home .flash-sales .flash-sales-list .flash-card .card-top .add-btn {
 section .home .flash-sales .flash-sales-list .flash-card .card-top .add-btn i {
   font-size: 1.1rem;
 }
-section .home .flash-sales .flash-sales-list .flash-card .card-top .add-btn:hover {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .card-top
+  .add-btn:hover {
   background: #ffb400;
   color: #fff;
 }
@@ -775,7 +802,13 @@ section .home .flash-sales .flash-sales-list .flash-card .product-img img {
 section .home .flash-sales .flash-sales-list .flash-card .product-info {
   padding: 0 18px;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .category {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .category {
   color: #bbb;
   font-size: 0.98rem;
   margin-top: 6px;
@@ -791,17 +824,37 @@ section .home .flash-sales .flash-sales-list .flash-card .product-info .brand {
   color: #e74c3c;
   margin-bottom: 4px;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .price-row {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .price-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .price-row .price {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .price-row
+  .price {
   color: #e74c3c;
   font-size: 1.15rem;
   font-weight: 700;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .price-row .old-price {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .price-row
+  .old-price {
   color: #bbb;
   font-size: 1rem;
   text-decoration: line-through;
@@ -811,18 +864,46 @@ section .home .flash-sales .flash-sales-list .flash-card .product-info .rating {
   align-items: center;
   margin-top: 2px;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .rating .fa-star {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .rating
+  .fa-star {
   color: #ffb400;
   font-size: 1.1rem;
   margin-right: 1px;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .rating .fa-star.filled {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .rating
+  .fa-star.filled {
   color: #ffb400;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .rating .fa-star:not(.filled) {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .rating
+  .fa-star:not(.filled) {
   color: #bbb;
 }
-section .home .flash-sales .flash-sales-list .flash-card .product-info .rating .rating {
+section
+  .home
+  .flash-sales
+  .flash-sales-list
+  .flash-card
+  .product-info
+  .rating
+  .rating {
   color: #bbb;
   font-size: 1rem;
   margin-left: 4px;
@@ -930,7 +1011,14 @@ section .home .products .product-list .product-card .product-info .brand {
   color: #e74c3c;
   margin-bottom: 4px;
 }
-section .home .products .product-list .product-card .product-info .brand .brand-name {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .brand
+  .brand-name {
   color: #e74c3c;
 }
 section .home .products .product-list .product-card .product-info .price-row {
@@ -938,17 +1026,38 @@ section .home .products .product-list .product-card .product-info .price-row {
   align-items: center;
   gap: 8px;
 }
-section .home .products .product-list .product-card .product-info .price-row .price {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .price-row
+  .price {
   color: #e74c3c;
   font-size: 1.15rem;
   font-weight: 700;
 }
 @media (min-width: 320px) and (max-width: 479px) {
-  section .home .products .product-list .product-card .product-info .price-row .price {
+  section
+    .home
+    .products
+    .product-list
+    .product-card
+    .product-info
+    .price-row
+    .price {
     font-size: 12px;
   }
 }
-section .home .products .product-list .product-card .product-info .price-row .old-price {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .price-row
+  .old-price {
   color: #bbb;
   font-size: 1rem;
   text-decoration: line-through;
@@ -958,18 +1067,46 @@ section .home .products .product-list .product-card .product-info .rating {
   align-items: center;
   margin-top: 2px;
 }
-section .home .products .product-list .product-card .product-info .rating .fa-star {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .rating
+  .fa-star {
   color: #ffb400;
   font-size: 1.1rem;
   margin-right: 1px;
 }
-section .home .products .product-list .product-card .product-info .rating .fa-star.filled {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .rating
+  .fa-star.filled {
   color: #ffb400;
 }
-section .home .products .product-list .product-card .product-info .rating .fa-star:not(.filled) {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .rating
+  .fa-star:not(.filled) {
   color: #bbb;
 }
-section .home .products .product-list .product-card .product-info .rating .rating {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .product-info
+  .rating
+  .rating {
   color: #bbb;
   font-size: 1rem;
   margin-left: 4px;
@@ -977,7 +1114,13 @@ section .home .products .product-list .product-card .product-info .rating .ratin
 section .home .products .product-list .product-card .add-cart-row {
   margin-top: auto;
 }
-section .home .products .product-list .product-card .add-cart-row button.add-cart {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .add-cart-row
+  button.add-cart {
   width: 100%;
   background: #fbeef1;
   color: #222;
@@ -993,10 +1136,23 @@ section .home .products .product-list .product-card .add-cart-row button.add-car
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-section .home .products .product-list .product-card .add-cart-row button.add-cart i {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .add-cart-row
+  button.add-cart
+  i {
   font-size: 1.2rem;
 }
-section .home .products .product-list .product-card .add-cart-row button.add-cart:hover {
+section
+  .home
+  .products
+  .product-list
+  .product-card
+  .add-cart-row
+  button.add-cart:hover {
   background: #ffb400;
   color: #fff;
 }
@@ -1017,7 +1173,8 @@ section .home .section-best-sells .tab-list .tab {
   padding: 2px 10px;
   border-radius: 6px;
 }
-section .home .section-best-sells .tab-list .tab.active, section .home .section-best-sells .tab-list .tab:hover {
+section .home .section-best-sells .tab-list .tab.active,
+section .home .section-best-sells .tab-list .tab:hover {
   background: #ffd233;
   color: #222;
 }
@@ -1092,19 +1249,37 @@ section .home .section-best-sells .product-card .product-info .brand {
   color: #707070;
   margin-bottom: 4px;
 }
-section .home .section-best-sells .product-card .product-info .brand .brand-name {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .product-info
+  .brand
+  .brand-name {
   color: #e74c3c;
 }
 section .home .section-best-sells .product-card .product-info .price-row {
   display: flex;
   flex-direction: column;
 }
-section .home .section-best-sells .product-card .product-info .price-row .price {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .product-info
+  .price-row
+  .price {
   color: #e74c3c;
   font-size: 12px;
   font-weight: 700;
 }
-section .home .section-best-sells .product-card .product-info .price-row .old-price {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .product-info
+  .price-row
+  .old-price {
   color: #bbb;
   font-size: 12px;
   text-decoration: line-through;
@@ -1118,10 +1293,22 @@ section .home .section-best-sells .product-card .product-info .rating .fa-star {
   color: #ffb400;
   margin-right: 1px;
 }
-section .home .section-best-sells .product-card .product-info .rating .fa-star.filled {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .product-info
+  .rating
+  .fa-star.filled {
   color: #ffb400;
 }
-section .home .section-best-sells .product-card .product-info .rating .fa-star:not(.filled) {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .product-info
+  .rating
+  .fa-star:not(.filled) {
   color: #bbb;
 }
 section .home .section-best-sells .product-card .product-info .rating .rating {
@@ -1151,7 +1338,13 @@ section .home .section-best-sells .product-card .sold-bar .progress {
   background: #fbeef1;
   border-radius: 8px;
 }
-section .home .section-best-sells .product-card .sold-bar .progress .progress-bar.bg-pink {
+section
+  .home
+  .section-best-sells
+  .product-card
+  .sold-bar
+  .progress
+  .progress-bar.bg-pink {
   background: #ff5fa2;
 }
 section .home .section-best-sells .product-card .sold-bar .sold-text {
@@ -1167,7 +1360,7 @@ section .login .login-nab .tab-pane {
   opacity: 1;
 }
 section .login .login-nab .tab-pane .nav-pills {
-  background: #EFF0F6;
+  background: #eff0f6;
   border: 1px solid #ccc;
   padding: 5px;
   border-radius: 10px;
@@ -1197,7 +1390,12 @@ section .login .tab-content .form-group .input-group .form-control {
   border: 1px solid #dee2e6;
   font-size: 0.875rem;
 }
-section .login .tab-content .form-group .input-group .form-control::placeholder {
+section
+  .login
+  .tab-content
+  .form-group
+  .input-group
+  .form-control::placeholder {
   color: #adb5bd;
 }
 section .login .tab-content .form-group .form-label {
@@ -1476,33 +1674,84 @@ section .product .main-catalog .catalog-sidebar {
 section .product .main-catalog .catalog-sidebar .sidebar-section {
   margin-bottom: 24px;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section .sidebar-title {
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .sidebar-title {
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 10px;
   color: #222;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section ul, section .product .main-catalog .catalog-sidebar .sidebar-section .review-list {
+section .product .main-catalog .catalog-sidebar .sidebar-section ul,
+section .product .main-catalog .catalog-sidebar .sidebar-section .review-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section ul li, section .product .main-catalog .catalog-sidebar .sidebar-section .review-list li {
+section .product .main-catalog .catalog-sidebar .sidebar-section ul li,
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .review-list
+  li {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
   font-size: 15px;
   color: #444;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section ul li.active span, section .product .main-catalog .catalog-sidebar .sidebar-section .review-list li.active span {
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  ul
+  li.active
+  span,
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .review-list
+  li.active
+  span {
   color: #43b05c;
   font-weight: 600;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section ul li input[type=checkbox], section .product .main-catalog .catalog-sidebar .sidebar-section .review-list li input[type=checkbox] {
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  ul
+  li
+  input[type="checkbox"],
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .review-list
+  li
+  input[type="checkbox"] {
   margin-right: 8px;
   accent-color: #43b05c;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section ul li .count, section .product .main-catalog .catalog-sidebar .sidebar-section .review-list li .count {
+section .product .main-catalog .catalog-sidebar .sidebar-section ul li .count,
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .review-list
+  li
+  .count {
   margin-left: auto;
   color: #bbb;
   font-size: 13px;
@@ -1510,11 +1759,23 @@ section .product .main-catalog .catalog-sidebar .sidebar-section ul li .count, s
 section .product .main-catalog .catalog-sidebar .sidebar-section .price-slider {
   margin: 10px 0;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section .price-slider input[type=range] {
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .price-slider
+  input[type="range"] {
   width: 100%;
   accent-color: #43b05c;
 }
-section .product .main-catalog .catalog-sidebar .sidebar-section .price-slider .price-range {
+section
+  .product
+  .main-catalog
+  .catalog-sidebar
+  .sidebar-section
+  .price-slider
+  .price-range {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
@@ -1556,7 +1817,13 @@ section .product .main-catalog .catalog-main .catalog-header .catalog-title {
   font-size: 1.4rem;
   font-weight: 700;
 }
-section .product .main-catalog .catalog-main .catalog-header .catalog-title .count {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-title
+  .count {
   color: #e74c3c;
 }
 section .product .main-catalog .catalog-main .catalog-header .catalog-controls {
@@ -1564,23 +1831,66 @@ section .product .main-catalog .catalog-main .catalog-header .catalog-controls {
   align-items: center;
   gap: 18px;
 }
-section .product .main-catalog .catalog-main .catalog-header .catalog-controls .view-switch {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .view-switch {
   background: #f5f5f5;
   border-radius: 6px;
   padding: 4px 8px;
 }
-section .product .main-catalog .catalog-main .catalog-header .catalog-controls .view-switch i {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .view-switch
+  i {
   font-size: 1.2rem;
   color: #888;
   margin: 0 2px;
   cursor: pointer;
 }
-section .product .main-catalog .catalog-main .catalog-header .catalog-controls .show-select label, section .product .main-catalog .catalog-main .catalog-header .catalog-controls .sort-select label {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .show-select
+  label,
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .sort-select
+  label {
   font-size: 14px;
   color: #888;
   margin-right: 4px;
 }
-section .product .main-catalog .catalog-main .catalog-header .catalog-controls .show-select select, section .product .main-catalog .catalog-main .catalog-header .catalog-controls .sort-select select {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .show-select
+  select,
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-header
+  .catalog-controls
+  .sort-select
+  select {
   border: 1px solid #eee;
   border-radius: 4px;
   padding: 2px 8px;
@@ -1609,7 +1919,13 @@ section .product .main-catalog .catalog-main .catalog-grid .product-card {
   position: relative;
   transition: border 0.2s, box-shadow 0.2s;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-badge {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-badge {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -1620,55 +1936,128 @@ section .product .main-catalog .catalog-main .catalog-grid .product-card .produc
   border-radius: 4px;
   padding: 2px 10px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-image img {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-image
+  img {
   width: 90px;
   height: 90px;
   object-fit: contain;
   margin-bottom: 10px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-category {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-category {
   font-size: 13px;
   color: #bbb;
   margin-bottom: 2px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-name {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-name {
   font-size: 1rem;
   font-weight: 700;
   color: #222;
   margin-bottom: 2px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-brand {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-brand {
   font-size: 13px;
   color: #e74c3c;
   margin-bottom: 4px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-price .price {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-price
+  .price {
   color: #e74c3c;
   font-size: 1.1rem;
   font-weight: 700;
   margin-right: 6px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-price .old-price {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-price
+  .old-price {
   color: #bbb;
   font-size: 0.95rem;
   text-decoration: line-through;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-rating {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-rating {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 2px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-rating .stars {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-rating
+  .stars {
   color: #ffb400;
   font-size: 14px;
   margin-right: 4px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .product-info .product-rating .rating {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .product-info
+  .product-rating
+  .rating {
   color: #bbb;
   font-size: 13px;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .add-to-cart {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .add-to-cart {
   margin-top: 10px;
   width: 100%;
   padding: 8px 0;
@@ -1685,10 +2074,30 @@ section .product .main-catalog .catalog-main .catalog-grid .product-card .add-to
   gap: 8px;
   transition: background 0.2s, border 0.2s, color 0.2s;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .add-to-cart i {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .add-to-cart
+  i {
   font-size: 1.1rem;
 }
-section .product .main-catalog .catalog-main .catalog-grid .product-card .add-to-cart.active, section .product .main-catalog .catalog-main .catalog-grid .product-card .add-to-cart:hover {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .add-to-cart.active,
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-grid
+  .product-card
+  .add-to-cart:hover {
   background: #ffb400;
   color: #fff;
   border-color: #ffb400;
@@ -1704,7 +2113,14 @@ section .product .main-catalog .catalog-main .catalog-pagination ul.pagination {
   padding: 0;
   margin: 0;
 }
-section .product .main-catalog .catalog-main .catalog-pagination ul.pagination li a {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-pagination
+  ul.pagination
+  li
+  a {
   display: block;
   min-width: 32px;
   height: 32px;
@@ -1717,7 +2133,22 @@ section .product .main-catalog .catalog-main .catalog-pagination ul.pagination l
   text-decoration: none;
   transition: background 0.2s, color 0.2s;
 }
-section .product .main-catalog .catalog-main .catalog-pagination ul.pagination li.active a, section .product .main-catalog .catalog-main .catalog-pagination ul.pagination li a:hover {
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-pagination
+  ul.pagination
+  li.active
+  a,
+section
+  .product
+  .main-catalog
+  .catalog-main
+  .catalog-pagination
+  ul.pagination
+  li
+  a:hover {
   background: #ffb400;
   color: #fff;
 }
@@ -1767,18 +2198,23 @@ section .product-detail .product-slider .carousel .carousel-indicators button {
   border: 1px;
 }
 section .product-detail .product-slider .carousel .carousel-indicators .active {
-  border: 1px solid #F37021;
+  border: 1px solid #f37021;
 }
-section .product-detail .product-slider .carousel .carousel-indicators [data-bs-target] {
+section
+  .product-detail
+  .product-slider
+  .carousel
+  .carousel-indicators
+  [data-bs-target] {
   opacity: 1;
 }
 section .product-detail .divide-line {
   width: 100%;
   height: 3px;
-  background: #F37021;
+  background: #f37021;
 }
 section .product-detail .news-item {
-  color: #6D6E71;
+  color: #6d6e71;
 }
 section .product-detail .news-item .news-img {
   width: 100%;
@@ -1795,8 +2231,9 @@ section .product-detail .news-item .desc {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-section .product-detail .news-item:hover .news-title, section .product-detail .news-item:hover .more {
-  color: #F37021;
+section .product-detail .news-item:hover .news-title,
+section .product-detail .news-item:hover .more {
+  color: #f37021;
 }
 section .product-detail .product-spec-table table {
   width: 100%;
@@ -1828,7 +2265,8 @@ section .product-detail .product-spec-table table td.value {
   font-weight: 400;
   width: 68%;
 }
-section .product-detail .product-spec-table table tr.selected, section .product-detail .product-spec-table table tr.selected.alt {
+section .product-detail .product-spec-table table tr.selected,
+section .product-detail .product-spec-table table tr.selected.alt {
   outline: 2px solid #3b82f6;
   outline-offset: -2px;
   background: #fff;
@@ -1862,19 +2300,39 @@ section .my-account .tab-content .tab-pane .profile-section {
   border-radius: 0.5rem;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-header .profile-image {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-header
+  .profile-image {
   position: relative;
   display: inline-block;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-header .profile-image img {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-header
+  .profile-image
+  img {
   object-fit: cover;
-  border: 3px solid #FFA500;
+  border: 3px solid #ffa500;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-header .profile-image .edit-icon {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-header
+  .profile-image
+  .edit-icon {
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: #FFA500;
+  background-color: #ffa500;
   color: white;
   width: 32px;
   height: 32px;
@@ -1885,32 +2343,74 @@ section .my-account .tab-content .tab-pane .profile-section .profile-header .pro
   cursor: pointer;
   transition: all 0.3s ease;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-form .form-label {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .form-label {
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-form .form-control,
-section .my-account .tab-content .tab-pane .profile-section .profile-form .form-select {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .form-control,
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .form-select {
   border-radius: 0.5rem;
   border: 1px solid #dee2e6;
   padding: 0.75rem;
   font-size: 0.95rem;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-form .form-control:focus,
-section .my-account .tab-content .tab-pane .profile-section .profile-form .form-select:focus {
-  border-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .form-control:focus,
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .form-select:focus {
+  border-color: #ffa500;
   box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.25);
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-form .btn-warning {
-  background-color: #FFA500;
-  border-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .btn-warning {
+  background-color: #ffa500;
+  border-color: #ffa500;
   color: white;
   font-weight: 500;
   padding: 0.75rem 2rem;
   border-radius: 0.5rem;
   transition: all 0.3s ease;
 }
-section .my-account .tab-content .tab-pane .profile-section .profile-form .btn-warning:focus {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .profile-section
+  .profile-form
+  .btn-warning:focus {
   box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.25);
 }
 section .my-account .tab-content .tab-pane .address-list {
@@ -1925,50 +2425,138 @@ section .my-account .tab-content .tab-pane .address-list .address-item {
   margin-bottom: 20px;
   align-items: center;
 }
-section .my-account .tab-content .tab-pane .address-list .address-item .address-info .name {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .address-item
+  .address-info
+  .name {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
 }
-section .my-account .tab-content .tab-pane .address-list .address-item .address-info .address {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .address-item
+  .address-info
+  .address {
   color: #666;
   line-height: 1.5;
 }
-section .my-account .tab-content .tab-pane .address-list .address-item .address-actions {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .address-item
+  .address-actions {
   display: flex;
   gap: 15px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .section-title {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .section-title {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 30px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-row {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-row {
   gap: 20px;
   margin-bottom: 20px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-row .form-group {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-row
+  .form-group {
   flex: 1;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group {
   margin-bottom: 20px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group label {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group .required {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  .required {
   color: #f44336;
   margin-left: 4px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group .optional {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  .optional {
   color: #666;
   font-size: 14px;
   margin-left: 4px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group input,
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group select {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  input,
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  select {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #e0e0e0;
@@ -1976,24 +2564,71 @@ section .my-account .tab-content .tab-pane .address-list .add-address .address-f
   font-size: 14px;
   transition: border-color 0.3s;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group input:focus,
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group select:focus {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  input:focus,
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  select:focus {
   outline: none;
-  border-color: #2196F3;
+  border-color: #2196f3;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group input::placeholder,
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group select::placeholder {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  input::placeholder,
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  select::placeholder {
   color: #999;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .form-group select {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .form-group
+  select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 15px center;
   padding-right: 40px;
 }
-section .my-account .tab-content .tab-pane .address-list .add-address .address-form .add-address-btn {
-  background-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .address-list
+  .add-address
+  .address-form
+  .add-address-btn {
+  background-color: #ffa500;
   color: white;
   border: none;
   padding: 14px 30px;
@@ -2011,11 +2646,23 @@ section .my-account .tab-content .tab-pane .change-password .form-group label {
   margin-bottom: 8px;
   font-weight: 500;
 }
-section .my-account .tab-content .tab-pane .change-password .form-group .required {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .change-password
+  .form-group
+  .required {
   color: #f44336;
   margin-left: 4px;
 }
-section .my-account .tab-content .tab-pane .change-password .form-group input[type=password] {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .change-password
+  .form-group
+  input[type="password"] {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #e0e0e0;
@@ -2023,15 +2670,32 @@ section .my-account .tab-content .tab-pane .change-password .form-group input[ty
   font-size: 14px;
   transition: border-color 0.3s;
 }
-section .my-account .tab-content .tab-pane .change-password .form-group input[type=password]:focus {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .change-password
+  .form-group
+  input[type="password"]:focus {
   outline: none;
-  border-color: #2196F3;
+  border-color: #2196f3;
 }
-section .my-account .tab-content .tab-pane .change-password .form-group input[type=password]::placeholder {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .change-password
+  .form-group
+  input[type="password"]::placeholder {
   color: #999;
 }
-section .my-account .tab-content .tab-pane .change-password .update-password-btn {
-  background-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .change-password
+  .update-password-btn {
+  background-color: #ffa500;
   color: white;
   border: none;
   padding: 14px 30px;
@@ -2047,23 +2711,54 @@ section .my-account .tab-content .tab-pane .payment-methods .method {
   padding: 10px 0;
   border-bottom: 1px solid #e0e0e0;
 }
-section .my-account .tab-content .tab-pane .payment-methods .method .form-check-input {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .method
+  .form-check-input {
   margin-right: 15px;
 }
-section .my-account .tab-content .tab-pane .payment-methods .method .form-check-input:checked {
-  background-color: #FFA500;
-  border-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .method
+  .form-check-input:checked {
+  background-color: #ffa500;
+  border-color: #ffa500;
   display: inline;
 }
-section .my-account .tab-content .tab-pane .payment-methods .method .form-check-input:focus {
-  border-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .method
+  .form-check-input:focus {
+  border-color: #ffa500;
 }
-section .my-account .tab-content .tab-pane .payment-methods .method .label-name {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .method
+  .label-name {
   display: flex;
   align-items: center;
   cursor: pointer;
 }
-section .my-account .tab-content .tab-pane .payment-methods .method .label-name .img-icon {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .method
+  .label-name
+  .img-icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
@@ -2071,19 +2766,46 @@ section .my-account .tab-content .tab-pane .payment-methods .method .label-name 
 section .my-account .tab-content .tab-pane .payment-methods .card-details {
   margin-top: 20px;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group {
   margin-bottom: 20px;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group label {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group
+  label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group .required {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group
+  .required {
   color: #f44336;
   margin-left: 4px;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group input[type=text] {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group
+  input[type="text"] {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #e0e0e0;
@@ -2091,22 +2813,55 @@ section .my-account .tab-content .tab-pane .payment-methods .card-details .form-
   font-size: 14px;
   transition: border-color 0.3s;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group input[type=text]:focus {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group
+  input[type="text"]:focus {
   outline: none;
-  border-color: #2196F3;
+  border-color: #2196f3;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-group input[type=text]::placeholder {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-group
+  input[type="text"]::placeholder {
   color: #999;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-row {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-row {
   display: flex;
   gap: 20px;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .form-row .form-group {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .form-row
+  .form-group {
   flex: 1;
 }
-section .my-account .tab-content .tab-pane .payment-methods .card-details .add-card-btn {
-  background-color: #FFA500;
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .payment-methods
+  .card-details
+  .add-card-btn {
+  background-color: #ffa500;
   color: white;
   border: none;
   padding: 14px 30px;
@@ -2125,7 +2880,8 @@ section .my-account .tab-content .tab-pane .table-container .order-table {
   width: 100%;
   border-collapse: collapse;
 }
-section .my-account .tab-content .tab-pane .table-container .order-table th, section .my-account .tab-content .tab-pane .table-container .order-table td {
+section .my-account .tab-content .tab-pane .table-container .order-table th,
+section .my-account .tab-content .tab-pane .table-container .order-table td {
   padding: 10px;
   text-align: left;
 }
@@ -2136,7 +2892,13 @@ section .my-account .tab-content .tab-pane .table-container .order-table th {
 section .my-account .tab-content .tab-pane .table-container .order-status {
   margin-top: 20px;
 }
-section .my-account .tab-content .tab-pane .table-container .order-status span.status {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .table-container
+  .order-status
+  span.status {
   background-color: #f8b400;
   color: white;
   padding: 5px 10px;
@@ -2145,22 +2907,46 @@ section .my-account .tab-content .tab-pane .table-container .order-status span.s
 section .my-account .tab-content .tab-pane .table-container .order-actions {
   margin-top: 20px;
 }
-section .my-account .tab-content .tab-pane .table-container .order-actions button {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .table-container
+  .order-actions
+  button {
   margin-right: 10px;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
-section .my-account .tab-content .tab-pane .table-container .order-actions button.track-order-btn {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .table-container
+  .order-actions
+  button.track-order-btn {
   background-color: #f8b400;
   color: white;
 }
-section .my-account .tab-content .tab-pane .table-container .order-actions button.invoice-btn {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .table-container
+  .order-actions
+  button.invoice-btn {
   background-color: #d32f2f;
   color: white;
 }
-section .my-account .tab-content .tab-pane .table-container .order-actions button.cancel-order-btn {
+section
+  .my-account
+  .tab-content
+  .tab-pane
+  .table-container
+  .order-actions
+  button.cancel-order-btn {
   background-color: #d32f2f;
   color: white;
 }

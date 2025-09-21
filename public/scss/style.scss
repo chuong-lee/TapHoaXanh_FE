@@ -321,14 +321,14 @@ body {
 }
 
 .dropdown-menu {
-  background: #052323;
+  background: #fff;
 
   .dropdown-item {
-    color: white;
-    font-size: 14px;
-    font-weight: 300;
+    color: #000;
+    font-size: 15px;
+    font-weight: 400;
     &:hover {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgb(240, 253, 244);
     }
   }
 }
