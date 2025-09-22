@@ -108,6 +108,24 @@ function PaymentCallbackContent() {
 
           // Xóa thông tin đơn hàng pending
           localStorage.removeItem("pending_payment_order");
+
+          // Xóa cart items đã thanh toán từ cart_selected
+          const cartSelected = localStorage.getItem("cart_selected");
+          if (cartSelected) {
+            try {
+              const selectedItems = JSON.parse(cartSelected);
+              const cartItemIds = selectedItems.map(
+                (item: { id: number }) => item.id
+              );
+              // Gọi API xóa cart items
+              await api.delete("/cart-item", {
+                data: { ids: cartItemIds },
+              });
+              localStorage.removeItem("cart_selected");
+            } catch (error) {
+              console.error("Error removing cart items:", error);
+            }
+          }
         } else {
           setStatus("error");
 

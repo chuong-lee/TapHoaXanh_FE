@@ -44,8 +44,21 @@ export default function CartPage() {
         console.error("Error parsing cart_selected from localStorage:", error);
         setSelected([]);
       }
+    } else if (cart.length > 0) {
+      // Mặc định chọn hết tất cả sản phẩm nếu không có cart_selected
+      setSelected(cart);
+      localStorage.setItem("cart_selected", JSON.stringify(cart));
     }
-  }, []);
+  }, [cart]); // Chạy khi cart thay đổi
+
+  // Sync selected items với cart khi cart thay đổi (nhưng không reset selection)
+  useEffect(() => {
+    if (cart.length > 0 && selected.length === 0) {
+      // Chỉ auto-select nếu chưa có gì được chọn
+      setSelected(cart);
+      localStorage.setItem("cart_selected", JSON.stringify(cart));
+    }
+  }, [cart, selected.length]);
   const handleSelect = (cartItem: CartItem) => {
     setSelected((prev) => {
       const exists = prev.some(
@@ -263,7 +276,7 @@ export default function CartPage() {
                       <div className="col-md-1 d-flex justify-content-center">
                         <button
                           className="btn btn-outline-danger"
-                          onClick={() => removeFromCart(item.product.id)}
+                          onClick={() => removeFromCart(item.id)}
                           title="Xóa sản phẩm"
                         >
                           Xóa

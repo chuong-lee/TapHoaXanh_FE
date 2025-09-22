@@ -27,7 +27,7 @@ function CheckoutPage() {
     phone: "",
     email: "",
     notes: "",
-    payment: "",
+    payment: "cod",
     voucher: "",
   });
 
@@ -49,11 +49,10 @@ function CheckoutPage() {
     const saved = localStorage.getItem("checkout_user_info");
     if (saved) {
       const savedData = JSON.parse(saved);
-      // Reset payment về trống khi vào trang checkout
       setForm((f) => ({
         ...f,
         ...savedData,
-        payment: "", // Luôn reset về trống
+        payment: "cod", // Mặc định chọn COD
       }));
     }
   }, []);
@@ -61,7 +60,7 @@ function CheckoutPage() {
   useEffect(() => {
     setForm((f) => ({
       ...f,
-      payment: "",
+      payment: "cod",
     }));
   }, []);
 
@@ -201,7 +200,7 @@ function CheckoutPage() {
           return;
         }
       }
-      // Chỉ xóa những cart items đã được thanh toán
+      // Chỉ xóa những cart items đã được thanh toán (COD)
       removeMultipleFromCart(selectedItems);
       localStorage.removeItem("cart_selected");
 

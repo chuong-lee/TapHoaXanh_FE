@@ -19,6 +19,20 @@ export interface Address {
   district: string;
   is_default: boolean;
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  image?: string | null;
+  isEmailVerified: boolean;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+  address?: Address[];
+}
 export type News = {
   id: string;
   name: string;
@@ -61,16 +75,27 @@ export interface Payment {
   txn_ref: string;
   order_id: number;
 }
+// Enum cho trạng thái đơn hàng
+export enum OrderStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  DELIVERED = "delivered",
+  SUCCESS = "success",
+  CANCELLED = "cancelled",
+}
+
 export interface Order {
   id: number;
   createdAt: string | null;
   // price: number | null;
   total_price: number;
   order_code: string;
-  status: "pending" | "confirmed" | "success" | "pending_cod" | "cancelled";
+  status: OrderStatus;
   orderItem: OrderItem[];
   voucher: Voucher[] | null;
   payments: Payment[];
+  address?: Address;
+  user?: User;
 }
 
 // Interface sản phẩm

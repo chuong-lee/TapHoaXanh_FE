@@ -61,8 +61,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     await fetchCart();
   };
 
-  const removeFromCart = async (productId: number) => {
-    await api.put("/cart/update", { productIds: productId, action: "remove" });
+  const removeFromCart = async (cartItemId: number) => {
+    await api.delete(`/cart-item/${cartItemId}`);
 
     // Fetch updated cart from database
     await fetchCart();
@@ -70,9 +70,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const removeMultipleFromCart = async (cartItemIds: number[]) => {
     // Remove multiple cart items by their database IDs
-    for (const id of cartItemIds) {
-      await api.put("/cart/update", { productIds: id, action: "remove" });
-    }
+    await api.delete("/cart-item", {
+      data: { ids: cartItemIds },
+    });
 
     // Fetch updated cart from database
     await fetchCart();

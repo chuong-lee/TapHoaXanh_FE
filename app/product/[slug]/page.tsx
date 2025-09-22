@@ -138,7 +138,7 @@ export default function ProductDetailPage() {
     const finalPrice = product.price * (1 - product.discount / 100);
     return finalPrice;
   };
-  const totalPrice = getProductPrice() * quantity;
+  const totalPrice = getProductPrice(); // Chỉ hiển thị đơn giá, không nhân với quantity
 
   const handleWishList = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
