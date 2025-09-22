@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect, useReducer } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import { useAuth } from "../context/AuthContext";
 import { profileService } from "../lib/profileService";
 import { Tabs, Tab, Form } from "react-bootstrap";
@@ -166,25 +169,34 @@ export default function ProfilePage() {
 
   return (
     <section>
-      <div className="my-account mt5" style={{ marginTop: "100px" }}>
+      <div className="breadcrumb-section">
         <div className="container">
-          <h1 className="page-title" style={{ marginBottom: "48px" }}>
-            Thông tin người dùng
-          </h1>
-          {/* <div className="breadcrumb mt-3">
-            <Link href="/">Trang chủ </Link>
-            <span>/</span>
-            <span>Thông tin người dùng</span>
-          </div> */}
+          <h3 className="text-center">My Account</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item"><Link href="/">Home</Link></li>
+              <li className="breadcrumb-item active" aria-current="page">My Account</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div className="my-account">
+        <div className="container">
+          <h1 className="page-title">Tài khoản của tôi</h1>
           <div className="row">
-            <div className="col-lg-12">
-              <Tabs
-                defaultActiveKey="personal"
-                id="profile-tabs"
-                className="mb-3"
-                fill
-              >
-                <Tab eventKey="personal" title="Thông tin cá nhân">
+            <div className="col-lg-4">
+              <div className="list-group list-group-pane" id="list-tab" role="tablist">
+                <a className="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">Thông tin cá nhân</a>
+                <a className="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Quản lý địa chỉ</a>
+                <a className="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Đơn hàng của tôi</a>
+                <a className="list-group-item list-group-item-action" id="list-payment-list" data-bs-toggle="list" href="#list-payment" role="tab" aria-controls="list-payment">Phương thức thanh toán</a>
+                <a className="list-group-item list-group-item-action" id="list-password-list" data-bs-toggle="list" href="#list-password" role="tab" aria-controls="list-password">Quản lý mật khẩu</a>
+                <a className="list-group-item list-group-item-action" id="list-logout-list" data-bs-toggle="list" href="#list-logout" role="tab" aria-controls="list-settings">Đăng xuất</a>
+              </div>
+            </div>
+            <div className="col-lg-8">
+              <div className="tab-content" id="nav-tabContent">
+                <div className="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list"> 
                   <div className="profile-section">
                     <div className="profile-header d-flex align-items-center mb-4">
                       <div className="profile-image position-relative">
@@ -193,7 +205,9 @@ export default function ProfilePage() {
                           name={form.name}
                           size={100}
                         />
-                        {/* <div className="edit-icon"><i className="fas fa-edit"></i></div> */}
+                        <div className="edit-icon">
+                          <i className="fas fa-edit"></i>
+                        </div>
                       </div>
                       <div className="avatar-upload-section ms-4">
                         <div className="mb-3">
@@ -225,28 +239,33 @@ export default function ProfilePage() {
                         )}
                       </div>
                     </div>
-                    <form
-                      className="profile-form"
-                      id="profile-form"
-                      onSubmit={handleSubmit}
-                    >
-                      <div className="mb-3">
-                        <label className="form-label" htmlFor="name">
-                          Tên người dùng
-                        </label>
-                        <input
-                          className="form-control"
-                          id="name"
-                          type="text"
-                          value={form.name}
-                          onChange={handleChange}
-                          required
-                        />
+                    <form className="profile-form" id="profile-form" onSubmit={handleSubmit}>
+                      <div className="row">
+                        <div className="col-md-6 mb-3">
+                          <label className="form-label" htmlFor="name">Tên*</label>
+                          <input
+                            className="form-control"
+                            id="name"
+                            type="text"
+                            value={form.name}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="col-md-6 mb-3">
+                          <label className="form-label" htmlFor="phone">Số điện thoại*</label>
+                          <input
+                            className="form-control"
+                            id="phone"
+                            type="tel"
+                            value={form.phone}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
                       </div>
                       <div className="mb-3">
-                        <label className="form-label" htmlFor="email">
-                          Địa chỉ email<span className="text-danger">*</span>
-                        </label>
+                        <label className="form-label" htmlFor="email">Email*</label>
                         <Form.Control
                           type="email"
                           id="email"
@@ -255,28 +274,13 @@ export default function ProfilePage() {
                           disabled
                         />
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label" htmlFor="phone">
-                          Số điện thoại
-                        </label>
-                        <input
-                          className="form-control"
-                          id="phone"
-                          type="tel"
-                          value={form.phone}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
                       <div className="mt-4">
                         <button
                           className="btn btn-warning"
                           type="submit"
                           disabled={updateLoadingRef.current}
                         >
-                          {updateLoadingRef.current
-                            ? "Updating..."
-                            : "Thay đổi thông tin"}
+                          {updateLoadingRef.current ? "Updating..." : "Cập nhật thay đổi"}
                         </button>
                       </div>
                       {updateSuccessRef.current && (
@@ -291,79 +295,91 @@ export default function ProfilePage() {
                       )}
                     </form>
                   </div>
-                </Tab>
-                <Tab eventKey="addresses" title="Địa chỉ giao hàng">
+                </div>
+                <div className="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list"> 
                   <AddressList />
-                </Tab>
-                <Tab eventKey="wishlist" title="Sản phẩm yêu thích">
-                  <Wishlist />
-                </Tab>
-                {/* <Tab eventKey="orders" title="Thông tin đơn hàng">
-                  <h2>Orders</h2>
+                </div>
+                <div className="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list"> 
+                  <h2>Đơn hàng</h2>
                   <div className="table-container">
                     <table className="order-table">
                       <thead>
                         <tr>
-                          <th>Order ID | #SDGT1254FD</th>
-                          <th>Total Payment</th>
-                          <th>Payment Method</th>
-                          <th>Estimated Delivery Date</th>
+                          <th>Mã đơn hàng | #SDGT1254FD</th>
+                          <th>Tổng thanh toán</th>
+                          <th>Phương thức thanh toán</th>
+                          <th>Ngày giao hàng dự kiến</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td>#SDGT1254FD</td>
-                          <td>$74.00</td>
+                          <td>1.700.000đ</td>
                           <td>Paypal</td>
-                          <td>29 July 2024</td>
+                          <td>29 Tháng 7, 2024</td>
                         </tr>
                       </tbody>
                     </table>
                     <div className="order-status">
-                      <span className="status">Accepted</span>
-                      <p>Your Order has been Accepted</p>
+                      <span className="status">Đã chấp nhận</span>
+                      <p>Đơn hàng của bạn đã được chấp nhận</p>
                     </div>
                     <div className="order-actions">
-                      <button className="track-order-btn">Track Order</button>
-                      <button className="invoice-btn">Invoice</button>
-                      <button className="cancel-order-btn">Cancel Order</button>
+                      <button className="track-order-btn">Theo dõi đơn hàng</button>
+                      <button className="invoice-btn">Hóa đơn</button>
+                      <button className="cancel-order-btn">Hủy đơn hàng</button>
                     </div>
                   </div>
-                </Tab> */}
-                {/* <Tab eventKey="payments" title="Phương thức thanh toán">
+                </div>
+                <div className="tab-pane fade" id="list-payment" role="tabpanel" aria-labelledby="list-payment-list"> 
                   <div className="payment-methods">
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="paypal" defaultChecked />
-                      <label className="label-name" htmlFor="paypal"><Image className="img-icon" src="/client/images/paypal.jpg" alt="Paypal" width={24} height={24} />Paypal</label>
+                      <label className="label-name" htmlFor="paypal">
+                        <Image className="img-icon" src="/client/images/paypal.png" alt="Paypal" width={24} height={24} />
+                        Paypal
+                      </label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="visa" />
-                      <label className="label-name" htmlFor="visa"><Image className="img-icon" src="/client/images/visa.jpg" alt="Visa" width={24} height={24} />**** **** **** 8047</label>
+                      <label className="label-name" htmlFor="visa">
+                        <Image className="img-icon" src="/client/images/visa.png" alt="Visa" width={24} height={24} />
+                        **** **** **** 8047
+                      </label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="googlepay" />
-                      <label className="label-name" htmlFor="googlepay"><Image className="img-icon" src="/client/images/gg.jpg" alt="Google Pay" width={24} height={24} />Google Pay</label>
+                      <label className="label-name" htmlFor="googlepay">
+                        <Image className="img-icon" src="/client/images/gg.png" alt="Google Pay" width={24} height={24} />
+                        Google Pay
+                      </label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="cod" />
-                      <label className="label-name" htmlFor="cod"><Image className="img-icon" src="/client/images/cash.jpg" alt="Cash On Delivery" width={24} height={24} />Cash On Delivery</label>
+                      <label className="label-name" htmlFor="cod">
+                        <Image className="img-icon" src="/client/images/cash.png" alt="Cash On Delivery" width={24} height={24} />
+                        Thanh toán khi nhận hàng
+                      </label>
                     </div>
                     <div className="method">
                       <input className="form-check-input" type="radio" name="payment" id="newcard" />
-                      <label className="label-name" htmlFor="newcard"><Image className="img-icon" src="/client/images/cre.jpg" alt="Add New Credit/Debit Card" width={24} height={24} />Add New Credit/Debit Card</label>
+                      <label className="label-name" htmlFor="newcard">
+                        <Image className="img-icon" src="/client/images/cre.png" alt="Add New Credit/Debit Card" width={24} height={24} />
+                        Thêm thẻ tín dụng/ghi nợ mới
+                      </label>
                     </div>
                     <div className="card-details">
                       <div className="form-group">
-                        <label htmlFor="cardHolder">Card Holder Name</label><span className="required">*</span>
-                        <input id="cardHolder" type="text" placeholder="Ex. John Dae" required />
+                        <label htmlFor="cardHolder">Tên chủ thẻ</label><span className="required">*</span>
+                        <input id="cardHolder" type="text" placeholder="VD: Nguyễn Văn An" required />
                       </div>
                       <div className="form-group">
-                        <label htmlFor="cardNumber">Card Number</label><span className="required">*</span>
+                        <label htmlFor="cardNumber">Số thẻ</label><span className="required">*</span>
                         <input id="cardNumber" type="text" placeholder="4716 9627 1635 8047" required />
                       </div>
                       <div className="form-row">
                         <div className="form-group">
-                          <label htmlFor="expiryDate">Expiry Date</label><span className="required">*</span>
+                          <label htmlFor="expiryDate">Ngày hết hạn</label><span className="required">*</span>
                           <input id="expiryDate" type="text" placeholder="MM/YY" required />
                         </div>
                         <div className="form-group">
@@ -373,91 +389,72 @@ export default function ProfilePage() {
                       </div>
                       <div className="form-group">
                         <input id="saveCard" type="checkbox" />
-                        <label htmlFor="saveCard">Save card for future payments</label>
+                        <label htmlFor="saveCard">Lưu thẻ cho thanh toán tương lai</label>
                       </div>
-                      <button className="add-card-btn">Add Card</button>
+                      <button className="add-card-btn">Thêm thẻ</button>
                     </div>
                   </div>
-                </Tab> */}
-                <Tab eventKey="password" title="Đổi mật khẩu">
-                  <div
-                    className="change-password-form card p-4 shadow-sm"
-                    style={{ maxWidth: 400, margin: "0 auto" }}
-                  >
-                    <h4 className="change-password-title mb-4 text-center">
-                      Đổi mật khẩu
-                    </h4>
-                    <form onSubmit={handlePasswordSubmit}>
-                      <div className="form-group mb-3">
-                        <label htmlFor="oldPassword" className="form-label">
-                          Mật khẩu cũ
-                        </label>
-                        <input
-                          id="oldPassword"
-                          className="form-control"
-                          type="password"
-                          placeholder="Nhập mật khẩu cũ"
-                          required
-                          value={passwordForm.oldPassword}
-                          onChange={handlePasswordChange}
-                        />
+                </div>
+                <div className="tab-pane fade" id="list-password" role="tabpanel" aria-labelledby="list-password-list">
+                  <div className="change-password">
+                    <div className="form-group">
+                      <label htmlFor="oldPassword">Mật khẩu hiện tại</label><span className="required">*</span>
+                      <input
+                        id="oldPassword"
+                        type="password"
+                        placeholder="Nhập mật khẩu hiện tại"
+                        required
+                        value={passwordForm.oldPassword}
+                        onChange={handlePasswordChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="newPassword">Mật khẩu mới</label><span className="required">*</span>
+                      <input
+                        id="newPassword"
+                        type="password"
+                        placeholder="Nhập mật khẩu mới"
+                        required
+                        value={passwordForm.newPassword}
+                        onChange={handlePasswordChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="confirmPassword">Xác nhận mật khẩu mới</label><span className="required">*</span>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Nhập lại mật khẩu mới"
+                        required
+                        value={passwordForm.confirmPassword}
+                        onChange={handlePasswordChange}
+                      />
+                    </div>
+                    <button
+                      className="update-password-btn"
+                      onClick={handlePasswordSubmit}
+                      disabled={passwordLoadingRef.current}
+                    >
+                      {passwordLoadingRef.current ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+                    </button>
+                    {passwordSuccessRef.current && (
+                      <div className="text-success mt-3 text-center">
+                        {passwordSuccessRef.current}
                       </div>
-                      <div className="form-group mb-3">
-                        <label htmlFor="newPassword" className="form-label">
-                          Mật khẩu mới
-                        </label>
-                        <input
-                          id="newPassword"
-                          className="form-control"
-                          type="password"
-                          placeholder="Nhập mật khẩu mới"
-                          required
-                          value={passwordForm.newPassword}
-                          onChange={handlePasswordChange}
-                        />
+                    )}
+                    {passwordErrorRef.current && (
+                      <div className="text-danger mt-3 text-center">
+                        {passwordErrorRef.current}
                       </div>
-                      <div className="form-group mb-4">
-                        <label htmlFor="confirmPassword" className="form-label">
-                          Xác nhận mật khẩu mới
-                        </label>
-                        <input
-                          id="confirmPassword"
-                          className="form-control"
-                          type="password"
-                          placeholder="Nhập lại mật khẩu mới"
-                          required
-                          value={passwordForm.confirmPassword}
-                          onChange={handlePasswordChange}
-                        />
-                      </div>
-                      <button
-                        className="btn btn-success w-100 change-password-btn"
-                        type="submit"
-                        disabled={passwordLoadingRef.current}
-                      >
-                        {passwordLoadingRef.current
-                          ? "Đang cập nhật..."
-                          : "Đổi mật khẩu"}
-                      </button>
-                      {passwordSuccessRef.current && (
-                        <div className="text-success mt-3 text-center">
-                          {passwordSuccessRef.current}
-                        </div>
-                      )}
-                      {passwordErrorRef.current && (
-                        <div className="text-danger mt-3 text-center">
-                          {passwordErrorRef.current}
-                        </div>
-                      )}
-                    </form>
+                    )}
                   </div>
-                </Tab>
-                <Tab eventKey="logout" title="Đăng xuất">
+                </div>
+                <div className="tab-pane fade" id="list-logout" role="tabpanel" aria-labelledby="list-logout-list"> 
                   <h1>Đăng xuất</h1>
-                  <p>Bạn có chắc chắn muốn đăng xuất?</p>
+                  <p>Bạn có chắc chắn muốn đăng xuất không?</p>
                   <LogoutButton />
-                </Tab>
-              </Tabs>
+                </div>
+              </div>
             </div>
           </div>
         </div>

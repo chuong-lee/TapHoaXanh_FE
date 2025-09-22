@@ -1,13 +1,17 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { News, RelatedNews } from "@/types";
 import Image from "next/image";
+
+import { News, RelatedNews } from "@/types";
 import api from "@/lib/axios";
 
 export default function NewsDetailPage() {
   const { id } = useParams();
+  
+  // State management
   const [news, setNews] = useState<News>({
     id: "",
     name: "",
@@ -20,20 +24,77 @@ export default function NewsDetailPage() {
     createdAt: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
-    const getNewsDetail = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch news detail
         const response = await api.get(`/news/detail/${id}`);
         await api.patch(`/news/${id}/views`); // Tăng view count
         setNews(response.data);
+
+        // Fetch categories
+        try {
+          const categoriesResponse = await api.get("/categories");
+          setCategories(categoriesResponse.data || []);
+        } catch (error) {
+          console.error("Lỗi khi tải danh mục:", error);
+        }
+
+        // Fetch trending products
+        try {
+          const productsResponse = await api.get("/products?limit=4&sort=popular");
+          setTrendingProducts(productsResponse.data || []);
+        } catch (error) {
+          console.error("Lỗi khi tải sản phẩm thịnh hành:", error);
+        }
+
+        // Fetch gallery images from news
+        try {
+          const newsResponse = await api.get("/news?limit=4");
+          const galleryData = newsResponse.data
+            .filter((item: any) => item.images && item.images.length > 0)
+            .slice(0, 4)
+            .map((item: any) => ({
+              id: item.id,
+              image: item.images[0],
+              title: item.name
+            }));
+          setGalleryImages(galleryData);
+        } catch (error) {
+          console.error("Lỗi khi tải thư viện ảnh:", error);
+        }
+
+        // Generate tags from news content
+        try {
+          const allNewsResponse = await api.get("/news");
+          const allTags = new Set<string>();
+          allNewsResponse.data.forEach((item: any) => {
+            if (item.description) {
+              const words = item.description.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .split(/\s+/)
+                .filter((word: string) => word.length > 3);
+              words.forEach((word: string) => allTags.add(word));
+            }
+          });
+          setTags(Array.from(allTags).slice(0, 6));
+        } catch (error) {
+          console.error("Lỗi khi tải thẻ:", error);
+        }
+
       } catch (error) {
-        console.error("Lỗi khi tải bài viết:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    getNewsDetail();
+    
+    fetchData();
   }, [id]);
 
   if (isLoading) {
@@ -107,330 +168,211 @@ export default function NewsDetailPage() {
   );
   console.log("🚀 ~ NewsDetailPage ~ mixedContent:", mixedContent);
   return (
-    <main className="main-content">
-      <div className="container py-4">
-        <div style={{ display: "flex", gap: 32 }}>
-          {/* Main content */}
-          <div style={{ flex: 3 }}>
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 32,
-                boxShadow: "0 2px 12px rgba(34,197,94,0.10)",
-                border: "1.5px solid #e0fbe2",
-              }}
-            >
-              {/* Breadcrumb */}
-              <div style={{ marginBottom: 24 }}>
-                <Link
-                  href="/news"
-                  style={{ color: "#22c55e", textDecoration: "none" }}
-                >
-                  ← Quay lại Tin Tức
-                </Link>
+    <section>
+      <div className="breadcrumb-section">
+        <div className="container">
+          <h3 className="text-center">News Detail</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item">
+                <Link href="/">Home</Link>
+              </li>
+              <li className="breadcrumb-item">
+                <Link href="/news">News</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                News Detail
+              </li>
+            </ol>
+          </nav>
+        </div>
               </div>
 
-              {/* Category badge */}
-              <div style={{ marginBottom: 16 }}>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 8,
-                    padding: "6px 16px",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {news.type}
+      <div className="news-detail">
+        <div className="section-article-detail">
+          <div className="container">
+            <div className="row">
+              <div className="col-lg-9 article-content">
+                <div className="article-category">{news.type || "Công thức nấu ăn"}</div>
+                <h1 className="article-title">{news.name || "Smartwatch tốt nhất 2022: những thiết bị đeo tay hàng đầu bạn có thể mua ngay hôm nay"}</h1>
+                <div className="article-meta">
+                  <span className="author">
+                    bởi Sugar Rock · 
+                    <span className="time">{news.date || "2 giờ trước"} ·</span>
+                    <span className="read-time">{news.readTime || "6 phút đọc"}</span>
                 </span>
               </div>
-
-              {/* Title */}
-              <h1
-                style={{
-                  fontWeight: 700,
-                  fontSize: "2.5rem",
-                  marginBottom: 16,
-                  color: "#222",
-                  lineHeight: 1.3,
-                }}
-              >
-                Bài viết: {news.name}
-              </h1>
-
-              {/* Meta info */}
-              <div
-                style={{
-                  color: "#666",
-                  fontSize: 16,
-                  marginBottom: 24,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 16,
-                }}
-              >
-                <span>📅 {news.date}</span>
-                <span>👁️ {news.views} lượt xem</span>
-                <span>⏱️ {news.readTime}</span>
+                <div className="article-image">
+                  <Image 
+                    src={news.images?.[0] || "/images/food1.png"} 
+                    alt={news.name || "Best smartwatch 2022"}
+                    width={800}
+                    height={400}
+                  />
+                </div>
+                <div className="article-excerpt">
+                  {news.description || "Giúp mọi người sống hạnh phúc và khỏe mạnh hơn tại nhà thông qua căn bếp của họ. Kitchn là tạp chí ẩm thực hàng ngày trên Web ca ngợi cuộc sống trong bếp thông qua việc nấu ăn tại nhà và trí tuệ ẩm thực."}
               </div>
-
-              {/* Content */}
-              <div
-                style={{
-                  fontSize: 16,
-                  lineHeight: 1.7,
-                  color: "#444",
-                }}
-              >
+                <div className="article-body">
                 {mixedContent.map((item, idx) =>
                   typeof item === "string" ? (
-                    <p key={idx} style={{ marginBottom: 20 }}>
-                      {item}
-                    </p>
+                      <p key={idx}>{item}</p>
                   ) : (
+                      <div key={idx} className="article-images-row">
                     <Image
-                      key={idx}
                       src={item.image}
                       alt={`image-${idx}`}
-                      style={{
-                        display: "block",
-                        margin: "20px auto",
-                        maxWidth: "100%",
-                        borderRadius: 8,
-                      }}
-                      width={800}
-                      height={450}
-                    />
+                          width={400}
+                          height={300}
+                        />
+                      </div>
                   )
                 )}
               </div>
-
-              {/* Tags */}
-              <div
-                style={{
-                  marginTop: 32,
-                  paddingTop: 24,
-                  borderTop: "1px solid #e0fbe2",
-                }}
-              >
-                <h5 style={{ color: "#22c55e", marginBottom: 16 }}>
-                  Thẻ liên quan:
-                </h5>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  <span
-                    style={{
-                      background: "#e0fbe2",
-                      color: "#22c55e",
-                      borderRadius: 20,
-                      padding: "6px 16px",
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {news.type}
-                  </span>
-                  <span
-                    style={{
-                      background: "#e0fbe2",
-                      color: "#22c55e",
-                      borderRadius: 20,
-                      padding: "6px 16px",
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Tạp Hóa Xanh
-                  </span>
-                  <span
-                    style={{
-                      background: "#e0fbe2",
-                      color: "#22c55e",
-                      borderRadius: 20,
-                      padding: "6px 16px",
-                      fontSize: 13,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Khuyến Mãi
-                  </span>
+                <div className="article-tags">
+                  <Link className="tag" href="#">{news.type || "Bánh ngọt"}</Link>
+                  <Link className="tag" href="#">Công thức</Link>
+                  <Link className="tag" href="#">Gà</Link>
                 </div>
-              </div>
+                <div className="article-share">
+                  <span>
+                    Chia sẻ bài viết:
+                    <Link href="#"><i className="fa fa-facebook"></i></Link>
+                    <Link href="#"><i className="fa fa-twitter"></i></Link>
+                    <Link href="#"><i className="fa fa-pinterest"></i></Link>
+                  </span>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 24,
-            }}
-          >
-            {/* Bài viết liên quan */}
-            <RelatedPosts currentId={news.id} />
-
-            {/* Danh mục */}
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 24,
-                border: "1.5px solid #e0fbe2",
-                boxShadow: "0 2px 8px rgba(34,197,94,0.05)",
-              }}
-            >
-              <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
-                Danh Mục
-              </h5>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🛒 Tin Khuyến Mãi
+              <div className="col-lg-3 sidebar">
+                <div className="sidebar-box category-box">
+                  <div className="sidebar-title">Danh mục</div>
+                  <ul className="category-list">
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <li key={category.id}>
+                          <Link href={`/product?category=${category.id}`}>
+                            {category.name}
+                          </Link>
+                        </li>
+                      ))
+                    ) : (
+                      <>
+                        <li><Link href="#">Sữa & Sản phẩm từ sữa</Link></li>
+                        <li><Link href="#">Quần áo</Link></li>
+                        <li><Link href="#">Thức ăn thú cưng</Link></li>
+                        <li><Link href="#">Nguyên liệu làm bánh</Link></li>
+                        <li><Link href="#">Trái cây tươi</Link></li>
+                      </>
+                    )}
+                  </ul>
                 </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🆕 Sản Phẩm Mới
+                
+                <div className="sidebar-box trending-box">
+                  <div className="sidebar-title">Đang thịnh hành</div>
+                  <ul className="trending-list">
+                    {trendingProducts.length > 0 ? (
+                      trendingProducts.map((product) => (
+                        <li key={product.id}>
+                          <Image 
+                            src={product.images?.[0] || "/images/trend1.png"} 
+                            alt={product.name} 
+                            width={60} 
+                            height={60} 
+                          />
+                          <div className="trend-info">
+                            <div className="trend-name">{product.name}</div>
+                            <div className="trend-price">
+                              {(product.price / 1000).toLocaleString('vi-VN')}.000đ
+                            </div>
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      <>
+                        <li>
+                          <Image src="/images/trend1.png" alt="Chen Cardigan" width={60} height={60} />
+                          <div className="trend-info">
+                            <div className="trend-name">Áo len Chen</div>
+                            <div className="trend-price">2.300.000đ</div>
+                          </div>
+                        </li>
+                        <li>
+                          <Image src="/images/trend2.png" alt="Chen Sweater" width={60} height={60} />
+                          <div className="trend-info">
+                            <div className="trend-name">Áo sweater Chen</div>
+                            <div className="trend-price">2.070.000đ</div>
+                          </div>
+                        </li>
+                        <li>
+                          <Image src="/images/trend3.png" alt="Colorful Jacket" width={60} height={60} />
+                          <div className="trend-info">
+                            <div className="trend-name">Áo khoác đa màu</div>
+                            <div className="trend-price">590.000đ</div>
+                          </div>
+                        </li>
+                        <li>
+                          <Image src="/images/trend4.png" alt="Lorem, ipsum" width={60} height={60} />
+                          <div className="trend-info">
+                            <div className="trend-name">Sản phẩm mới</div>
+                            <div className="trend-price">580.000đ</div>
+                          </div>
+                        </li>
+                      </>
+                    )}
+                  </ul>
                 </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  💚 Sức Khỏe & Dinh Dưỡng
+                
+                <div className="sidebar-box gallery-box">
+                  <div className="sidebar-title">Thư viện ảnh</div>
+                  <div className="gallery-list">
+                    {galleryImages.length > 0 ? (
+                      galleryImages.map((item) => (
+                        <Image 
+                          key={item.id}
+                          src={item.image} 
+                          alt={item.title} 
+                          width={80} 
+                          height={80} 
+                        />
+                      ))
+                    ) : (
+                      <>
+                        <Image src="/images/gallery1.png" alt="Gallery 1" width={80} height={80} />
+                        <Image src="/images/gallery2.png" alt="Gallery 2" width={80} height={80} />
+                        <Image src="/images/gallery3.png" alt="Gallery 3" width={80} height={80} />
+                        <Image src="/images/gallery4.png" alt="Gallery 4" width={80} height={80} />
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🍽️ Ẩm Thực
+                
+                <div className="sidebar-box tags-box">
+                  <div className="sidebar-title">Thẻ phổ biến</div>
+                  <div className="tags-list">
+                    {tags.length > 0 ? (
+                      tags.map((tag, index) => (
+                        <span key={index} className="tag">{tag}</span>
+                      ))
+                    ) : (
+                      <>
+                        <span className="tag">Bắp cải</span>
+                        <span className="tag">Bông cải xanh</span>
+                        <span className="tag">Sinh tố</span>
+                        <span className="tag">Trái cây</span>
+                        <span className="tag">Salad</span>
+                        <span className="tag">Khai vị</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                  }}
-                >
-                  🌟 Lifestyle
-                </div>
-              </div>
-            </div>
-
-            {/* Thẻ phổ biến */}
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 24,
-                border: "1.5px solid #e0fbe2",
-                boxShadow: "0 2px 8px rgba(34,197,94,0.05)",
-              }}
-            >
-              <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
-                Thẻ Phổ Biến
-              </h5>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Khuyến Mãi
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Sản Phẩm Mới
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Sức Khỏe
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Ẩm Thực
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Lifestyle
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Tạp Hóa
-                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </section>
   );
 }
 

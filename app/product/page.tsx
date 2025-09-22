@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import ProductCard from "@/components/ProductCard";
 import api from "@/lib/axios";
 import SidebarFilter from "@/components/SidebarFilter";
@@ -23,6 +26,7 @@ type Product = {
 };
 
 export default function ProductListPage() {
+  // State management
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,87 +102,171 @@ export default function ProductListPage() {
   };
 
   return (
-    <main className="main-content">
-      <div className="container py-4">
+    <section>
+      <div className="product-page">
+        <div className="container my-4">
         <div className="row">
-          {/* Sidebar filter */}
-          <div className="col-md-3">
-            <SidebarFilter
-              onCategoryChange={handleCategoryChange}
-              onPriceChange={handlePriceChange}
+            {/* Left Sidebar */}
+            <div className="col-lg-3 d-none d-lg-block">
+              <div className="sidebar">
+                {/* Categories Filter */}
+                <div className="filter-group mb-4">
+                  <h3 className="filter-title text-success">Categories</h3>
+                  <ul className="filter-list list-unstyled">
+                    <li className="mb-2">
+                      <div className="form-check">
+                        <input 
+                          className="form-check-input" 
+                          type="checkbox" 
+                          id="dairy"
+                          checked={selectedCategory === 1}
+                          onChange={() => handleCategoryChange(selectedCategory === 1 ? null : 1)}
+                        />
+                        <label className="form-check-label" htmlFor="dairy">Dairy Bread</label>
+                      </div>
+                    </li>
+                    <li className="mb-2">
+                      <div className="form-check">
+                        <input 
+                          className="form-check-input" 
+                          type="checkbox" 
+                          id="fruits"
+                          checked={selectedCategory === 2}
+                          onChange={() => handleCategoryChange(selectedCategory === 2 ? null : 2)}
+                        />
+                        <label className="form-check-label" htmlFor="fruits">Fresh fruits</label>
+                      </div>
+                    </li>
+                    <li className="mb-2">
+                      <div className="form-check">
+                        <input 
+                          className="form-check-input" 
+                          type="checkbox" 
+                          id="tubers"
+                          checked={selectedCategory === 3}
+                          onChange={() => handleCategoryChange(selectedCategory === 3 ? null : 3)}
+                        />
+                        <label className="form-check-label" htmlFor="tubers">Fresh tubers</label>
+                      </div>
+                    </li>
+                    <li className="mb-2">
+                      <div className="form-check">
+                        <input 
+                          className="form-check-input" 
+                          type="checkbox" 
+                          id="vegetables"
+                          checked={selectedCategory === 4}
+                          onChange={() => handleCategoryChange(selectedCategory === 4 ? null : 4)}
+                        />
+                        <label className="form-check-label" htmlFor="vegetables">Vegetables</label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                
+                {/* Price Filter */}
+                <div className="filter-group mb-4">
+                  <h3 className="filter-title text-success">Price</h3>
+                  <div className="price-range mb-2">
+                    <span>Range $28.00 - $79.00</span>
+                  </div>
+                  <div className="price-slider">
+                    <input 
+                      className="form-range price-min" 
+                      type="range" 
+                      min="28" 
+                      max="79" 
+                      value={Math.min(79, Math.max(28, maxPrice / 1000))}
+                      onChange={(e) => handlePriceChange(Number(e.target.value) * 1000)}
             />
           </div>
-          {/* Product grid */}
-          <div className="col-md-9">
-            {/* Thanh Show/Sắp xếp */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h2 className="fw-bold mb-0" style={{ fontSize: "2rem" }}>
-                {selectedCategory ? (
-                  <>
-                    Danh mục:{" "}
-                    <span style={{ color: "#22c55e" }}>
-                      {getSelectedCategoryName() || "Đang tải..."}
+                </div>
+                
+                {/* Best Sellers Section */}
+                <div className="filter-group mb-4">
+                  <h3 className="filter-title text-success">Best Sellers</h3>
+                  <div className="best-sellers">
+                    {products.slice(0, 3).map((product, index) => (
+                      <div key={product.id} className="best-seller-item d-flex align-items-center mb-3">
+                        <img 
+                          className="me-3" 
+                          src={product.images || "/client/images/product-1.png"} 
+                          alt={product.name} 
+                          style={{ width: 60, height: 60, objectFit: "cover" }}
+                        />
+                        <div className="best-seller-info">
+                          <div className="category text-muted small">
+                            {product.category?.name || "Fresh Fruits"}
+                          </div>
+                          <div className="title fw-bold">{product.name}</div>
+                          <div className="price">
+                            {product.discount > 0 ? (
+                              <>
+                                <span className="text-muted text-decoration-line-through">
+                                  ${(product.price / 1000).toFixed(2)}
+                                </span>
+                                <span className="ms-2">
+                                  ${((product.price * (1 - product.discount / 100)) / 1000).toFixed(2)}
                     </span>
                   </>
                 ) : (
-                  <>
-                    Tất cả sản phẩm:{" "}
-                    <span style={{ color: "#e11d48" }}>
-                      {filteredProducts.length}
-                    </span>
-                  </>
-                )}
-              </h2>
-              <div className="d-flex align-items-center" style={{ gap: 16 }}>
-                <label className="me-2" htmlFor="showSelect">
-                  Hiển thị:
-                </label>
-                <select
-                  id="showSelect"
-                  value={show}
-                  onChange={(e) => setShow(Number(e.target.value))}
-                  style={{ borderRadius: 6, padding: "2px 8px" }}
-                >
-                  {[12, 24, 36, 50, 100].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
-                  ))}
-                </select>
-                <label className="ms-3 me-2" htmlFor="sortSelect">
-                  Sắp xếp theo:
-                </label>
-                <select
-                  id="sortSelect"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                  style={{ borderRadius: 6, padding: "2px 8px" }}
-                >
-                  <option value="price-asc">Giá: Thấp đến Cao</option>
-                  <option value="price-desc">Giá: Cao đến Thấp</option>
-                  <option value="name-asc">Tên: A-Z</option>
-                  <option value="name-desc">Tên: Z-A</option>
-                </select>
+                              `$${(product.price / 1000).toFixed(2)}`
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Sidebar Banner */}
+                <div className="sidebar-banner">
+                  <img 
+                    className="img-fluid" 
+                    src="/client/images/banner-1.png" 
+                    alt="Organic Shop Banner"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Debug info - tạm thời ẩn để debug */}
-            {/* {process.env.NODE_ENV === 'development' && (
-              <div className="mb-3 p-2 bg-light rounded">
-                <small className="text-muted">
-                  Debug: {products.length} sản phẩm tổng, {filteredProducts.length} đã lọc, 
-                  Category ID: {selectedCategory}, 
-                  Sample product category: {products[0]?.category?.name || 'N/A'}
-                </small>
+            {/* Main Content Area */}
+            <div className="col-lg-9">
+              {/* Header Controls */}
+              <div className="content-header d-flex justify-content-between align-items-center mb-4">
+                <div className="results-info">
+                  <span>Showing {Math.min(show, sortedProducts.length)} results</span>
+                  <div className="view-toggles ms-3 d-inline-block">
+                    <i className="fas fa-th-large text-success me-2"></i>
+                    <i className="fas fa-th-large text-success me-2"></i>
+                    <i className="fas fa-th-large text-muted"></i>
+                  </div>
+                </div>
+                <div className="sorting-controls">
+                  <select 
+                    className="form-select"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                  >
+                    <option value="price-asc">Sorting: Price Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="name-asc">Name: A to Z</option>
+                    <option value="name-desc">Name: Z to A</option>
+                  </select>
+                </div>
               </div>
-            )} */}
 
-            {/* Thông báo khi không có sản phẩm */}
-            {!loading && filteredProducts.length === 0 && (
+              {/* Product Grid */}
+              {loading ? (
               <div className="text-center py-5">
-                <div
-                  style={{ fontSize: "3rem", color: "#ccc", marginBottom: 16 }}
-                >
+                  <div className="spinner-border text-success" role="status">
+                    <span className="visually-hidden">Đang tải...</span>
+                  </div>
+                  <p className="mt-3 text-muted">Đang tải sản phẩm...</p>
+                </div>
+              ) : !loading && filteredProducts.length === 0 ? (
+                <div className="text-center py-5">
+                  <div style={{ fontSize: "3rem", color: "#ccc", marginBottom: 16 }}>
                   📦
                 </div>
                 <h4 className="text-muted mb-3">
@@ -189,42 +277,97 @@ export default function ProductListPage() {
                 <p className="text-muted">
                   Vui lòng thử chọn danh mục khác hoặc quay lại sau.
                 </p>
+                </div>
+              ) : (
+                <div className="row g-3 g-lg-4">
+                  {sortedProducts.slice(0, show).map((product, index) => (
+                    <div key={product.id} className="col-12 col-md-4 col-lg-4">
+                      <div className="hvr-float wow fadeInLeft" data-wow-delay={`${(index + 1) * 0.1}s`} data-wow-duration="0.5s">
+                        <div className="product-card">
+                          <div className="product-image-wrapper">
+                            <img 
+                              className="product-image" 
+                              src={product.images || "/client/images/product-1.png"} 
+                              alt={product.name} 
+                              title={product.name}
+                            />
+                            <div className="product-overlay">
+                              <div className="overlay-actions">
+                                <button className="quick-view-btn">
+                                  <i className="fas fa-eye"></i>
+                                </button>
+                                <button className="wishlist-btn">
+                                  <i className="fas fa-heart"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div className="product-badge">
+                              {product.discount > 0 ? (
+                                <div className="badge badge-sale">Sale</div>
+                              ) : (
+                                <div className="badge badge-new">New</div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="product-content">
+                            <div className="product-category">
+                              {product.category?.name?.toUpperCase() || "FRESH FRUITS"}
+                            </div>
+                            <div className="product-title">{product.name}</div>
+                            <div className="product-price">
+                              <div className="current-price">
+                                ${((product.price * (1 - product.discount / 100)) / 1000).toFixed(2)}
+                              </div>
+                              {product.discount > 0 && (
+                                <div className="old-price">
+                                  ${(product.price / 1000).toFixed(2)}
               </div>
             )}
-
-            {loading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-success" role="status">
-                  <span className="visually-hidden">Đang tải...</span>
+                            </div>
+                            <div className="product-description">
+                              <p>{product.description || "Sản phẩm tươi ngon, chất lượng cao, tốt cho sức khỏe."}</p>
+                            </div>
+                            <div className="product-actions">
+                              <button className="wishlist-btn">
+                                <i className="fas fa-heart"></i>
+                              </button>
+                              <button className="add-to-cart-btn">Thêm vào giỏ</button>
+                              <button className="quick-view-btn">
+                                <i className="fas fa-eye"></i>
+                              </button>
+                            </div>
+                          </div>
                 </div>
-                <p className="mt-3 text-muted">Đang tải sản phẩm...</p>
               </div>
-            ) : (
-              <div className="row g-4">
-                {sortedProducts.slice(0, show).map((product) => (
-                  <div
-                    className="col-12 col-sm-6 col-md-4 col-lg-3"
-                    key={product.id}
-                  >
-                    <ProductCard product={product} />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Hiển thị thông tin về số lượng sản phẩm */}
+              {/* Pagination */}
             {!loading && filteredProducts.length > 0 && (
-              <div className="text-center mt-4">
-                <p className="text-muted">
-                  Hiển thị {Math.min(show, sortedProducts.length)} trong tổng số{" "}
-                  {filteredProducts.length} sản phẩm
-                  {selectedCategory && " trong danh mục này"}
-                </p>
+                <div className="pagination-wrapper d-flex justify-content-center mt-5">
+                  <nav>
+                    <ul className="pagination">
+                      <li className="page-item active">
+                        <a className="page-link" href="#">1</a>
+                      </li>
+                      <li className="page-item">
+                        <a className="page-link" href="#">2</a>
+                      </li>
+                      <li className="page-item">
+                        <a className="page-link" href="#">
+                          <i className="fas fa-chevron-right"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
-    </main>
+    </section>
   );
 }

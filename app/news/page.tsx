@@ -1,35 +1,110 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { News } from "@/types";
 import Image from "next/image";
+
+import { News } from "@/types";
 import api from "@/lib/axios";
 
 export default function PostPage() {
+  // State management
   const [news, setNews] = useState<News[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
-    const getNews = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get("/news");
-        const mapped = response.data.map((item: News) => ({
+        // Fetch news data
+        const newsResponse = await api.get("/news");
+        const mappedNews = newsResponse.data.map((item: News) => ({
           ...item,
           date: item.createdAt
             ? new Date(item.createdAt).toLocaleDateString("vi-VN")
-            : "", // format ngày Việt Nam
-          readTime: Math.floor(Math.random() * 10) + 3 + " phút", // Random thời gian đọc
+            : "",
+          readTime: Math.floor(Math.random() * 10) + 3 + " phút",
           description: item.description,
         }));
-        setNews(mapped);
-        setIsLoading(false);
+        setNews(mappedNews);
+
+        // Fetch categories
+        try {
+          const categoriesResponse = await api.get("/categories");
+          setCategories(categoriesResponse.data || []);
+        } catch (error) {
+          console.error("Lỗi khi tải danh mục:", error);
+          // Fallback categories
+          setCategories([
+            { id: 1, name: "Sữa & Sản phẩm từ sữa" },
+            { id: 2, name: "Quần áo" },
+            { id: 3, name: "Thức ăn thú cưng" },
+            { id: 4, name: "Nguyên liệu làm bánh" },
+            { id: 5, name: "Trái cây tươi" }
+          ]);
+        }
+
+        // Fetch trending products
+        try {
+          const productsResponse = await api.get("/products?limit=4&sort=popular");
+          setTrendingProducts(productsResponse.data || []);
+        } catch (error) {
+          console.error("Lỗi khi tải sản phẩm thịnh hành:", error);
+          // Fallback trending products
+          setTrendingProducts([
+            { id: 1, name: "Áo len Chen", price: 2300000, images: ["/images/trend1.png"] },
+            { id: 2, name: "Áo sweater Chen", price: 2070000, images: ["/images/trend2.png"] },
+            { id: 3, name: "Áo khoác đa màu", price: 590000, images: ["/images/trend3.png"] },
+            { id: 4, name: "Sản phẩm mới", price: 580000, images: ["/images/trend4.png"] }
+          ]);
+        }
+
+        // Fetch gallery images from news
+        try {
+          const galleryData = mappedNews
+            .filter((item: any) => item.images && item.images.length > 0)
+            .slice(0, 4)
+            .map((item: any) => ({
+              id: item.id,
+              image: item.images[0],
+              title: item.name
+            }));
+          setGalleryImages(galleryData);
+        } catch (error) {
+          console.error("Lỗi khi tải thư viện ảnh:", error);
+          // Fallback gallery
+          setGalleryImages([
+            { id: 1, image: "/images/gallery1.png", title: "Gallery 1" },
+            { id: 2, image: "/images/gallery2.png", title: "Gallery 2" },
+            { id: 3, image: "/images/gallery3.png", title: "Gallery 3" },
+            { id: 4, image: "/images/gallery4.png", title: "Gallery 4" }
+          ]);
+        }
+
+        // Generate tags from news content
+        const allTags = new Set<string>();
+        mappedNews.forEach((item: any) => {
+          if (item.description) {
+            const words = item.description.toLowerCase()
+              .replace(/[^\w\s]/g, '')
+              .split(/\s+/)
+              .filter((word: string) => word.length > 3);
+            words.forEach((word: string) => allTags.add(word));
+          }
+        });
+        setTags(Array.from(allTags).slice(0, 6));
+
       } catch (error) {
-        console.error("Lỗi khi tải tin tức:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    getNews();
+    
+    fetchData();
   }, []);
 
   if (isLoading) {
@@ -48,117 +123,74 @@ export default function PostPage() {
   }
 
   return (
-    <main className="main-content">
-      <div className="container py-4">
-        {/* Header */}
-        <div className="text-center mb-5">
-          <h1
-            className="fw-bold"
-            style={{ color: "#22c55e", fontSize: "2.5rem" }}
-          >
-            Tin Tức & Khuyến Mãi
-          </h1>
-          <p className="text-muted" style={{ fontSize: 18 }}>
-            Cập nhật những tin tức mới nhất từ Tạp Hóa Xanh
-          </p>
+    <section>
+      <div className="breadcrumb-section">
+        <div className="container">
+          <h3 className="text-center">News</h3>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item">
+                <Link href="/">Home</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                News
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      
+      <div className="news">
+        <div className="section-recipe-articles">
+          <div className="container">
+            {/* Mobile Filter Dropdown */}
+            <div className="mobile-filters d-block d-lg-none mb-4">
+              <div className="row">
+                <div className="col-6">
+                  <select className="form-select mb-3">
+                    <option value="">Chọn danh mục</option>
+                    <option value="sua">Sữa & Sản phẩm từ sữa</option>
+                    <option value="quanao">Quần áo</option>
+                    <option value="thucan">Thức ăn thú cưng</option>
+                    <option value="nguyenlieu">Nguyên liệu làm bánh</option>
+                    <option value="traicay">Trái cây tươi</option>
+                  </select>
+                </div>
+                <div className="col-6">
+                  <select className="form-select mb-3">
+                    <option value="">Sắp xếp theo</option>
+                    <option value="moi">Mới nhất</option>
+                    <option value="xem">Xem nhiều</option>
+                    <option value="trend">Thịnh hành</option>
+                  </select>
+                </div>
+              </div>
         </div>
 
-        <div style={{ display: "flex", gap: 32 }}>
-          {/* Main content */}
-          <div style={{ flex: 3 }}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                gap: 24,
-              }}
-            >
+            <div className="row">
+              <div className="col-lg-8 col-12 col-md-8 order-2 order-lg-1">
+                <div className="articles-grid">
               {news.map((item) => (
                 <Link
+                      key={item.id} 
+                      className="article-card" 
                   href={`/news/${item.id}`}
-                  key={item.id}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <div
-                    style={{
-                      background: "#fff",
-                      borderRadius: 16,
-                      boxShadow: "0 2px 12px rgba(34,197,94,0.10)",
-                      border: "1.5px solid #e0fbe2",
-                      padding: 20,
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 32px rgba(34,197,94,0.18)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 12px rgba(34,197,94,0.10)";
-                    }}
-                  >
-                    <Image
-                      src={item.images?.[0] ?? "/images/thailan.jpeg"}
-                      alt={item.name}
-                      style={{
-                        width: "100%",
-                        height: 180,
-                        objectFit: "cover",
-                        borderRadius: 12,
-                        marginBottom: 16,
-                      }}
-                      width={400}
-                      height={180}
-                    />
-
-                    <h5
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "1.1rem",
-                        marginBottom: 8,
-                        lineHeight: 1.4,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
                     >
-                      {item.name || "Tin tức hấp dẫn từ Tạp Hóa Xanh"}
-                    </h5>
-                    <p
-                      style={{
-                        color: "#666",
-                        fontSize: 14,
-                        marginBottom: 12,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {item.description ||
-                        "Khám phá những thông tin thú vị về sản phẩm và dịch vụ của chúng tôi..."}
-                    </p>
-                    <div
-                      style={{
-                        color: "#888",
-                        fontSize: 13,
-                        marginTop: "auto",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                      }}
-                    >
-                      <span>📅 {item.date}</span>
-                      <span>👁️ {item.views} lượt xem</span>
-                      <span>⏱️ {item.readTime}</span>
+                      <div className="article-img">
+                        <Image 
+                          src={item.images?.[0] ?? "/images/food1.png"} 
+                          alt={item.name || "Hướng dẫn trung cấp về thực phẩm lành mạnh"}
+                          width={300}
+                          height={200}
+                        />
+                        <div className="article-tag">Món ăn kèm</div>
+                      </div>
+                      <div className="article-info">
+                        <div className="article-title">
+                          {item.name || "Hướng dẫn trung cấp về thực phẩm lành mạnh"}
+                        </div>
+                        <div className="article-meta">
+                          {item.date} · {item.views || "1,2k"} lượt xem · {item.readTime || "4 phút đọc"}
                     </div>
                   </div>
                 </Link>
@@ -166,239 +198,85 @@ export default function PostPage() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 24,
-            }}
-          >
-            {/* Danh mục */}
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 24,
-                border: "1.5px solid #e0fbe2",
-                boxShadow: "0 2px 8px rgba(34,197,94,0.05)",
-              }}
-            >
-              <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
-                Danh Mục
-              </h5>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🛒 Tin Khuyến Mãi
-                </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🆕 Sản Phẩm Mới
-                </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  💚 Sức Khỏe & Dinh Dưỡng
-                </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  🍽️ Ẩm Thực
-                </div>
-                <div
-                  style={{
-                    color: "#22c55e",
-                    padding: "8px 0",
-                    cursor: "pointer",
-                  }}
-                >
-                  🌟 Lifestyle
-                </div>
-              </div>
-            </div>
-
-            {/* Tin nổi bật */}
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 24,
-                border: "1.5px solid #e0fbe2",
-                boxShadow: "0 2px 8px rgba(34,197,94,0.05)",
-              }}
-            >
-              <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
-                Tin Nổi Bật
-              </h5>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                <div
-                  style={{
-                    padding: "12px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Khuyến mãi cuối tuần
+              <div className="col-lg-4 col-md-4 order-1 order-lg-2">
+                <div className="sidebar d-none d-lg-block">
+                  <div className="sidebar-box category-box">
+                    <div className="sidebar-title">Danh mục</div>
+                    <ul className="category-list">
+                      {categories.map((category) => (
+                        <li key={category.id}>
+                          <Link href={`/product?category=${category.id}`}>
+                            {category.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <span style={{ color: "#22c55e", fontWeight: 600 }}>
-                    Giảm đến 50%
-                  </span>
+                  
+                  <div className="sidebar-box trending-box">
+                    <div className="sidebar-title">Đang thịnh hành</div>
+                    <ul className="trending-list">
+                      {trendingProducts.map((product) => (
+                        <li key={product.id}>
+                          <Image 
+                            src={product.images?.[0] || "/images/trend1.png"} 
+                            alt={product.name} 
+                            width={60} 
+                            height={60} 
+                          />
+                          <div className="trend-info">
+                            <div className="trend-name">{product.name}</div>
+                            <div className="trend-price">
+                              {(product.price / 1000).toLocaleString('vi-VN')}.000đ
+                            </div>
                 </div>
-                <div
-                  style={{
-                    padding: "12px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Sản phẩm mới tháng 12
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <span style={{ color: "#22c55e", fontWeight: 600 }}>
-                    Đã có mặt
-                  </span>
+                  
+                  <div className="sidebar-box gallery-box">
+                    <div className="sidebar-title">Thư viện ảnh</div>
+                    <div className="gallery-list d-flex flex-wrap gap-2">
+                      {galleryImages.map((item) => (
+                        <Image 
+                          key={item.id}
+                          src={item.image} 
+                          alt={item.title} 
+                          width={80} 
+                          height={80} 
+                        />
+                      ))}
                 </div>
-                <div
-                  style={{
-                    padding: "12px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Chương trình tích điểm
                   </div>
-                  <span style={{ color: "#22c55e", fontWeight: 600 }}>
-                    Nhận quà ngay
+                  
+                  <div className="sidebar-box tags-box">
+                    <div className="sidebar-title">Thẻ phổ biến</div>
+                    <div className="tags-list d-flex flex-wrap gap-2">
+                      {tags.length > 0 ? (
+                        tags.map((tag, index) => (
+                          <span key={index} className="tag badge bg-light text-dark">
+                            {tag}
                   </span>
+                        ))
+                      ) : (
+                        <>
+                          <span className="tag badge bg-light text-dark">Bắp cải</span>
+                          <span className="tag badge bg-light text-dark">Bông cải xanh</span>
+                          <span className="tag badge bg-light text-dark">Sinh tố</span>
+                          <span className="tag badge bg-light text-dark">Trái cây</span>
+                          <span className="tag badge bg-light text-dark">Salad</span>
+                          <span className="tag badge bg-light text-dark">Khai vị</span>
+                        </>
+                      )}
                 </div>
-                <div style={{ padding: "12px 0" }}>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Giao hàng miễn phí
                   </div>
-                  <span style={{ color: "#22c55e", fontWeight: 600 }}>
-                    Đơn từ 200k
-                  </span>
                 </div>
-              </div>
-            </div>
-
-            {/* Thẻ phổ biến */}
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: 24,
-                border: "1.5px solid #e0fbe2",
-                boxShadow: "0 2px 8px rgba(34,197,94,0.05)",
-              }}
-            >
-              <h5 className="fw-bold mb-3" style={{ color: "#22c55e" }}>
-                Thẻ Phổ Biến
-              </h5>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Khuyến Mãi
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Sản Phẩm Mới
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Sức Khỏe
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Ẩm Thực
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Lifestyle
-                </span>
-                <span
-                  style={{
-                    background: "#e0fbe2",
-                    color: "#22c55e",
-                    borderRadius: 20,
-                    padding: "6px 16px",
-                    fontSize: 13,
-                    cursor: "pointer",
-                  }}
-                >
-                  Tạp Hóa
-                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </section>
   );
 }
