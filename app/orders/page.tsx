@@ -26,8 +26,11 @@ const getDisplayStatus = (order: Order) => {
   const payment =
     order.payments && order.payments.length > 0 ? order.payments[0] : null;
 
-  // Nếu có payment và trạng thái thanh toán là pending hoặc failed
+  // CHỈ hiển thị "Chưa thanh toán" khi:
+  // 1. Đơn hàng đang ở trạng thái PENDING (chưa được xác nhận)
+  // 2. Có payment và trạng thái thanh toán là pending hoặc failed
   if (
+    order.status === OrderStatus.PENDING &&
     payment &&
     (payment.status.toLowerCase() === "pending" ||
       payment.status.toLowerCase() === "failed")
@@ -35,7 +38,8 @@ const getDisplayStatus = (order: Order) => {
     return "Chưa thanh toán";
   }
 
-  // Ngược lại hiển thị theo trạng thái đơn hàng
+  // Với các trạng thái khác (CONFIRMED, DELIVERED, SUCCESS),
+  // luôn hiển thị theo trạng thái đơn hàng chính
   return (
     STATUS_LABELS.find((s) => s.key === order.status)?.label || order.status
   );
@@ -344,9 +348,9 @@ export default function OrdersPage() {
     }
   };
 
-  const handlePayment = async (orderId: number) => {
+  const handleRetryPayment = async (orderId: number) => {
     try {
-      const response = await api.post("/payment/create-payment", {
+      const response = await api.post("/payment/retry-payment", {
         orderId: orderId,
       });
 
@@ -354,11 +358,11 @@ export default function OrdersPage() {
       if (paymentUrl) {
         window.location.href = paymentUrl;
       } else {
-        toast.error("Không thể tạo link thanh toán. Vui lòng thử lại.");
+        toast.error("Không thể tạo lại link thanh toán. Vui lòng thử lại.");
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Có lỗi xảy ra khi tạo thanh toán. Vui lòng thử lại.");
+      console.error("Retry payment error:", error);
+      toast.error("Có lỗi xảy ra khi thử lại thanh toán. Vui lòng thử lại.");
     }
   };
 
@@ -447,22 +451,27 @@ export default function OrdersPage() {
     }
   };
 
-  // Kiểm tra có nên hiển thị nút "Thanh toán ngay" không
-  const shouldShowPaymentButton = (order: Order) => {
-    // Chỉ hiển thị nút thanh toán nếu:
-    // 1. Đơn hàng đang pending hoặc cancelled
-    // 2. Trạng thái thanh toán chưa thành công (không phải success)
-    // 3. Phương thức thanh toán là VNPay
+  // Kiểm tra có nên hiển thị nút "Thử lại thanh toán" không
+  const shouldShowRetryPaymentButton = (order: Order) => {
     const payment =
       order.payments && order.payments.length > 0 ? order.payments[0] : null;
-    const isPaymentNotSuccess =
-      !payment || payment.status.toLowerCase() !== "success";
-    const isPendingOrCancelled =
-      order.status === OrderStatus.PENDING ||
-      order.status === OrderStatus.CANCELLED;
-    const isVnPay = payment && payment.payment_method.toLowerCase() === "vnpay";
 
-    return isPendingOrCancelled && isPaymentNotSuccess && isVnPay;
+    // Hiển thị nút retry khi:
+    // 1. Có payment
+    // 2. Trạng thái thanh toán là failed hoặc pending
+    // 3. Đơn hàng chưa bị hủy
+    // 4. Phương thức thanh toán là VNPay
+    if (!payment || order.status === OrderStatus.CANCELLED) {
+      return false;
+    }
+
+    const isPaymentFailedOrPending =
+      payment.status.toLowerCase() === "failed" ||
+      payment.status.toLowerCase() === "pending";
+
+    const isVnPay = payment.payment_method.toLowerCase() === "vnpay";
+
+    return isPaymentFailedOrPending && isVnPay;
   };
 
   // Kiểm tra có thể mua lại không
@@ -676,11 +685,12 @@ export default function OrdersPage() {
                           >
                             {loadingDetails ? "Đang tải..." : "Xem chi tiết"}
                           </button>
-                          {shouldShowPaymentButton(order) && (
+                          {shouldShowRetryPaymentButton(order) && (
                             <button
                               className="btn btn-success btn-sm"
-                              onClick={() => handlePayment(order.id)}
+                              onClick={() => handleRetryPayment(order.id)}
                             >
+                              <i className="fas fa-redo me-1"></i>
                               Thanh toán
                             </button>
                           )}
@@ -1018,17 +1028,17 @@ export default function OrdersPage() {
                   )}
                 </div>
                 <div className="modal-footer">
-                  {shouldShowPaymentButton(selectedOrder) && (
+                  {shouldShowRetryPaymentButton(selectedOrder) && (
                     <button
                       type="button"
                       className="btn btn-success me-2"
                       onClick={() => {
-                        handlePayment(selectedOrder.id);
+                        handleRetryPayment(selectedOrder.id);
                         closeModal();
                       }}
                     >
-                      <i className="fas fa-credit-card me-1"></i>
-                      Thanh toán ngay
+                      <i className="fas fa-redo me-1"></i>
+                      Thanh toán
                     </button>
                   )}
                   {selectedOrder.status === OrderStatus.PENDING && (
