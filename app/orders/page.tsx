@@ -35,7 +35,7 @@ const getDisplayStatus = (order: Order) => {
     (payment.status.toLowerCase() === "pending" ||
       payment.status.toLowerCase() === "failed")
   ) {
-    return "Chưa thanh toán";
+    return "Chờ xử lý";
   }
 
   // Với các trạng thái khác (CONFIRMED, DELIVERED, SUCCESS),
@@ -64,7 +64,7 @@ const getPaymentStatusLabel = (status: string) => {
     case "success":
       return "Thành công";
     case "pending":
-      return "Chờ xử lý";
+      return "Chưa thanh toán";
     case "failed":
       return "Thất bại";
     case "cancelled":
