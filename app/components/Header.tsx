@@ -30,20 +30,19 @@ const Header = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.avatar-dropdown-container')) {
+      if (!target.closest(".avatar-dropdown-container")) {
         setShowDropdown(false);
       }
     };
 
     if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showDropdown]);
-
 
   // Hàm kiểm tra đăng nhập và chuyển hướng
   const handleProtectedRoute = (route: string) => {
@@ -60,11 +59,7 @@ const Header = () => {
             className="container d-flex align-items-center justify-content-between"
             style={{ gap: 0, minHeight: 70 }}
           >
-            {/* Logo + Tên */}
-            <div
-              className="d-flex align-items-center gap-2"
-              style={{ minWidth: 220 }}
-            >
+            <div className="d-flex align-items-center gap-2">
               <Link
                 className="navbar-brand d-flex align-items-center gap-2 p-0 m-0"
                 href="/"
@@ -202,7 +197,7 @@ const Header = () => {
               </button>
               {profile ? (
                 <div className="avatar-dropdown-container">
-                  <div 
+                  <div
                     className="avatar-trigger"
                     onClick={() => setShowDropdown(!showDropdown)}
                   >
@@ -215,8 +210,8 @@ const Header = () => {
                   </div>
                   {showDropdown && (
                     <div className="avatar-dropdown-menu">
-                      <Link 
-                        href="/profile" 
+                      <Link
+                        href="/profile"
                         className="dropdown-item"
                         onClick={() => setShowDropdown(false)}
                       >

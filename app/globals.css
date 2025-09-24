@@ -2871,3 +2871,24 @@ a:hover,
     width: 100%;
   }
 }
+
+.cart-scroll-voucher {
+  max-height: 360px;
+  overflow-y: scroll;
+  padding-right: 10px;
+}
+
+/* Custom scrollbar */
+.cart-scroll-voucher::-webkit-scrollbar {
+  display: inherit !important;
+  width: 6px;
+}
+
+.cart-scroll-voucher::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.cart-scroll-voucher::-webkit-scrollbar-track {
+  background: transparent;
+}

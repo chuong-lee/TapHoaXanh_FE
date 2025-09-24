@@ -31,7 +31,7 @@ export default function ContactUs() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("contact", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -253,7 +253,7 @@ export default function ContactUs() {
               <div className="fw-bold mb-2" style={{ color: "#22c55e" }}>
                 Email
               </div>
-              <div className="text-muted">contact@taphoxanh.com</div>
+              <div className="text-muted">contact@taphoaxanh.com</div>
             </div>
           </div>
         </div>

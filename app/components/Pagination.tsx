@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
 interface PaginationProps {
-  currentPage: number
-  totalItems: number
-  itemsPerPage: number
-  onPageChange: (page: number) => void
-  maxPagesToShow?: number // tuỳ chọn: số nút phân trang hiển thị (default 5)
+  currentPage: number;
+  totalItems: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  maxPagesToShow?: number; // tuỳ chọn: số nút phân trang hiển thị (default 5)
 }
 
 export default function Pagination({
@@ -15,25 +15,25 @@ export default function Pagination({
   onPageChange,
   maxPagesToShow = 5,
 }: PaginationProps) {
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
-  if (totalPages <= 1) return null
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  if (totalPages <= 1) return null;
 
   // Hiển thị phân trang dạng ... 4 5 6 7 8 ...
-  let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2))
-  let endPage = startPage + maxPagesToShow - 1
+  let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+  let endPage = startPage + maxPagesToShow - 1;
   if (endPage > totalPages) {
-    endPage = totalPages
-    startPage = Math.max(1, endPage - maxPagesToShow + 1)
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - maxPagesToShow + 1);
   }
-  const pages = []
+  const pages = [];
   for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
+    pages.push(i);
   }
 
   return (
     <nav>
       <ul className="pagination justify-content-center">
-        <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+        <li className={`page-item${currentPage === 1 ? " disabled" : ""}`}>
           <button
             className="page-link"
             onClick={() => onPageChange(currentPage - 1)}
@@ -44,14 +44,16 @@ export default function Pagination({
         </li>
         {startPage > 1 && (
           <li className="page-item">
-            <button className="page-link" onClick={() => onPageChange(1)}>1</button>
+            <button className="page-link" onClick={() => onPageChange(1)}>
+              1
+            </button>
             {startPage > 2 && <span className="page-link disabled">...</span>}
           </li>
         )}
         {pages.map((page) => (
           <li
             key={page}
-            className={`page-item${currentPage === page ? ' active' : ''}`}
+            className={`page-item${currentPage === page ? " active" : ""}`}
           >
             <button className="page-link" onClick={() => onPageChange(page)}>
               {page}
@@ -60,11 +62,22 @@ export default function Pagination({
         ))}
         {endPage < totalPages && (
           <li className="page-item">
-            {endPage < totalPages - 1 && <span className="page-link disabled">...</span>}
-            <button className="page-link" onClick={() => onPageChange(totalPages)}>{totalPages}</button>
+            {endPage < totalPages - 1 && (
+              <span className="page-link disabled">...</span>
+            )}
+            <button
+              className="page-link"
+              onClick={() => onPageChange(totalPages)}
+            >
+              {totalPages}
+            </button>
           </li>
         )}
-        <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+        <li
+          className={`page-item${
+            currentPage === totalPages ? " disabled" : ""
+          }`}
+        >
           <button
             className="page-link"
             onClick={() => onPageChange(currentPage + 1)}
@@ -75,5 +88,5 @@ export default function Pagination({
         </li>
       </ul>
     </nav>
-  )
+  );
 }

@@ -33,6 +33,7 @@ function CheckoutPage() {
 
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [showAllVouchers, setShowAllVouchers] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -92,6 +93,23 @@ function CheckoutPage() {
     fetchVouchers();
   }, []);
 
+  // Load selected voucher from localStorage
+  useEffect(() => {
+    const savedVoucher = localStorage.getItem("selected_voucher");
+    if (savedVoucher) {
+      try {
+        const parsedVoucher = JSON.parse(savedVoucher);
+        setSelectedVoucher(parsedVoucher);
+      } catch (error) {
+        console.error(
+          "Error parsing selected_voucher from localStorage:",
+          error
+        );
+        setSelectedVoucher(null);
+      }
+    }
+  }, []);
+
   // Load addresses
   useEffect(() => {
     const loadAddresses = async () => {
@@ -126,22 +144,44 @@ function CheckoutPage() {
         }, 0)
     : 0;
 
-  let discount = 0;
-  if (
-    selectedVoucher &&
-    subtotal >= selectedVoucher.min_order_value &&
-    selectedVoucher.value
-  ) {
-    if (selectedVoucher.type === "PERCENTAGE") {
+  // Tính toán discount dựa trên voucher được chọn (sử dụng cùng logic với cart)
+  const calculateDiscount = (
+    voucher: Voucher | null,
+    orderValue: number
+  ): number => {
+    if (!voucher) return 0;
+
+    // Kiểm tra điều kiện tối thiểu đơn hàng
+    if (orderValue < voucher.min_order_value) return 0;
+
+    // Kiểm tra voucher có còn hiệu lực không
+    const now = new Date();
+    const startDate = new Date(voucher.start_date);
+    const endDate = new Date(voucher.end_date);
+
+    if (now < startDate || now > endDate) return 0;
+
+    // Kiểm tra số lượng voucher còn lại
+    if (voucher.quantity <= 0) return 0;
+
+    // Xử lý các loại voucher khác nhau
+    if (voucher.type === "PERCENTAGE" && voucher.value) {
       // Giảm theo phần trăm
-      const calculatedDiscount = subtotal * (selectedVoucher.value / 100);
-      discount = Math.min(selectedVoucher.max_discount, calculatedDiscount);
-    } else if (selectedVoucher.type === "NORMAL") {
+      const calculatedDiscount = orderValue * (voucher.value / 100);
+      return Math.min(voucher.max_discount, calculatedDiscount);
+    } else if (voucher.type === "NORMAL" && voucher.value) {
       // Giảm theo số tiền cố định
-      discount = Math.min(selectedVoucher.max_discount, selectedVoucher.value);
+      return Math.min(voucher.max_discount, voucher.value);
+    } else if (voucher.type === null && voucher.value === null) {
+      // Voucher miễn phí ship hoặc giảm giá cố định theo max_discount
+      return voucher.max_discount;
     }
-  }
-  const total = subtotal - discount;
+
+    return 0;
+  };
+
+  const discount = calculateDiscount(selectedVoucher, subtotal);
+  const total = Math.max(0, subtotal - discount);
 
   // Tự động chuyển về COD nếu đang chọn VNPay mà tổng tiền < 5,000đ
   useEffect(() => {
@@ -203,6 +243,8 @@ function CheckoutPage() {
       // Chỉ xóa những cart items đã được thanh toán (COD)
       removeMultipleFromCart(selectedItems);
       localStorage.removeItem("cart_selected");
+      // Xóa voucher đã sử dụng
+      localStorage.removeItem("selected_voucher");
 
       // Chuyển về trang chủ sau khi xử lý xong
       setTimeout(() => {
@@ -464,12 +506,14 @@ function CheckoutPage() {
                         {subtotal.toLocaleString("vi-VN")}₫
                       </td>
                     </tr>
-                    <tr>
-                      <td>Giảm giá voucher</td>
-                      <td className="text-end">
-                        -{discount.toLocaleString("vi-VN")}₫
-                      </td>
-                    </tr>
+                    {discount > 0 && (
+                      <tr>
+                        <td>Giảm giá voucher ({selectedVoucher?.code})</td>
+                        <td className="text-end text-success">
+                          -{discount.toLocaleString("vi-VN")}₫
+                        </td>
+                      </tr>
+                    )}
                     <tr>
                       <td>
                         <b>Tổng cộng</b>
@@ -484,39 +528,88 @@ function CheckoutPage() {
                 </table>
                 <div className="mb-3">
                   <label className="fw-bold mb-2">Mã giảm giá</label>
-                  <div className="d-flex align-items-center mb-3">
-                    <div className="d-flex align-items-center gap-2 flex-wrap">
-                      {vouchers.map((voucher) => (
-                        <div
-                          onClick={() => setSelectedVoucher(voucher)}
-                          className={`badge ${
-                            voucher.id === selectedVoucher?.id
-                              ? ""
-                              : "badge-foreground"
-                          }`}
-                          key={voucher.id}
-                        >
-                          {voucher.code}
-                        </div>
-                      ))}
-
-                      {/* {selectedProductVoucher && (
-                        <div className="badge bg-success me-1">
-                          Sản phẩm: {selectedProductVoucher}
+                  {selectedVoucher ? (
+                    <div className="p-2 bg-success bg-opacity-10 border border-success rounded mb-3">
+                      <div className="fw-bold text-success">
+                        Voucher đã chọn: {selectedVoucher.code}
+                      </div>
+                      <div className="small text-success">
+                        {selectedVoucher.type === "PERCENTAGE" &&
+                        selectedVoucher.value
+                          ? `Giảm ${
+                              selectedVoucher.value
+                            }% (tối đa ${selectedVoucher.max_discount.toLocaleString()}₫)`
+                          : selectedVoucher.type === "NORMAL" &&
+                            selectedVoucher.value
+                          ? `Giảm ${selectedVoucher.value.toLocaleString()}₫`
+                          : `Giảm ${selectedVoucher.max_discount.toLocaleString()}₫`}
+                      </div>
+                      <div className="small text-success">
+                        Đơn tối thiểu:{" "}
+                        {selectedVoucher.min_order_value.toLocaleString()}₫
+                      </div>
+                      <button
+                        className="btn btn-sm btn-outline-danger mt-2"
+                        onClick={() => setSelectedVoucher(null)}
+                      >
+                        Bỏ chọn voucher
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="d-flex align-items-center mb-3">
+                      <div
+                        className="d-flex align-items-center gap-2 flex-wrap"
+                        style={{
+                          maxHeight: showAllVouchers ? "none" : "200px",
+                          overflowY: showAllVouchers ? "visible" : "auto",
+                        }}
+                      >
+                        {(showAllVouchers
+                          ? vouchers
+                          : vouchers.slice(0, 5)
+                        ).map((voucherItem) => (
+                          <div
+                            onClick={() => setSelectedVoucher(voucherItem)}
+                            className={`badge ${
+                              selectedVoucher &&
+                              (selectedVoucher as Voucher).id === voucherItem.id
+                                ? "bg-primary"
+                                : "bg-secondary"
+                            }`}
+                            key={voucherItem.id}
+                          >
+                            {voucherItem.code}
+                          </div>
+                        ))}
+                      </div>
+                      {/* Nút hiển thị tất cả voucher nếu có nhiều hơn 5 voucher */}
+                      {vouchers.length > 5 && !showAllVouchers && (
+                        <div className="text-center my-2">
+                          <button
+                            className="btn btn-link"
+                            style={{ textDecoration: "none", fontWeight: 500 }}
+                            onClick={() => setShowAllVouchers(true)}
+                          >
+                            Xem thêm {vouchers.length - 5} voucher khác{" "}
+                            <span style={{ fontSize: "1.2em" }}>&#8595;</span>
+                          </button>
                         </div>
                       )}
-                      {selectedShippingVoucher && (
-                        <div className="badge bg-info">
-                          Vận chuyển: {selectedShippingVoucher}
+                      {/* Nút thu gọn nếu đã mở rộng */}
+                      {vouchers.length > 5 && showAllVouchers && (
+                        <div className="text-center my-2">
+                          <button
+                            className="btn btn-link"
+                            style={{ textDecoration: "none", fontWeight: 500 }}
+                            onClick={() => setShowAllVouchers(false)}
+                          >
+                            Thu gọn{" "}
+                            <span style={{ fontSize: "1.2em" }}>&#8593;</span>
+                          </button>
                         </div>
-                      )} */}
-                      {/* {!(selectedProductVoucher || selectedShippingVoucher) && (
-                        <span className="text-muted">
-                          Chưa chọn mã giảm giá
-                        </span>
-                      )} */}
+                      )}
                     </div>
-                  </div>
+                  )}
 
                   {!isFormInfoComplete() ? (
                     <div className="alert alert-warning">

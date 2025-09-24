@@ -32,19 +32,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Kiểm tra biến môi trường
+    if (
+      !process.env.EMAIL_USER ||
+      !process.env.EMAIL_PASS ||
+      !process.env.CONTACT_EMAIL
+    ) {
+      console.error("Thiếu cấu hình email trong biến môi trường");
+      return NextResponse.json(
+        {
+          error:
+            "Cấu hình email chưa được thiết lập. Vui lòng kiểm tra EMAIL_USER, EMAIL_PASS và CONTACT_EMAIL",
+        },
+        { status: 500 }
+      );
+    }
+
     // Tạo transporter (sử dụng Gmail SMTP)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // Email gửi
-        pass: process.env.EMAIL_PASS, // App password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
+    // Verify transporter configuration
+    try {
+      await transporter.verify();
+    } catch (error) {
+      console.error("Lỗi cấu hình email transporter:", error);
+      return NextResponse.json(
+        {
+          error:
+            "Cấu hình email không đúng. Vui lòng kiểm tra EMAIL_USER và EMAIL_PASS.",
+        },
+        { status: 500 }
+      );
+    }
+
     // Nội dung email
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: process.env.CONTACT_EMAIL || process.env.EMAIL_USER, // Email nhận
+      from: process.env.EMAIL_USER, // Gửi từ email của bạn
+      to: process.env.CONTACT_EMAIL, // Email nhận của bạn
       subject: `[Tạp Hóa Xanh] Liên hệ từ khách hàng: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -86,6 +116,29 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Lỗi gửi email:", error);
+
+    // Kiểm tra loại lỗi cụ thể
+    if (error instanceof Error) {
+      if (error.message.includes("Invalid login")) {
+        return NextResponse.json(
+          {
+            error:
+              "Cấu hình email không đúng. Vui lòng kiểm tra EMAIL_USER và EMAIL_PASS.",
+          },
+          { status: 500 }
+        );
+      }
+      if (error.message.includes("ENOTFOUND")) {
+        return NextResponse.json(
+          {
+            error:
+              "Không thể kết nối đến server email. Vui lòng kiểm tra kết nối mạng.",
+          },
+          { status: 500 }
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau." },
       { status: 500 }

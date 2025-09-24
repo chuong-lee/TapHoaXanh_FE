@@ -57,25 +57,49 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       quantity: quantity,
     });
 
-    // Fetch updated cart from database to get correct IDs
-    await fetchCart();
-  };
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex(
+        (item) => item.product.id === product.id
+      );
 
-  const removeFromCart = async (cartItemId: number) => {
-    await api.delete(`/cart-item/${cartItemId}`);
+      let updatedCart;
+      if (existingIndex !== -1) {
+        updatedCart = [...prevCart];
+        updatedCart[existingIndex].quantity += quantity;
+        updatedCart[existingIndex].total_price =
+          updatedCart[existingIndex].quantity *
+          (product.price - product.discount);
+      } else {
+        updatedCart = [
+          ...prevCart,
+          {
+            id: Date.now(),
+            product,
+            quantity,
+            total_price: quantity * (product.price - product.discount),
+            slug: product.slug,
+          } as CartItem,
+        ];
+      }
 
-    // Fetch updated cart from database
-    await fetchCart();
-  };
-
-  const removeMultipleFromCart = async (cartItemIds: number[]) => {
-    // Remove multiple cart items by their database IDs
-    await api.delete("/cart-item", {
-      data: { ids: cartItemIds },
+      return updatedCart;
     });
 
-    // Fetch updated cart from database
     await fetchCart();
+  };
+
+  const removeFromCart = async (newId: number) => {
+    const updatedCart = cart.filter((item) => !(item.product.id === newId));
+
+    await api.put("/cart/update", { productIds: newId, action: "remove" });
+    setCart(updatedCart);
+    localStorage.setItem("cart_selected", JSON.stringify(updatedCart));
+  };
+
+  const removeMultipleFromCart = async (newId: number[]) => {
+    const updatedCart = cart.filter((item) => !newId.includes(item.id));
+    setCart(updatedCart);
+    localStorage.setItem("cart_selected", JSON.stringify(updatedCart));
   };
 
   const updateQuantity = (
@@ -83,30 +107,38 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     action: CartAction,
     quantity?: number
   ) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.product.id === id
-          ? {
-              ...item,
-              quantity:
-                action === "increase"
-                  ? item.quantity + 1
-                  : action === "decrease"
-                  ? item.quantity - 1
-                  : item.quantity,
-            }
-          : item
-      )
-    );
+    setCart(function (prev) {
+      return prev.map(function (item) {
+        if (item.product.id === id) {
+          if (action === "increase") {
+            item.quantity += 1;
+          } else if (action === "decrease") {
+            item.quantity -= 1;
+          } else {
+            item.quantity = quantity || item.quantity;
+          }
+
+          return {
+            ...item,
+          };
+        } else {
+          return item;
+        }
+      });
+    });
 
     debouncedUpdate(id, quantity);
   };
 
   async function fetchCart() {
-    const res = await api.get<Cart>("/cart/owned");
-    setCart(res.data.cartItems);
+    try {
+      const res = await api.get<Cart>("/cart/owned");
+      setCart(res.data.cartItems);
 
-    return res.data;
+      return res.data;
+    } finally {
+      setIsCartLoading(false);
+    }
   }
 
   useEffect(() => {
