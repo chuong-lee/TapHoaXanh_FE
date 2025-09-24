@@ -17,6 +17,7 @@ export default function ProfilePage() {
     email: profile?.email || "",
     image: profile?.image || "",
   });
+  console.log("form", form);
   const updateLoadingRef = useRef(false);
   const updateSuccessRef = useRef<string | null>(null);
   const updateErrorRef = useRef<string | null>(null);
@@ -138,10 +139,11 @@ export default function ProfilePage() {
           name: profile.name,
           phone: profile.phone,
           email: profile.email,
-          image: result.imageUrl,
+          image: result.image,
         };
+
         setProfile(updatedProfile);
-        setForm((prev) => ({ ...prev, image: result.imageUrl }));
+        refreshProfile();
       }
 
       avatarSuccessRef.current = result.message;

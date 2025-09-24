@@ -15,7 +15,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
-  const { refreshProfile } = useAuth();
+  const { initAuth } = useAuth();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ function LoginForm() {
 
       if (refresh_token) localStorage.setItem("refresh_token", refresh_token);
 
-      await refreshProfile();
+      await initAuth();
       router.push(redirectTo);
     } catch (error: unknown) {
       handleError(error);

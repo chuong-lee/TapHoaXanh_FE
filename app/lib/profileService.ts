@@ -35,31 +35,16 @@ export const profileService = {
   },
   uploadAvatar: async (
     file: File
-  ): Promise<{ imageUrl: string; message: string }> => {
+  ): Promise<{ image: string; message: string }> => {
     const formData = new FormData();
     formData.append("avatar", file);
 
-    const res = await fetch("/users/avatar", {
-      method: "POST",
-      body: formData,
+    const res = await api.post("/users/avatar", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
 
-    if (!res.ok) {
-      throw new Error("Upload không thành công");
-    }
-
-    const result = await res.json();
-
-    // Sau khi upload thành công, cập nhật profile với avatar mới
-    if (result.imageUrl) {
-      try {
-        await api.put("/users", { image: result.imageUrl });
-      } catch (error) {
-        console.error("Lỗi khi cập nhật profile:", error);
-        return result;
-      }
-    }
-
-    return result;
+    return res.data;
   },
 };
