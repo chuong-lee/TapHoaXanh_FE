@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import api from "@/lib/axios";
 import SidebarFilter from "@/components/SidebarFilter";
+import debounce from "lodash.debounce";
+import Pagination from "@/components/Pagination";
 
 type Product = {
   id: number;
@@ -23,23 +25,28 @@ type Product = {
 };
 
 export default function ProductListPage() {
+  const itemsPerPage = 8;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const [products, setProducts] = useState<Product[]>([]);
+  const [originalFilteredProducts, setOriginalFilteredProducts] = useState<
+    Product[]
+  >([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [maxPrice, setMaxPrice] = useState(1000000);
+  const [_maxPrice, setMaxPrice] = useState(1000000);
 
-  // State cho show và sort
-  const [show, setShow] = useState(12);
-  const [sort, setSort] = useState("price-asc");
+  const [sort, setSort] = useState("default");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await api.get("/products");
         const productsData = Array.isArray(res.data) ? res.data : [];
-        console.log("Products data:", productsData); // Debug log
+
         setProducts(productsData);
+        setOriginalFilteredProducts(productsData);
         setFilteredProducts(productsData);
       } catch (err) {
         console.error("Lỗi khi tải sản phẩm:", err);
@@ -52,50 +59,53 @@ export default function ProductListPage() {
     fetchData();
   }, []);
 
-  // Xử lý lọc theo danh mục
-  const handleCategoryChange = (categoryId: number | null) => {
-    setSelectedCategory(categoryId);
-    filterProducts(categoryId, maxPrice);
-  };
+  const handleCategoryChange = async (categoryId: number | null) => {
+    if (categoryId) {
+      const res = await api.get(`/products/search?categoryId=${categoryId}`);
+      const productFilteredByCategory = res.data || [];
+      setSelectedCategory(categoryId);
 
-  // Lọc sản phẩm theo danh mục và giá
-  const filterProducts = (categoryId: number | null, price: number) => {
-    let filtered = products;
-    if (categoryId !== null) {
-      filtered = filtered.filter(
-        (product) =>
-          product.category?.id === categoryId ||
-          product.categoryId === categoryId
-      );
+      setFilteredProducts(productFilteredByCategory.data);
+      setOriginalFilteredProducts(productFilteredByCategory.data);
+    } else {
+      setFilteredProducts(products);
     }
-    filtered = filtered.filter((product) => product.price <= price);
-    setFilteredProducts(filtered);
+    // filterProducts(categoryId, maxPrice);
   };
 
   // Xử lý lọc theo giá
-  const handlePriceChange = (price: number) => {
+  const handlePriceChange = async (price: number) => {
     setMaxPrice(price);
-    filterProducts(selectedCategory, price);
+    // filterProducts(selectedCategory, price);
+    const { data } = await api.get(`/products/search?minPrice=${price}`);
+    const { data: productData } = data;
+    setFilteredProducts(productData);
   };
 
-  // Hàm sắp xếp sản phẩm
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sort === "price-asc") return a.price - b.price;
-    if (sort === "price-desc") return b.price - a.price;
-    if (sort === "name-asc") return a.name.localeCompare(b.name);
-    if (sort === "name-desc") return b.name.localeCompare(a.name);
-    return 0;
-  });
+  const debouncedFetchProducts = debounce((price: number) => {
+    handlePriceChange(price);
+  }, 500);
 
-  // Lấy tên danh mục đang được chọn
-  const getSelectedCategoryName = () => {
-    if (!selectedCategory) return null;
-    const product = products.find(
-      (p) =>
-        p.category?.id === selectedCategory || p.categoryId === selectedCategory
-    );
-    return product?.category?.name || "Đang tải...";
+  const handleSortChange = async (sort: string) => {
+    if (sort) {
+      const sortedProducts = [...filteredProducts].sort((a, b) => {
+        if (sort === "price-asc") return a.price - b.price;
+        if (sort === "price-desc") return b.price - a.price;
+        if (sort === "name-asc") return a.name.localeCompare(b.name);
+        if (sort === "name-desc") return b.name.localeCompare(a.name);
+        return 0;
+      });
+
+      setFilteredProducts(sortedProducts);
+    } else {
+      setFilteredProducts(originalFilteredProducts);
+    }
   };
+
+  useEffect(() => {
+    handleSortChange(sort);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort]);
 
   return (
     <main className="main-content">
@@ -105,7 +115,7 @@ export default function ProductListPage() {
           <div className="col-md-3">
             <SidebarFilter
               onCategoryChange={handleCategoryChange}
-              onPriceChange={handlePriceChange}
+              onPriceChange={debouncedFetchProducts}
             />
           </div>
           {/* Product grid */}
@@ -117,20 +127,20 @@ export default function ProductListPage() {
                   <>
                     Danh mục:{" "}
                     <span style={{ color: "#22c55e" }}>
-                      {getSelectedCategoryName() || "Đang tải..."}
+                      {filteredProducts.slice(0, itemsPerPage).length}
                     </span>
                   </>
                 ) : (
                   <>
                     Tất cả sản phẩm:{" "}
                     <span style={{ color: "#e11d48" }}>
-                      {filteredProducts.length}
+                      {filteredProducts.slice(0, itemsPerPage).length}
                     </span>
                   </>
                 )}
               </h2>
               <div className="d-flex align-items-center" style={{ gap: 16 }}>
-                <label className="me-2" htmlFor="showSelect">
+                {/* <label className="me-2" htmlFor="showSelect">
                   Hiển thị:
                 </label>
                 <select
@@ -144,7 +154,7 @@ export default function ProductListPage() {
                       {num}
                     </option>
                   ))}
-                </select>
+                </select> */}
                 <label className="ms-3 me-2" htmlFor="sortSelect">
                   Sắp xếp theo:
                 </label>
@@ -154,6 +164,7 @@ export default function ProductListPage() {
                   onChange={(e) => setSort(e.target.value)}
                   style={{ borderRadius: 6, padding: "2px 8px" }}
                 >
+                  <option value="default">Mặc định</option>
                   <option value="price-asc">Giá: Thấp đến Cao</option>
                   <option value="price-desc">Giá: Cao đến Thấp</option>
                   <option value="name-asc">Tên: A-Z</option>
@@ -201,14 +212,19 @@ export default function ProductListPage() {
               </div>
             ) : (
               <div className="row g-4">
-                {sortedProducts.slice(0, show).map((product) => (
-                  <div
-                    className="col-12 col-sm-6 col-md-4 col-lg-3"
-                    key={product.id}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+                {filteredProducts
+                  .slice(
+                    currentPage > 1 ? (currentPage - 1) * itemsPerPage : 0,
+                    itemsPerPage * currentPage
+                  )
+                  .map((product) => (
+                    <div
+                      className="col-12 col-sm-6 col-md-4 col-lg-3"
+                      key={product.id}
+                    >
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
               </div>
             )}
 
@@ -216,12 +232,19 @@ export default function ProductListPage() {
             {!loading && filteredProducts.length > 0 && (
               <div className="text-center mt-4">
                 <p className="text-muted">
-                  Hiển thị {Math.min(show, sortedProducts.length)} trong tổng số{" "}
-                  {filteredProducts.length} sản phẩm
+                  Hiển thị {Math.min(itemsPerPage, filteredProducts.length)}{" "}
+                  trong tổng số {filteredProducts.length} sản phẩm
                   {selectedCategory && " trong danh mục này"}
                 </p>
               </div>
             )}
+
+            <Pagination
+              currentPage={currentPage || 1}
+              totalItems={products.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>

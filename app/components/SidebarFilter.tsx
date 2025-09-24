@@ -20,12 +20,32 @@ export default function SidebarFilter({
   const [categories, setCategories] = useState<Category[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [price, setPrice] = useState(1000000);
-  console.log("selected", selected);
+  function mergeCategoryWithCount(
+    categories: Category[],
+    counts: { categoryId: number; categoryName: string; count: string }[]
+  ): (Category & { count?: number })[] {
+    const countMap = new Map<number, number>();
+
+    counts.forEach((c) => {
+      if (c.categoryId != null) {
+        countMap.set(c.categoryId, Number(c.count));
+      }
+    });
+
+    return categories.map((cat) => ({
+      ...cat,
+      count: countMap.get(cat.id) ?? 0,
+    }));
+  }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await api.get("/categories");
-        setCategories(Array.isArray(res.data) ? res.data : []);
+        const categoryCountRes = await api.get("/products/search");
+        const { meta } = categoryCountRes.data;
+        const categoryCounts = meta.categoryCounts;
+        mergeCategoryWithCount(res.data, categoryCounts);
+        setCategories(mergeCategoryWithCount(res.data, categoryCounts));
       } catch {
         setCategories([]);
       }
@@ -35,6 +55,7 @@ export default function SidebarFilter({
 
   const handleCategoryChange = (categoryId: number | null) => {
     setSelected(categoryId);
+
     if (onCategoryChange) {
       onCategoryChange(categoryId);
     }
@@ -42,6 +63,9 @@ export default function SidebarFilter({
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
+
+    // const res = await api.get("/products/search?minPrice=12000");
+    // setCategories(Array.isArray(res.data) ? res.data : []);
     setPrice(value);
     if (onPriceChange) onPriceChange(value);
   };
