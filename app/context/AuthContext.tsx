@@ -16,6 +16,7 @@ interface AuthContextType {
   address: Address[];
   profile: ProfileDto | null;
   setProfile: React.Dispatch<React.SetStateAction<ProfileDto | null>>;
+  initAuth: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -28,7 +29,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [profile, setProfile] = useState<ProfileDto | null>(null);
   const [address, setAddress] = useState<Address[]>([]);
-  const refreshProfile = useCallback(async () => {
+
+  const initAuth = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await profileService.getProfile();
@@ -45,15 +47,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    try {
+      const data = await profileService.getProfile();
+      const addressData = await profileService.getAddress();
+
+      setAddress(addressData);
+      setProfile(data);
+    } catch {
+      setProfile(null);
+    }
+  }, []);
+
   useEffect(() => {
     if (localStorage.getItem("access_token")) {
-      refreshProfile();
+      initAuth();
     } else {
       setTimeout(() => {
         setIsLoading(false);
       }, 500);
     }
-  }, [refreshProfile]);
+  }, [initAuth]);
 
   useEffect(() => {
     if (profile) {
@@ -77,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ address, profile, setProfile, refreshProfile }}
+      value={{ address, profile, setProfile, initAuth, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>
